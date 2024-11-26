@@ -1,0 +1,18 @@
+Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Size,Build Seconds
+"/home/gux/monogame-game/monogame/Content/../../../Desktop/donutsprite.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/donutsprite.xnb","TextureProcessor","Texture2DContent",33002,147541,0.1005765
+"/home/gux/monogame-game/monogame/Content/angrydonut.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/angrydonut.xnb","TextureProcessor","Texture2DContent",1634334,36000085,0.6857494
+"/home/gux/monogame-game/monogame/Content/ball.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/ball.xnb","TextureProcessor","Texture2DContent",8368,16469,0.0885307
+"/home/gux/monogame-game/monogame/Content/charaset.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/charaset.xnb","TextureProcessor","Texture2DContent",5470,147541,0.0901322
+"/home/gux/monogame-game/monogame/Content/DefaultFont1.spritefont","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/DefaultFont1.xnb","FontDescriptionProcessor","SpriteFontContent",465,37922,0.110705
+"/home/gux/monogame-game/monogame/Content/donutsmol.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/donutsmol.xnb","TextureProcessor","Texture2DContent",64599,379541,0.0997255
+"/home/gux/monogame-game/monogame/Content/donutsprite.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/donutsprite.xnb","TextureProcessor","Texture2DContent",25813,4000085,0.1021934
+"/home/gux/monogame-game/monogame/Content/donutsprite2.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/donutsprite2.xnb","TextureProcessor","Texture2DContent",33002,147541,0.010223
+"/home/gux/monogame-game/monogame/Content/donutsprite3.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/donutsprite3.xnb","TextureProcessor","Texture2DContent",30570,147541,0.0054299
+"/home/gux/monogame-game/monogame/Content/donutsprite4.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/donutsprite4.xnb","TextureProcessor","Texture2DContent",31329,589909,0.0126508
+"/home/gux/monogame-game/monogame/Content/donutsprite5.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/donutsprite5.xnb","TextureProcessor","Texture2DContent",31332,589909,0.0136637
+"/home/gux/monogame-game/monogame/Content/donutsprite6.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/donutsprite6.xnb","TextureProcessor","Texture2DContent",40432,589909,0.0143771
+"/home/gux/monogame-game/monogame/Content/donutsprite7.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/donutsprite7.xnb","TextureProcessor","Texture2DContent",54819,589909,0.0147794
+"/home/gux/monogame-game/monogame/Content/donutsprite8.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/donutsprite8.xnb","TextureProcessor","Texture2DContent",68973,589909,0.0161873
+"/home/gux/monogame-game/monogame/Content/donutsprite9.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/donutsprite9.xnb","TextureProcessor","Texture2DContent",68305,589909,0.0156672
+"/home/gux/monogame-game/monogame/Content/donutsss.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/donutsss.xnb","TextureProcessor","Texture2DContent",768026,12960085,0.1939808
+"/home/gux/monogame-game/monogame/Content/nachofrontstant1.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/nachofrontstant1.xnb","TextureProcessor","Texture2DContent",10573,160085,0.0051352

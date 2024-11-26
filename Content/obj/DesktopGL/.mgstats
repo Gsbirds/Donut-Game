@@ -1,0 +1,3 @@
+Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Size,Build Seconds
+"/home/gux/monogame-game/monogame/Content/ball.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/ball.xnb","TextureProcessor","Texture2DContent",8368,16469,0.1025841
+"/home/gux/monogame-game/monogame/Content/donutsprite.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/donutsprite.xnb","TextureProcessor","Texture2DContent",25813,4000085,0.2694211
