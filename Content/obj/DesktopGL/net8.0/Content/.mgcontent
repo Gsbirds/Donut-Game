@@ -8,6 +8,7 @@
     <File>/home/gux/monogame-game/monogame/Content/angrydonut.png</File>
     <File>/home/gux/monogame-game/monogame/Content/ball.png</File>
     <File>/home/gux/monogame-game/monogame/Content/charaset.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/cheeselaunch.png</File>
     <File>/home/gux/monogame-game/monogame/Content/DefaultFont1.spritefont</File>
     <File>/home/gux/monogame-game/monogame/Content/donutsmol.png</File>
     <File>/home/gux/monogame-game/monogame/Content/donutsprite.png</File>
@@ -21,9 +22,14 @@
     <File>/home/gux/monogame-game/monogame/Content/donutsprite9.png</File>
     <File>/home/gux/monogame-game/monogame/Content/donutsss.png</File>
     <File>/home/gux/monogame-game/monogame/Content/nachofrontstant1.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/nachofrontstant2.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/openmountnacho2.png</File>
   </SourceFiles>
   <DestFiles>
     <File>donutsprite.png</File>
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />

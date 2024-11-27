@@ -39,3 +39,7 @@
 /home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/donutsprite9.xnb
 /home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/nachofrontstant1.xnb
 /home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/DefaultFont1.xnb
+/home/gux/monogame-game/monogame/obj/Debug/net8.0/monogame.sourcelink.json
+/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/cheeselaunch.xnb
+/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/nachofrontstant2.xnb
+/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/openmountnacho2.xnb

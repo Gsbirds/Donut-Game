@@ -10,11 +10,13 @@ public class Game1 : Game
     Texture2D charaset;
     Texture2D nacho;
     Vector2 ballPosition;
+    Texture2D cheeseLaunch;
+    Texture2D nachoMouth;
     Vector2 nachoPosition;
     float ballSpeed;
     float nachoSpeed = 40f;
-    float nachoRotation = 0f; // Rotation of the nacho
-    bool rotatingRight = true; // Direction of tilt
+    float nachoRotation = 0f;
+    bool rotatingRight = true;
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
     int health;
@@ -27,14 +29,20 @@ public class Game1 : Game
     Rectangle[] leftRectangles;
     Rectangle[] rightRectangles;
 
-    Vector2 lastDonutPosition;  // Tracks the previous position of the donut
-    Vector2 donutVelocity;      // Velocity of the donut
-    float predictionTime = 0.5f;
+    Vector2 lastDonutPosition;
+
+    bool isCheeseActive = true;
 
     byte currentAnimationIndex;
 
     enum Direction { Down, Up, Left, Right }
     Direction currentDirection;
+
+    float cheeseDisableTimer = 0f;
+    bool isCheeseTimerActive = false;
+
+    bool hasCheeseDealtDamage = false;
+
 
     public Game1()
     {
@@ -47,9 +55,9 @@ public class Game1 : Game
     {
         ballPosition = new Vector2(_graphics.PreferredBackBufferWidth / 2,
                                    _graphics.PreferredBackBufferHeight / 2);
-        nachoPosition = new Vector2(100, 100); // Initial nacho position
+        nachoPosition = new Vector2(100, 100);
         ballSpeed = 100f;
-        lastDonutPosition = ballPosition; // Initialize last position
+        lastDonutPosition = ballPosition;
         base.Initialize();
     }
 
@@ -57,8 +65,10 @@ public class Game1 : Game
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
         charaset = Content.Load<Texture2D>("donutsprite9");
-        nacho = Content.Load<Texture2D>("nachofrontstant1");
+        nacho = Content.Load<Texture2D>("nachofrontstant2");
         font = Content.Load<SpriteFont>("DefaultFont1");
+        cheeseLaunch = Content.Load<Texture2D>("cheeselaunch");
+        nachoMouth = Content.Load<Texture2D>("openmountnacho2");
 
         health = 4;
 
@@ -97,162 +107,201 @@ public class Game1 : Game
         currentDirection = Direction.Down;
     }
 
-protected override void Update(GameTime gameTime)
-{
-    if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
-        Keyboard.GetState().IsKeyDown(Keys.Escape))
-        Exit();
-
-    float elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
-    float updatedBallSpeed = ballSpeed * elapsedTime;
-    float updatedNachoSpeed = nachoSpeed * elapsedTime;
-
-    var kstate = Keyboard.GetState();
-    bool isMoving = false;
-
-    Vector2 movement = Vector2.Zero;
-
-    // Donut Movement Logic
-    if (kstate.IsKeyDown(Keys.Up))
+    protected override void Update(GameTime gameTime)
     {
-        movement.Y -= 1;
-        currentDirection = Direction.Up;
-        isMoving = true;
-    }
-    if (kstate.IsKeyDown(Keys.Down))
-    {
-        movement.Y += 1;
-        currentDirection = Direction.Down;
-        isMoving = true;
-    }
-    if (kstate.IsKeyDown(Keys.Left))
-    {
-        movement.X -= 1;
-        currentDirection = Direction.Left;
-        isMoving = true;
-    }
-    if (kstate.IsKeyDown(Keys.Right))
-    {
-        movement.X += 1;
-        currentDirection = Direction.Right;
-        isMoving = true;
-    }
+        if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
+            Keyboard.GetState().IsKeyDown(Keys.Escape))
+            Exit();
 
-    if (movement != Vector2.Zero)
-    {
-        movement.Normalize();
-        ballPosition += movement * updatedBallSpeed;
-    }
+        float elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+        float updatedBallSpeed = ballSpeed * elapsedTime;
+        float updatedNachoSpeed = nachoSpeed * elapsedTime;
 
-    Rectangle currentRect = GetCurrentRectangles()[currentAnimationIndex];
-    ballPosition.X = MathHelper.Clamp(ballPosition.X, currentRect.Width / 2, _graphics.PreferredBackBufferWidth - currentRect.Width / 2);
-    ballPosition.Y = MathHelper.Clamp(ballPosition.Y, currentRect.Height / 2, _graphics.PreferredBackBufferHeight - currentRect.Height / 2);
+        var kstate = Keyboard.GetState();
+        bool isMoving = false;
 
-    Vector2 directionToDonut = ballPosition - nachoPosition;
-    if (directionToDonut != Vector2.Zero)
-    {
-        directionToDonut.Normalize();
-        nachoPosition += directionToDonut * updatedNachoSpeed;
-    }
+        Vector2 movement = Vector2.Zero;
 
-    // Clamp Nacho to screen bounds
-    nachoPosition.X = MathHelper.Clamp(nachoPosition.X, nacho.Width / 2, _graphics.PreferredBackBufferWidth - nacho.Width / 2);
-    nachoPosition.Y = MathHelper.Clamp(nachoPosition.Y, nacho.Height / 2, _graphics.PreferredBackBufferHeight - nacho.Height / 2);
-
-    // Nacho Tilting Logic
-    if (rotatingRight)
-    {
-        nachoRotation += 0.05f; // Tilt right
-        if (nachoRotation >= 0.3f) // Maximum tilt angle
+        // Donut Movement Logic
+        if (kstate.IsKeyDown(Keys.Up))
         {
-            rotatingRight = false;
+            movement.Y -= 1;
+            currentDirection = Direction.Up;
+            isMoving = true;
         }
-    }
-    else
-    {
-        nachoRotation -= 0.05f; // Tilt left
-        if (nachoRotation <= -0.3f) // Minimum tilt angle
+        if (kstate.IsKeyDown(Keys.Down))
         {
-            rotatingRight = true;
+            movement.Y += 1;
+            currentDirection = Direction.Down;
+            isMoving = true;
         }
-    }
-
-    if (isMoving)
-    {
-        if (timer > threshold)
+        if (kstate.IsKeyDown(Keys.Left))
         {
-            currentAnimationIndex = (byte)((currentAnimationIndex + 1) % 3);
-            timer = 0;
+            movement.X -= 1;
+            currentDirection = Direction.Left;
+            isMoving = true;
+        }
+        if (kstate.IsKeyDown(Keys.Right))
+        {
+            movement.X += 1;
+            currentDirection = Direction.Right;
+            isMoving = true;
+        }
+
+        if (movement != Vector2.Zero)
+        {
+            movement.Normalize();
+            ballPosition += movement * updatedBallSpeed;
+        }
+
+        // Clamp Donut to screen bounds
+        Rectangle currentRect = GetCurrentRectangles()[currentAnimationIndex];
+        ballPosition.X = MathHelper.Clamp(ballPosition.X, currentRect.Width / 2, _graphics.PreferredBackBufferWidth - currentRect.Width / 2);
+        ballPosition.Y = MathHelper.Clamp(ballPosition.Y, currentRect.Height / 2, _graphics.PreferredBackBufferHeight - currentRect.Height / 2);
+
+        // Nacho Movement Logic
+        Vector2 directionToDonut = ballPosition - nachoPosition;
+        if (directionToDonut != Vector2.Zero)
+        {
+            directionToDonut.Normalize();
+            nachoPosition += directionToDonut * updatedNachoSpeed;
+        }
+
+        nachoPosition.X = MathHelper.Clamp(nachoPosition.X, nacho.Width / 2, _graphics.PreferredBackBufferWidth - nacho.Width / 2);
+        nachoPosition.Y = MathHelper.Clamp(nachoPosition.Y, nacho.Height / 2, _graphics.PreferredBackBufferHeight - nacho.Height / 2);
+
+        if (rotatingRight)
+        {
+            nachoRotation += 0.05f;
+            if (nachoRotation >= 0.3f) 
+            {
+                rotatingRight = false;
+            }
         }
         else
         {
-            timer += (float)gameTime.ElapsedGameTime.TotalMilliseconds;
+            nachoRotation -= 0.05f;
+            if (nachoRotation <= -0.3f)
+            {
+                rotatingRight = true;
+            }
         }
+
+            int cheeseWidth = 20;
+            int cheeseHeight = 20; 
+
+            Rectangle cheeseRect = new Rectangle(
+                (int)nachoPosition.X - cheeseWidth / 2, 
+                (int)nachoPosition.Y - cheeseHeight / 2, 
+                cheeseWidth,
+                cheeseHeight
+            );
+
+            Rectangle donutRect = new Rectangle(
+                (int)ballPosition.X - currentRect.Width / 2,
+                (int)ballPosition.Y - currentRect.Height / 2,
+                currentRect.Width,
+                currentRect.Height
+            );
+
+            if (cheeseRect.Intersects(donutRect) && !hasCheeseDealtDamage)
+            {
+                health--;
+                hasCheeseDealtDamage = true;
+                Console.WriteLine("Cheese hit the donut! Health reduced.");
+            }
+
+            cheeseDisableTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+            if (cheeseDisableTimer >= 2f)
+            {
+                isCheeseActive = true;
+                hasCheeseDealtDamage = false;
+                cheeseDisableTimer = 0f;
+                Console.WriteLine("Cheese reappeared.");
+            }
+
+        if (isMoving)
+        {
+            if (timer > threshold)
+            {
+                currentAnimationIndex = (byte)((currentAnimationIndex + 1) % 3);
+                timer = 0;
+            }
+            else
+            {
+                timer += (float)gameTime.ElapsedGameTime.TotalMilliseconds;
+            }
+        }
+        else
+        {
+            currentAnimationIndex = 1;
+        }
+
+        base.Update(gameTime);
     }
-    else
+
+    protected override void Draw(GameTime gameTime)
     {
-        currentAnimationIndex = 1;
+        _graphics.GraphicsDevice.Clear(Color.CornflowerBlue);
+        _spriteBatch.Begin();
+
+        _spriteBatch.Draw(charaset, ballPosition, GetCurrentRectangles()[currentAnimationIndex], Color.White);
+
+        if (Vector2.Distance(nachoPosition, ballPosition) >= 100)
+        {
+            _spriteBatch.Draw(
+                nacho,
+                nachoPosition,
+                null,
+                Color.White,
+                nachoRotation,
+                new Vector2(nacho.Width / 2, nacho.Height / 2),
+                1.0f,
+                SpriteEffects.None,
+                0f
+            );
+        }
+
+        if (Vector2.Distance(nachoPosition, ballPosition) <= 200)
+        {
+            _spriteBatch.Draw(
+                nachoMouth,
+                nachoPosition,
+                null,
+                Color.White,
+                nachoRotation,
+                new Vector2(nacho.Width / 2, nacho.Height / 2),
+                1.0f,
+                SpriteEffects.None,
+                0f
+            );
+
+            _spriteBatch.Draw(
+                cheeseLaunch,
+                new Vector2(nachoPosition.X - 20, nachoPosition.Y - 80),
+                Color.White
+            );
+        }
+
+        // Draw Health UI
+        string healthText = $"Health: {health}";
+        Vector2 healthPosition = new Vector2(_graphics.PreferredBackBufferWidth - font.MeasureString(healthText).X - 10, 10);
+        _spriteBatch.DrawString(font, healthText, healthPosition, Color.Black);
+
+        _spriteBatch.End();
+        base.Draw(gameTime);
     }
 
-    Rectangle donutRectangle = new Rectangle(
-        (int)(ballPosition.X - currentRect.Width / 2)-40,
-        (int)(ballPosition.Y - currentRect.Height / 2)-40,
-        currentRect.Width,
-        currentRect.Height);
 
-    Rectangle nachoRectangle = new Rectangle(
-        (int)(nachoPosition.X - nacho.Width / 2)-170,
-        (int)(nachoPosition.Y - nacho.Height / 2)-170,
-        nacho.Width,
-        nacho.Height);
-
-    if (donutRectangle.Intersects(nachoRectangle))
+    private Rectangle[] GetCurrentRectangles()
     {
-        health--;
-
-        nachoPosition = new Vector2(100, 100);
+        return currentDirection switch
+        {
+            Direction.Up => upRectangles,
+            Direction.Down => downRectangles,
+            Direction.Left => leftRectangles,
+            Direction.Right => rightRectangles,
+            _ => downRectangles,
+        };
     }
-
-    base.Update(gameTime);
-}
-
-protected override void Draw(GameTime gameTime)
-{
-    _graphics.GraphicsDevice.Clear(Color.CornflowerBlue);
-    _spriteBatch.Begin();
-
-    _spriteBatch.Draw(charaset, ballPosition, GetCurrentRectangles()[currentAnimationIndex], Color.White);
-
-    _spriteBatch.Draw(
-        nacho,
-        nachoPosition,
-        null,
-        Color.White,
-        nachoRotation,
-        new Vector2(nacho.Width / 2, nacho.Height / 2),
-        1.0f,
-        SpriteEffects.None,
-        0f
-    );
-
-    // Draw Health UI
-    string healthText = $"Health: {health}";
-    Vector2 healthPosition = new Vector2(_graphics.PreferredBackBufferWidth - font.MeasureString(healthText).X - 10, 10);
-    _spriteBatch.DrawString(font, healthText, healthPosition, Color.Black);
-
-    _spriteBatch.End();
-    base.Draw(gameTime);
-}
-
-private Rectangle[] GetCurrentRectangles()
-{
-    return currentDirection switch
-    {
-        Direction.Up => upRectangles,
-        Direction.Down => downRectangles,
-        Direction.Left => leftRectangles,
-        Direction.Right => rightRectangles,
-        _ => downRectangles,
-    };
-}
 }
