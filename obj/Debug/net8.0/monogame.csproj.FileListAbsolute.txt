@@ -43,3 +43,4 @@
 /home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/cheeselaunch.xnb
 /home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/nachofrontstant2.xnb
 /home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/openmountnacho2.xnb
+/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/sombrerosetting.xnb

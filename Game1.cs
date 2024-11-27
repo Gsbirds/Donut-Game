@@ -13,6 +13,7 @@ public class Game1 : Game
     Texture2D cheeseLaunch;
     Texture2D nachoMouth;
     Vector2 nachoPosition;
+    Texture2D sombreroWallpaper;
     float ballSpeed;
     float nachoSpeed = 40f;
     float nachoRotation = 0f;
@@ -53,6 +54,10 @@ public class Game1 : Game
 
     protected override void Initialize()
     {
+
+        _graphics.PreferredBackBufferWidth = 650;
+        _graphics.PreferredBackBufferHeight = 650;
+        _graphics.ApplyChanges();
         ballPosition = new Vector2(_graphics.PreferredBackBufferWidth / 2,
                                    _graphics.PreferredBackBufferHeight / 2);
         nachoPosition = new Vector2(100, 100);
@@ -69,6 +74,8 @@ public class Game1 : Game
         font = Content.Load<SpriteFont>("DefaultFont1");
         cheeseLaunch = Content.Load<Texture2D>("cheeselaunch");
         nachoMouth = Content.Load<Texture2D>("openmountnacho2");
+        sombreroWallpaper = Content.Load<Texture2D>("sombrerosetting");
+
 
         health = 4;
 
@@ -238,8 +245,14 @@ public class Game1 : Game
 
     protected override void Draw(GameTime gameTime)
     {
-        _graphics.GraphicsDevice.Clear(Color.CornflowerBlue);
+        _graphics.GraphicsDevice.Clear(Color.Tan);
         _spriteBatch.Begin();
+
+        _spriteBatch.Draw(
+      sombreroWallpaper,
+      new Rectangle(0, 0, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight), // Stretch to cover the screen
+      Color.White
+  );
 
         _spriteBatch.Draw(charaset, ballPosition, GetCurrentRectangles()[currentAnimationIndex], Color.White);
 
@@ -258,7 +271,7 @@ public class Game1 : Game
             );
         }
 
-        if (Vector2.Distance(nachoPosition, ballPosition) <= 200)
+        if (Vector2.Distance(nachoPosition, ballPosition) <= 130)
         {
             _spriteBatch.Draw(
                 nachoMouth,
