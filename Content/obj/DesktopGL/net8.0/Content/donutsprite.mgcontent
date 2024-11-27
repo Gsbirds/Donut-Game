@@ -3,7 +3,7 @@
   <SourceFile>/home/gux/monogame-game/monogame/Content/donutsprite.png</SourceFile>
   <SourceTime>2024-11-25T12:29:34.377913-07:00</SourceTime>
   <DestFile>/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/donutsprite.xnb</DestFile>
-  <DestTime>2024-11-27T13:11:29.7826767-07:00</DestTime>
+  <DestTime>2024-11-27T13:39:58.5525966-07:00</DestTime>
   <Importer>TextureImporter</Importer>
   <ImporterTime>2024-08-16T11:05:56-06:00</ImporterTime>
   <Processor>TextureProcessor</Processor>

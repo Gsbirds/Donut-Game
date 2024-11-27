@@ -19,7 +19,7 @@ public class Game1 : Game
     bool rotatingRight = true;
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
-    int health;
+    float health;
     float timer;
     int threshold;
     private SpriteFont font;
@@ -31,7 +31,7 @@ public class Game1 : Game
 
     Vector2 lastDonutPosition;
 
-    bool isCheeseActive = true;
+    bool cheeseVisible = true;
 
     byte currentAnimationIndex;
 
@@ -122,7 +122,6 @@ public class Game1 : Game
 
         Vector2 movement = Vector2.Zero;
 
-        // Donut Movement Logic
         if (kstate.IsKeyDown(Keys.Up))
         {
             movement.Y -= 1;
@@ -154,12 +153,10 @@ public class Game1 : Game
             ballPosition += movement * updatedBallSpeed;
         }
 
-        // Clamp Donut to screen bounds
         Rectangle currentRect = GetCurrentRectangles()[currentAnimationIndex];
         ballPosition.X = MathHelper.Clamp(ballPosition.X, currentRect.Width / 2, _graphics.PreferredBackBufferWidth - currentRect.Width / 2);
         ballPosition.Y = MathHelper.Clamp(ballPosition.Y, currentRect.Height / 2, _graphics.PreferredBackBufferHeight - currentRect.Height / 2);
 
-        // Nacho Movement Logic
         Vector2 directionToDonut = ballPosition - nachoPosition;
         if (directionToDonut != Vector2.Zero)
         {
@@ -173,7 +170,7 @@ public class Game1 : Game
         if (rotatingRight)
         {
             nachoRotation += 0.05f;
-            if (nachoRotation >= 0.3f) 
+            if (nachoRotation >= 0.3f)
             {
                 rotatingRight = false;
             }
@@ -187,38 +184,37 @@ public class Game1 : Game
             }
         }
 
-            int cheeseWidth = 20;
-            int cheeseHeight = 20; 
+        int cheeseWidth = 20;
+        int cheeseHeight = 20;
 
-            Rectangle cheeseRect = new Rectangle(
-                (int)nachoPosition.X - cheeseWidth / 2, 
-                (int)nachoPosition.Y - cheeseHeight / 2, 
-                cheeseWidth,
-                cheeseHeight
-            );
+        Rectangle cheeseRect = new Rectangle(
+            (int)nachoPosition.X - cheeseWidth / 2,
+            (int)nachoPosition.Y - cheeseHeight / 2,
+            cheeseWidth,
+            cheeseHeight
+        );
 
-            Rectangle donutRect = new Rectangle(
-                (int)ballPosition.X - currentRect.Width / 2,
-                (int)ballPosition.Y - currentRect.Height / 2,
-                currentRect.Width,
-                currentRect.Height
-            );
+        Rectangle donutRect = new Rectangle(
+            (int)ballPosition.X - currentRect.Width / 2,
+            (int)ballPosition.Y - currentRect.Height / 2,
+            currentRect.Width,
+            currentRect.Height
+        );
 
-            if (cheeseRect.Intersects(donutRect) && !hasCheeseDealtDamage)
-            {
-                health--;
-                hasCheeseDealtDamage = true;
-                Console.WriteLine("Cheese hit the donut! Health reduced.");
-            }
+        if (cheeseRect.Intersects(donutRect) && !hasCheeseDealtDamage)
+        {
+            health -= 0.5f;
+            cheeseVisible = false;
+            hasCheeseDealtDamage = true;
+        }
 
-            cheeseDisableTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
-            if (cheeseDisableTimer >= 2f)
-            {
-                isCheeseActive = true;
-                hasCheeseDealtDamage = false;
-                cheeseDisableTimer = 0f;
-                Console.WriteLine("Cheese reappeared.");
-            }
+        cheeseDisableTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+        if (cheeseDisableTimer >= 2f)
+        {
+            cheeseVisible = true;
+            hasCheeseDealtDamage = false;
+            cheeseDisableTimer = 0f;
+        }
 
         if (isMoving)
         {
@@ -276,14 +272,17 @@ public class Game1 : Game
                 0f
             );
 
-            _spriteBatch.Draw(
-                cheeseLaunch,
-                new Vector2(nachoPosition.X - 20, nachoPosition.Y - 80),
-                Color.White
-            );
+
+            if (cheeseVisible)
+            {
+                _spriteBatch.Draw(
+                    cheeseLaunch,
+                    new Vector2(nachoPosition.X - 20, nachoPosition.Y - 80),
+                    Color.White
+                );
+            }
         }
 
-        // Draw Health UI
         string healthText = $"Health: {health}";
         Vector2 healthPosition = new Vector2(_graphics.PreferredBackBufferWidth - font.MeasureString(healthText).X - 10, 10);
         _spriteBatch.DrawString(font, healthText, healthPosition, Color.Black);
