@@ -20,6 +20,9 @@
     <File>/home/gux/monogame-game/monogame/Content/donutsprite7.png</File>
     <File>/home/gux/monogame-game/monogame/Content/donutsprite8.png</File>
     <File>/home/gux/monogame-game/monogame/Content/donutsprite9.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/donutsprites10.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/donutsprites11.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/donutsprites12.png</File>
     <File>/home/gux/monogame-game/monogame/Content/donutsss.png</File>
     <File>/home/gux/monogame-game/monogame/Content/nachofrontstant1.png</File>
     <File>/home/gux/monogame-game/monogame/Content/nachofrontstant2.png</File>
@@ -28,6 +31,9 @@
   </SourceFiles>
   <DestFiles>
     <File>donutsprite.png</File>
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />

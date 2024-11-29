@@ -48,6 +48,10 @@ public class Game1 : Game
     bool hasCheeseDealtDamage = false;
     float cheeseRotation = 0f;
 
+    int animationCycleCount = 0;
+    bool useBlinkingFrame = false;
+
+
 
 
     public Game1()
@@ -74,7 +78,7 @@ public class Game1 : Game
     protected override void LoadContent()
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
-        charaset = Content.Load<Texture2D>("donutsprite9");
+        charaset = Content.Load<Texture2D>("donutsprites12");
         nacho = Content.Load<Texture2D>("nachofrontstant2");
         font = Content.Load<SpriteFont>("DefaultFont1");
         cheeseLaunch = Content.Load<Texture2D>("cheeselaunch");
@@ -121,7 +125,7 @@ public class Game1 : Game
 
     private Vector2 GetNachoMouthPosition()
     {
-        Vector2 mouthOffset = new Vector2(0, (nacho.Height / 2) - 100); // "Up" from the center, tweak `+10`
+        Vector2 mouthOffset = new Vector2(0, (nacho.Height / 2) - 100);
 
         float sin = (float)Math.Sin(nachoRotation);
         float cos = (float)Math.Cos(nachoRotation);
@@ -145,7 +149,7 @@ public class Game1 : Game
         Vector2 donutVelocity = ballPosition - lastDonutPosition;
         lastDonutPosition = ballPosition;
 
-        Vector2 predictedDonutPosition = ballPosition + donutVelocity * 0.5f; // Scale the prediction factor (adjust as needed)
+        Vector2 predictedDonutPosition = ballPosition + donutVelocity * 1f;
 
 
         Vector2 directionToDonutfromCheese = ballPosition - cheesePosition;
@@ -275,12 +279,26 @@ public class Game1 : Game
                 rotatingRight = true;
             }
         }
-
         if (isMoving)
         {
             if (timer > threshold)
             {
                 currentAnimationIndex = (byte)((currentAnimationIndex + 1) % 3);
+
+                if (currentAnimationIndex == 0)
+                {
+                    animationCycleCount++;
+
+                    if (animationCycleCount % 3 == 0)
+                    {
+                        useBlinkingFrame = true;
+                    }
+                    else
+                    {
+                        useBlinkingFrame = false;
+                    }
+                }
+
                 timer = 0;
             }
             else
@@ -292,6 +310,7 @@ public class Game1 : Game
         {
             currentAnimationIndex = 1;
         }
+
 
         cheeseLauncher(currentRect, updatedNachoSpeed, gameTime);
 
@@ -325,8 +344,7 @@ public class Game1 : Game
                 0f
             );
         }
-
-        if (Vector2.Distance(nachoPosition, ballPosition) <= 130)
+        if (Vector2.Distance(nachoPosition, ballPosition) <= 200)
         {
             _spriteBatch.Draw(
                 nachoMouth,
@@ -368,13 +386,48 @@ public class Game1 : Game
 
     private Rectangle[] GetCurrentRectangles()
     {
-        return currentDirection switch
+        Rectangle[] baseRectangles = currentDirection switch
         {
-            Direction.Up => upRectangles,
-            Direction.Down => downRectangles,
-            Direction.Left => leftRectangles,
-            Direction.Right => rightRectangles,
-            _ => downRectangles,
+
+            Direction.Up => new Rectangle[]
+            {
+            new Rectangle(0, 0, 96, 128),    // First frame in the Up row
+            new Rectangle(96, 0, 96, 128),  // Second frame
+            new Rectangle(192, 0, 96, 128)  // Third frame
+            },
+            Direction.Down => new Rectangle[]
+            {
+            new Rectangle(0, 256, 96, 128),  // First frame in the Down row
+            new Rectangle(96, 256, 96, 128), // Second frame
+            new Rectangle(192, 256, 96, 128) // Third frame
+            },
+            Direction.Left => new Rectangle[]
+            {
+            new Rectangle(0, 384, 96, 128),  // First frame in the Left row
+            new Rectangle(96, 384, 96, 128), // Second frame
+            new Rectangle(192, 384, 96, 128) // Third frame
+            },
+            Direction.Right => new Rectangle[]
+            {
+               new Rectangle(0, 128, 96, 128),  // First frame in the Right row
+            new Rectangle(96, 128, 96, 128), // Second frame
+            new Rectangle(192, 128, 96, 128) // Third frame
+            },
+            _ => new Rectangle[]
+            {
+            new Rectangle(0, 128, 96, 128),    // Default Down row
+            new Rectangle(96, 128, 96, 128),  // Default Down row
+            new Rectangle(192, 128, 96, 128)  // Default Down row
+            },
         };
+
+        if (useBlinkingFrame)
+        {
+            // Replace the last frame in the animation with the blinking column
+            baseRectangles[2] = new Rectangle(288, baseRectangles[2].Y, 96, 128); // Blinking column
+        }
+
+        return baseRectangles;
     }
+
 }

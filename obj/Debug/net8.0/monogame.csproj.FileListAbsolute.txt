@@ -44,3 +44,6 @@
 /home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/nachofrontstant2.xnb
 /home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/openmountnacho2.xnb
 /home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/sombrerosetting.xnb
+/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/donutsprites10.xnb
+/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/donutsprites11.xnb
+/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/donutsprites12.xnb
