@@ -55,8 +55,16 @@ public class Game1 : Game
     float blinkTimer = 0f;
     float blinkDelay = 1f;
 
+    bool useSpacebarFrame = false;
+
+
     bool useOpenMouthFrame = false;
 
+    // Add fields to manage the second animation step
+    private bool isSpacebarAnimationActive = false;
+    private float spacebarAnimationTimer = 0f;
+    private float firstSpacebarFrameDuration = 0.5f; // Duration for the first spacebar frame in seconds
+    private float secondSpacebarFrameDuration = 0.5f; // Duration for the second spacebar frame in seconds
 
     public Game1()
     {
@@ -82,7 +90,7 @@ public class Game1 : Game
     protected override void LoadContent()
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
-        charaset = Content.Load<Texture2D>("donutsprites13");
+        charaset = Content.Load<Texture2D>("donutsprites16");
         nacho = Content.Load<Texture2D>("nachosprites2");
         font = Content.Load<SpriteFont>("DefaultFont1");
         cheeseLaunch = Content.Load<Texture2D>("cheeselaunch");
@@ -129,13 +137,10 @@ public class Game1 : Game
 
     private Vector2 GetNachoMouthPosition()
     {
-        // Get the current frame of the nacho
         Rectangle currentRect = GetCurrentRectanglesNacho()[currentAnimationIndex];
 
-        // Adjust for the mouth position in the sprite
         Vector2 mouthOffset = new Vector2(currentRect.Width / 2, currentRect.Height - 20); // Adjust `-20` for your mouth's exact position.
 
-        // Apply rotation
         float sin = (float)Math.Sin(nachoRotation);
         float cos = (float)Math.Cos(nachoRotation);
 
@@ -224,6 +229,16 @@ public class Game1 : Game
         var kstate = Keyboard.GetState();
         bool isMoving = false;
 
+        // Toggle the spacebar frame
+        if (kstate.IsKeyDown(Keys.Space))
+        {
+            useSpacebarFrame = true;
+        }
+        else
+        {
+            useSpacebarFrame = false;
+        }
+
         Vector2 movement = Vector2.Zero;
 
         if (kstate.IsKeyDown(Keys.Up))
@@ -287,6 +302,7 @@ public class Game1 : Game
                 rotatingRight = true;
             }
         }
+
         if (isMoving)
         {
             if (timer > threshold)
@@ -319,11 +335,11 @@ public class Game1 : Game
             currentAnimationIndex = 1;
         }
 
-
         cheeseLauncher(currentRect, updatedNachoSpeed, gameTime);
 
         base.Update(gameTime);
     }
+
 
     protected override void Draw(GameTime gameTime)
     {
@@ -355,9 +371,10 @@ public class Game1 : Game
         _spriteBatch.Draw(nacho, nachoPosition, GetCurrentRectanglesNacho()[currentAnimationIndex], Color.White);
 
         // }
-        if (Vector2.Distance(nachoPosition, ballPosition) <= 100){
-        useOpenMouthFrame=true;
-    }
+        if (Vector2.Distance(nachoPosition, ballPosition) <= 100)
+        {
+            useOpenMouthFrame = true;
+        }
         if (cheeseVisible)
         {
             _spriteBatch.Draw(
@@ -381,68 +398,68 @@ public class Game1 : Game
         base.Draw(gameTime);
     }
 
-private Rectangle[] GetCurrentRectanglesNacho()
-{
-    Rectangle[] baseRectangles = currentDirection switch
+    private Rectangle[] GetCurrentRectanglesNacho()
     {
-        Direction.Up => new Rectangle[]
+        Rectangle[] baseRectangles = currentDirection switch
         {
-            new Rectangle(0, 0, 96, 128),    // First frame in the Up row
+            Direction.Up => new Rectangle[]
+            {
+            new Rectangle(0, 0, 96, 128),
             new Rectangle(0, 0, 96, 128),
             new Rectangle(0, 0, 96, 128)
-        },
-        Direction.Down => new Rectangle[]
-        {
-            useOpenMouthFrame 
-                ? new Rectangle(96, 128, 96, 128) // Middle frame in the open-mouth row
-                : new Rectangle(96, 256, 96, 128),
-            useOpenMouthFrame 
+            },
+            Direction.Down => new Rectangle[]
+            {
+            useOpenMouthFrame
                 ? new Rectangle(96, 128, 96, 128)
                 : new Rectangle(96, 256, 96, 128),
-            useOpenMouthFrame 
+            useOpenMouthFrame
+                ? new Rectangle(96, 128, 96, 128)
+                : new Rectangle(96, 256, 96, 128),
+            useOpenMouthFrame
                 ? new Rectangle(96, 128, 96, 128)
                 : new Rectangle(96, 256, 96, 128)
-        },
-        Direction.Left => new Rectangle[]
-        {
-            useOpenMouthFrame 
-                ? new Rectangle(192, 128, 96, 128) // Rightmost frame in the open-mouth row
-                : new Rectangle(192, 256, 96, 128),
-            useOpenMouthFrame 
+            },
+            Direction.Left => new Rectangle[]
+            {
+            useOpenMouthFrame
                 ? new Rectangle(192, 128, 96, 128)
                 : new Rectangle(192, 256, 96, 128),
-            useOpenMouthFrame 
+            useOpenMouthFrame
+                ? new Rectangle(192, 128, 96, 128)
+                : new Rectangle(192, 256, 96, 128),
+            useOpenMouthFrame
                 ? new Rectangle(192, 128, 96, 128)
                 : new Rectangle(192, 256, 96, 128)
-        },
-        Direction.Right => new Rectangle[]
-        {
-            useOpenMouthFrame 
-                ? new Rectangle(0, 128, 96, 128) // Leftmost frame in the open-mouth row
-                : new Rectangle(0, 256, 96, 128),
-            useOpenMouthFrame 
+            },
+            Direction.Right => new Rectangle[]
+            {
+            useOpenMouthFrame
                 ? new Rectangle(0, 128, 96, 128)
                 : new Rectangle(0, 256, 96, 128),
-            useOpenMouthFrame 
+            useOpenMouthFrame
+                ? new Rectangle(0, 128, 96, 128)
+                : new Rectangle(0, 256, 96, 128),
+            useOpenMouthFrame
                 ? new Rectangle(0, 128, 96, 128)
                 : new Rectangle(0, 256, 96, 128)
-        },
-        _ => new Rectangle[]
-        {
-            new Rectangle(0, 384, 96, 128),  // Default Left row
+            },
+            _ => new Rectangle[]
+            {
+            new Rectangle(0, 384, 96, 128),
             new Rectangle(96, 384, 96, 128),
             new Rectangle(192, 384, 96, 128)
-        },
-    };
+            },
+        };
 
-    // Add blinking frame logic if needed
-    if (useBlinkingFrame && currentDirection != Direction.Up)
-    {
-        baseRectangles[2] = new Rectangle(baseRectangles[2].X, 384, 96, 128); // Blink frame
+        // Add blinking frame logic if needed
+        if (useBlinkingFrame && currentDirection != Direction.Up)
+        {
+            baseRectangles[2] = new Rectangle(baseRectangles[2].X, 384, 96, 128);
+        }
+
+        return baseRectangles;
     }
-
-    return baseRectangles;
-}
 
 
 
@@ -450,45 +467,73 @@ private Rectangle[] GetCurrentRectanglesNacho()
     {
         Rectangle[] baseRectangles = currentDirection switch
         {
-
             Direction.Up => new Rectangle[]
             {
-            new Rectangle(0, 0, 96, 128),    // First frame in the Up row
-            new Rectangle(96, 0, 96, 128),  // Second frame
-            new Rectangle(192, 0, 96, 128)  // Third frame
+            useSpacebarFrame
+                ? new Rectangle(384, 0, 96, 128)  // Fifth column for Up
+                : new Rectangle(0, 0, 96, 128),   // First column
+            useSpacebarFrame
+                ? new Rectangle(384, 0, 96, 128)
+                : new Rectangle(96, 0, 96, 128),  // Second column
+            useSpacebarFrame
+                ? new Rectangle(384, 0, 96, 128)
+                : new Rectangle(192, 0, 96, 128)  // Third column
             },
             Direction.Down => new Rectangle[]
             {
-            new Rectangle(0, 256, 96, 128),  // First frame in the Down row
-            new Rectangle(96, 256, 96, 128), // Second frame
-            new Rectangle(192, 256, 96, 128) // Third frame
+            useSpacebarFrame
+                ? new Rectangle(384, 256, 96, 128) // Fifth column for Down
+                : new Rectangle(0, 256, 96, 128),
+            useSpacebarFrame
+                ? new Rectangle(384, 256, 96, 128)
+                : new Rectangle(96, 256, 96, 128),
+            useSpacebarFrame
+                ? new Rectangle(384, 256, 96, 128)
+                : new Rectangle(192, 256, 96, 128)
             },
             Direction.Left => new Rectangle[]
             {
-            new Rectangle(0, 384, 96, 128),  // First frame in the Left row
-            new Rectangle(96, 384, 96, 128), // Second frame
-            new Rectangle(192, 384, 96, 128) // Third frame
+            useSpacebarFrame
+                ? new Rectangle(384, 384, 96, 128) // Fifth column for Left
+                : new Rectangle(0, 384, 96, 128),
+            useSpacebarFrame
+                ? new Rectangle(384, 384, 96, 128)
+                : new Rectangle(96, 384, 96, 128),
+            useSpacebarFrame
+                ? new Rectangle(384, 384, 96, 128)
+                : new Rectangle(192, 384, 96, 128)
             },
             Direction.Right => new Rectangle[]
             {
-               new Rectangle(0, 128, 96, 128),  // First frame in the Right row
-            new Rectangle(96, 128, 96, 128), // Second frame
-            new Rectangle(192, 128, 96, 128) // Third frame
+            useSpacebarFrame
+                ? new Rectangle(384, 128, 96, 128) // Fifth column for Right
+                : new Rectangle(0, 128, 96, 128),
+            useSpacebarFrame
+                ? new Rectangle(384, 128, 96, 128)
+                : new Rectangle(96, 128, 96, 128),
+            useSpacebarFrame
+                ? new Rectangle(384, 128, 96, 128)
+                : new Rectangle(192, 128, 96, 128)
             },
             _ => new Rectangle[]
             {
-            new Rectangle(0, 128, 96, 128),    // Default Down row
-            new Rectangle(96, 128, 96, 128),  // Default Down row
-            new Rectangle(192, 128, 96, 128)  // Default Down row
+            useSpacebarFrame
+                ? new Rectangle(384, 128, 96, 128) // Default to fifth column
+                : new Rectangle(0, 128, 96, 128),
+            useSpacebarFrame
+                ? new Rectangle(384, 128, 96, 128)
+                : new Rectangle(96, 128, 96, 128),
+            useSpacebarFrame
+                ? new Rectangle(384, 128, 96, 128)
+                : new Rectangle(192, 128, 96, 128)
             },
         };
 
-        if (useBlinkingFrame)
+        if (useBlinkingFrame && !useSpacebarFrame)
         {
-            baseRectangles[2] = new Rectangle(288, baseRectangles[2].Y, 96, 128);
+            baseRectangles[2] = new Rectangle(288, baseRectangles[2].Y, 96, 128); // Blinking frame
         }
 
         return baseRectangles;
     }
-
 }
