@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -420,7 +421,7 @@ public class Game1 : Game
             },
         };
 
-        if (useBlinkingFrame)
+        if (useBlinkingFrame && currentDirection != Direction.Up)
         {
             baseRectangles[2] = new Rectangle(baseRectangles[2].X, 384, 96, 128);
         }
