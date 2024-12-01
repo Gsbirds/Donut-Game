@@ -4,41 +4,23 @@
   <Platform>DesktopGL</Platform>
   <Config />
   <SourceFiles>
-    <File>/home/gux/monogame-game/monogame/Content/../../../Desktop/donutsprite.png</File>
     <File>/home/gux/monogame-game/monogame/Content/angrydonut.png</File>
     <File>/home/gux/monogame-game/monogame/Content/ball.png</File>
-    <File>/home/gux/monogame-game/monogame/Content/charaset.png</File>
     <File>/home/gux/monogame-game/monogame/Content/cheeselaunch.png</File>
     <File>/home/gux/monogame-game/monogame/Content/DefaultFont1.spritefont</File>
     <File>/home/gux/monogame-game/monogame/Content/donutsmol.png</File>
     <File>/home/gux/monogame-game/monogame/Content/donutsprite.png</File>
-    <File>/home/gux/monogame-game/monogame/Content/donutsprite2.png</File>
-    <File>/home/gux/monogame-game/monogame/Content/donutsprite3.png</File>
-    <File>/home/gux/monogame-game/monogame/Content/donutsprite4.png</File>
-    <File>/home/gux/monogame-game/monogame/Content/donutsprite5.png</File>
-    <File>/home/gux/monogame-game/monogame/Content/donutsprite6.png</File>
-    <File>/home/gux/monogame-game/monogame/Content/donutsprite7.png</File>
-    <File>/home/gux/monogame-game/monogame/Content/donutsprite8.png</File>
-    <File>/home/gux/monogame-game/monogame/Content/donutsprite9.png</File>
-    <File>/home/gux/monogame-game/monogame/Content/donutsprites10.png</File>
-    <File>/home/gux/monogame-game/monogame/Content/donutsprites11.png</File>
     <File>/home/gux/monogame-game/monogame/Content/donutsprites12.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/donutsprites13.png</File>
     <File>/home/gux/monogame-game/monogame/Content/donutsss.png</File>
     <File>/home/gux/monogame-game/monogame/Content/nachofrontstant1.png</File>
     <File>/home/gux/monogame-game/monogame/Content/nachofrontstant2.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/nachosprites.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/nachosprites2.png</File>
     <File>/home/gux/monogame-game/monogame/Content/openmountnacho2.png</File>
     <File>/home/gux/monogame-game/monogame/Content/sombrerosetting.png</File>
   </SourceFiles>
   <DestFiles>
-    <File>donutsprite.png</File>
-    <File xsi:nil="true" />
-    <File xsi:nil="true" />
-    <File xsi:nil="true" />
-    <File xsi:nil="true" />
-    <File xsi:nil="true" />
-    <File xsi:nil="true" />
-    <File xsi:nil="true" />
-    <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />

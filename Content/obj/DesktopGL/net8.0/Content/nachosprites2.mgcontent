@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <SourceFile>/home/gux/monogame-game/monogame/Content/donutsprite9.png</SourceFile>
-  <SourceTime>2024-11-26T06:39:22.380384-07:00</SourceTime>
-  <DestFile>/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/donutsprite9.xnb</DestFile>
-  <DestTime>2024-11-26T06:40:00.0824083-07:00</DestTime>
+  <SourceFile>/home/gux/monogame-game/monogame/Content/nachosprites2.png</SourceFile>
+  <SourceTime>2024-12-01T08:44:20.3727489-07:00</SourceTime>
+  <DestFile>/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/nachosprites2.xnb</DestFile>
+  <DestTime>2024-12-01T08:44:48.1132909-07:00</DestTime>
   <Importer>TextureImporter</Importer>
   <ImporterTime>2024-08-16T11:05:56-06:00</ImporterTime>
   <Processor>TextureProcessor</Processor>

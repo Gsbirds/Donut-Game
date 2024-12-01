@@ -27,16 +27,7 @@
 /home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/angrydonut.xnb
 /home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/donutsss.xnb
 /home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/donutsmol.xnb
-/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/charaset.xnb
 /home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/donutsprite.xnb
-/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/donutsprite2.xnb
-/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/donutsprite3.xnb
-/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/donutsprite4.xnb
-/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/donutsprite5.xnb
-/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/donutsprite6.xnb
-/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/donutsprite7.xnb
-/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/donutsprite8.xnb
-/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/donutsprite9.xnb
 /home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/nachofrontstant1.xnb
 /home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/DefaultFont1.xnb
 /home/gux/monogame-game/monogame/obj/Debug/net8.0/monogame.sourcelink.json
@@ -44,6 +35,7 @@
 /home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/nachofrontstant2.xnb
 /home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/openmountnacho2.xnb
 /home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/sombrerosetting.xnb
-/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/donutsprites10.xnb
-/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/donutsprites11.xnb
 /home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/donutsprites12.xnb
+/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/donutsprites13.xnb
+/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/nachosprites.xnb
+/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/nachosprites2.xnb
