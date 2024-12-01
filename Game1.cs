@@ -52,6 +52,12 @@ public class Game1 : Game
     int animationCycleCount = 0;
     bool useBlinkingFrame = false;
 
+    float blinkTimer = 0f;
+    float blinkDelay = 1f;
+
+    bool useOpenMouthFrame = false;
+
+
     public Game1()
     {
         _graphics = new GraphicsDeviceManager(this);
@@ -334,25 +340,8 @@ public class Game1 : Game
 
         // if (Vector2.Distance(nachoPosition, ballPosition) >= 100)
         // {
-            // _spriteBatch.Draw(
-            //     nacho,
-            //     nachoPosition,
-            //     null,
-            //     Color.White,
-            //     nachoRotation,
-            //     new Vector2(nacho.Width / 2, nacho.Height / 2),
-            //     1.0f,
-            //     SpriteEffects.None,
-            //     0f
-            // );
-
-            _spriteBatch.Draw(nacho, nachoPosition, GetCurrentRectanglesNacho()[currentAnimationIndex], Color.White);
-
-        // }
-        // if (Vector2.Distance(nachoPosition, ballPosition) <= 200)
-        // {
         // _spriteBatch.Draw(
-        //     nachoMouth,
+        //     nacho,
         //     nachoPosition,
         //     null,
         //     Color.White,
@@ -362,6 +351,13 @@ public class Game1 : Game
         //     SpriteEffects.None,
         //     0f
         // );
+
+        _spriteBatch.Draw(nacho, nachoPosition, GetCurrentRectanglesNacho()[currentAnimationIndex], Color.White);
+
+        // }
+        if (Vector2.Distance(nachoPosition, ballPosition) <= 100){
+        useOpenMouthFrame=true;
+    }
         if (cheeseVisible)
         {
             _spriteBatch.Draw(
@@ -385,49 +381,69 @@ public class Game1 : Game
         base.Draw(gameTime);
     }
 
-    private Rectangle[] GetCurrentRectanglesNacho()
+private Rectangle[] GetCurrentRectanglesNacho()
+{
+    Rectangle[] baseRectangles = currentDirection switch
     {
-        Rectangle[] baseRectangles = currentDirection switch
+        Direction.Up => new Rectangle[]
         {
-            Direction.Up => new Rectangle[]
-            {
+            new Rectangle(0, 0, 96, 128),    // First frame in the Up row
             new Rectangle(0, 0, 96, 128),
-            new Rectangle(0, 0, 96, 128),
-            new Rectangle(0, 0, 96, 128),
-            },
-            Direction.Down => new Rectangle[]
-            {
-            new Rectangle(96, 256, 96, 128),
-            new Rectangle(96, 256, 96, 128),
-            new Rectangle(96, 256, 96, 128)
-            },
-            Direction.Left => new Rectangle[]
-            {
-             new Rectangle(192, 256, 96, 128),
-            new Rectangle(192, 256, 96, 128),
-            new Rectangle(192, 256, 96, 128),
-            },
-            Direction.Right => new Rectangle[]
-            {
-            new Rectangle(0, 256, 96, 128),
-            new Rectangle(0, 256, 96, 128),
-            new Rectangle(0, 256, 96, 128),
-            },
-            _ => new Rectangle[]
-             {
-            new Rectangle(0, 384, 96, 128),
+            new Rectangle(0, 0, 96, 128)
+        },
+        Direction.Down => new Rectangle[]
+        {
+            useOpenMouthFrame 
+                ? new Rectangle(96, 128, 96, 128) // Middle frame in the open-mouth row
+                : new Rectangle(96, 256, 96, 128),
+            useOpenMouthFrame 
+                ? new Rectangle(96, 128, 96, 128)
+                : new Rectangle(96, 256, 96, 128),
+            useOpenMouthFrame 
+                ? new Rectangle(96, 128, 96, 128)
+                : new Rectangle(96, 256, 96, 128)
+        },
+        Direction.Left => new Rectangle[]
+        {
+            useOpenMouthFrame 
+                ? new Rectangle(192, 128, 96, 128) // Rightmost frame in the open-mouth row
+                : new Rectangle(192, 256, 96, 128),
+            useOpenMouthFrame 
+                ? new Rectangle(192, 128, 96, 128)
+                : new Rectangle(192, 256, 96, 128),
+            useOpenMouthFrame 
+                ? new Rectangle(192, 128, 96, 128)
+                : new Rectangle(192, 256, 96, 128)
+        },
+        Direction.Right => new Rectangle[]
+        {
+            useOpenMouthFrame 
+                ? new Rectangle(0, 128, 96, 128) // Leftmost frame in the open-mouth row
+                : new Rectangle(0, 256, 96, 128),
+            useOpenMouthFrame 
+                ? new Rectangle(0, 128, 96, 128)
+                : new Rectangle(0, 256, 96, 128),
+            useOpenMouthFrame 
+                ? new Rectangle(0, 128, 96, 128)
+                : new Rectangle(0, 256, 96, 128)
+        },
+        _ => new Rectangle[]
+        {
+            new Rectangle(0, 384, 96, 128),  // Default Left row
             new Rectangle(96, 384, 96, 128),
             new Rectangle(192, 384, 96, 128)
-            },
-        };
+        },
+    };
 
-        if (useBlinkingFrame && currentDirection != Direction.Up)
-        {
-            baseRectangles[2] = new Rectangle(baseRectangles[2].X, 384, 96, 128);
-        }
-
-        return baseRectangles;
+    // Add blinking frame logic if needed
+    if (useBlinkingFrame && currentDirection != Direction.Up)
+    {
+        baseRectangles[2] = new Rectangle(baseRectangles[2].X, 384, 96, 128); // Blink frame
     }
+
+    return baseRectangles;
+}
+
 
 
     private Rectangle[] GetCurrentRectangles()
