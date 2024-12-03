@@ -44,7 +44,6 @@ public class Game1 : Game
     Direction currentDirection;
 
     float cheeseDisableTimer = 0f;
-    bool isCheeseTimerActive = false;
 
     bool hasCheeseDealtDamage = false;
     float cheeseRotation = 0f;
@@ -52,19 +51,15 @@ public class Game1 : Game
     int animationCycleCount = 0;
     bool useBlinkingFrame = false;
 
-    float blinkTimer = 0f;
-    float blinkDelay = 1f;
-
     bool useSpacebarFrame = false;
-
 
     bool useOpenMouthFrame = false;
 
-    // Add fields to manage the second animation step
     private bool isSpacebarAnimationActive = false;
     private float spacebarAnimationTimer = 0f;
-    private float firstSpacebarFrameDuration = 0.5f; // Duration for the first spacebar frame in seconds
-    private float secondSpacebarFrameDuration = 0.5f; // Duration for the second spacebar frame in seconds
+    private float spacebarFirstFrameDuration = 0.3f;
+    private float spacebarSecondFrameDuration = 0.5f;
+    private int doubleWidth = 192;
 
     public Game1()
     {
@@ -229,15 +224,37 @@ public class Game1 : Game
         var kstate = Keyboard.GetState();
         bool isMoving = false;
 
-        // Toggle the spacebar frame
         if (kstate.IsKeyDown(Keys.Space))
         {
-            useSpacebarFrame = true;
+            if (!isSpacebarAnimationActive)
+            {
+                isSpacebarAnimationActive = true;
+                spacebarAnimationTimer = 0f;
+            }
         }
         else
         {
-            useSpacebarFrame = false;
+            isSpacebarAnimationActive = false;
         }
+
+        if (isSpacebarAnimationActive)
+        {
+            spacebarAnimationTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            if (spacebarAnimationTimer <= spacebarFirstFrameDuration)
+            {
+                useSpacebarFrame = true;
+            }
+            else if (spacebarAnimationTimer <= spacebarFirstFrameDuration + spacebarSecondFrameDuration)
+            {
+                useSpacebarFrame = false;
+            }
+            else
+            {
+                spacebarAnimationTimer = 0f;
+            }
+        }
+
 
         Vector2 movement = Vector2.Zero;
 
@@ -272,6 +289,7 @@ public class Game1 : Game
             ballPosition += movement * updatedBallSpeed;
         }
 
+
         Rectangle currentRect = GetCurrentRectangles()[currentAnimationIndex];
         ballPosition.X = MathHelper.Clamp(ballPosition.X, currentRect.Width / 2, _graphics.PreferredBackBufferWidth - currentRect.Width / 2);
         ballPosition.Y = MathHelper.Clamp(ballPosition.Y, currentRect.Height / 2, _graphics.PreferredBackBufferHeight - currentRect.Height / 2);
@@ -285,6 +303,7 @@ public class Game1 : Game
 
         nachoPosition.X = MathHelper.Clamp(nachoPosition.X, nacho.Width / 2, _graphics.PreferredBackBufferWidth - nacho.Width / 2);
         nachoPosition.Y = MathHelper.Clamp(nachoPosition.Y, nacho.Height / 2, _graphics.PreferredBackBufferHeight - nacho.Height / 2);
+
 
         if (rotatingRight)
         {
@@ -303,7 +322,7 @@ public class Game1 : Game
             }
         }
 
-        if (isMoving)
+        if (isMoving || isSpacebarAnimationActive)
         {
             if (timer > threshold)
             {
@@ -369,11 +388,16 @@ public class Game1 : Game
         // );
 
         _spriteBatch.Draw(nacho, nachoPosition, GetCurrentRectanglesNacho()[currentAnimationIndex], Color.White);
-
         // }
+
         if (Vector2.Distance(nachoPosition, ballPosition) <= 100)
         {
             useOpenMouthFrame = true;
+        }
+        else
+        {
+            useOpenMouthFrame = false;
+
         }
         if (cheeseVisible)
         {
@@ -469,67 +493,53 @@ public class Game1 : Game
         {
             Direction.Up => new Rectangle[]
             {
-            useSpacebarFrame
-                ? new Rectangle(384, 0, 96, 128)  // Fifth column for Up
-                : new Rectangle(0, 0, 96, 128),   // First column
-            useSpacebarFrame
-                ? new Rectangle(384, 0, 96, 128)
-                : new Rectangle(96, 0, 96, 128),  // Second column
-            useSpacebarFrame
-                ? new Rectangle(384, 0, 96, 128)
-                : new Rectangle(192, 0, 96, 128)  // Third column
+            isSpacebarAnimationActive
+                ? (useSpacebarFrame
+                    ? new Rectangle(384, 0, 96, 128)  // Fifth column
+                    : new Rectangle(480, 0, doubleWidth, 128))  // Sixth column
+                : new Rectangle(0, 0, 96, 128),
+            new Rectangle(96, 0, 96, 128),
+            new Rectangle(192, 0, 96, 128)
             },
             Direction.Down => new Rectangle[]
             {
-            useSpacebarFrame
-                ? new Rectangle(384, 256, 96, 128) // Fifth column for Down
+            isSpacebarAnimationActive
+                ? (useSpacebarFrame
+                    ? new Rectangle(384, 256, 96, 128) // Fifth column
+                    : new Rectangle(480, 256, doubleWidth, 128)) // Sixth column
                 : new Rectangle(0, 256, 96, 128),
-            useSpacebarFrame
-                ? new Rectangle(384, 256, 96, 128)
-                : new Rectangle(96, 256, 96, 128),
-            useSpacebarFrame
-                ? new Rectangle(384, 256, 96, 128)
-                : new Rectangle(192, 256, 96, 128)
+            new Rectangle(96, 256, 96, 128),
+            new Rectangle(192, 256, 96, 128)
             },
             Direction.Left => new Rectangle[]
             {
-            useSpacebarFrame
-                ? new Rectangle(384, 384, 96, 128) // Fifth column for Left
+            isSpacebarAnimationActive
+                ? (useSpacebarFrame
+                    ? new Rectangle(384, 384, 96, 128) // Fifth column
+                    : new Rectangle(480, 384, doubleWidth, 128)) // Sixth column
                 : new Rectangle(0, 384, 96, 128),
-            useSpacebarFrame
-                ? new Rectangle(384, 384, 96, 128)
-                : new Rectangle(96, 384, 96, 128),
-            useSpacebarFrame
-                ? new Rectangle(384, 384, 96, 128)
-                : new Rectangle(192, 384, 96, 128)
+            new Rectangle(96, 384, 96, 128),
+            new Rectangle(192, 384, 96, 128)
             },
             Direction.Right => new Rectangle[]
             {
-            useSpacebarFrame
-                ? new Rectangle(384, 128, 96, 128) // Fifth column for Right
+            isSpacebarAnimationActive
+                ? (useSpacebarFrame
+                    ? new Rectangle(384, 128, 96, 128) // Fifth column
+                    : new Rectangle(480, 128, doubleWidth, 128)) // Sixth column
                 : new Rectangle(0, 128, 96, 128),
-            useSpacebarFrame
-                ? new Rectangle(384, 128, 96, 128)
-                : new Rectangle(96, 128, 96, 128),
-            useSpacebarFrame
-                ? new Rectangle(384, 128, 96, 128)
-                : new Rectangle(192, 128, 96, 128)
+            new Rectangle(96, 128, 96, 128),
+            new Rectangle(192, 128, 96, 128)
             },
             _ => new Rectangle[]
             {
-            useSpacebarFrame
-                ? new Rectangle(384, 128, 96, 128) // Default to fifth column
-                : new Rectangle(0, 128, 96, 128),
-            useSpacebarFrame
-                ? new Rectangle(384, 128, 96, 128)
-                : new Rectangle(96, 128, 96, 128),
-            useSpacebarFrame
-                ? new Rectangle(384, 128, 96, 128)
-                : new Rectangle(192, 128, 96, 128)
+            new Rectangle(0, 128, 96, 128),
+            new Rectangle(96, 128, 96, 128),
+            new Rectangle(192, 128, 96, 128)
             },
         };
 
-        if (useBlinkingFrame && !useSpacebarFrame)
+        if (useBlinkingFrame && !isSpacebarAnimationActive)
         {
             baseRectangles[2] = new Rectangle(288, baseRectangles[2].Y, 96, 128); // Blinking frame
         }
