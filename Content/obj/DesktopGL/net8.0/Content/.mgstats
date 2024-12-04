@@ -10,6 +10,8 @@ Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Siz
 "/home/gux/monogame-game/monogame/Content/donutsprites14.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/donutsprites14.xnb","TextureProcessor","Texture2DContent",119673,983125,0.11849
 "/home/gux/monogame-game/monogame/Content/donutsprites15.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/donutsprites15.xnb","TextureProcessor","Texture2DContent",120135,983125,0.1171446
 "/home/gux/monogame-game/monogame/Content/donutsprites16.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/donutsprites16.xnb","TextureProcessor","Texture2DContent",149768,1376341,0.126713
+"/home/gux/monogame-game/monogame/Content/donutsprites17.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/donutsprites17.xnb","TextureProcessor","Texture2DContent",149789,1376341,0.1340605
+"/home/gux/monogame-game/monogame/Content/donutsprites18.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/donutsprites18.xnb","TextureProcessor","Texture2DContent",150793,1376341,0.1297592
 "/home/gux/monogame-game/monogame/Content/donutsss.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/donutsss.xnb","TextureProcessor","Texture2DContent",768026,12960085,0.1939808
 "/home/gux/monogame-game/monogame/Content/nachofrontstant1.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/nachofrontstant1.xnb","TextureProcessor","Texture2DContent",10573,160085,0.0051352
 "/home/gux/monogame-game/monogame/Content/nachofrontstant2.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/nachofrontstant2.xnb","TextureProcessor","Texture2DContent",11547,160085,0.0043228

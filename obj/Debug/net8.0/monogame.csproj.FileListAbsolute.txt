@@ -42,3 +42,5 @@
 /home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/donutsprites14.xnb
 /home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/donutsprites15.xnb
 /home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/donutsprites16.xnb
+/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/donutsprites17.xnb
+/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/donutsprites18.xnb

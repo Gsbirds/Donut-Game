@@ -57,9 +57,11 @@ public class Game1 : Game
 
     private bool isSpacebarAnimationActive = false;
     private float spacebarAnimationTimer = 0f;
-    private float spacebarFirstFrameDuration = 0.3f;
-    private float spacebarSecondFrameDuration = 0.5f;
+    private float spacebarFirstFrameDuration = 0.5f;
+    private float spacebarSecondFrameDuration = 0.8f;
     private int doubleWidth = 192;
+    float nachoHealth;
+    private bool nachoDamagedThisCycle = false;
 
     public Game1()
     {
@@ -79,13 +81,15 @@ public class Game1 : Game
         nachoPosition = new Vector2(100, 100);
         ballSpeed = 100f;
         lastDonutPosition = ballPosition;
+
+        nachoHealth = 4;
         base.Initialize();
     }
 
     protected override void LoadContent()
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
-        charaset = Content.Load<Texture2D>("donutsprites16");
+        charaset = Content.Load<Texture2D>("donutsprites17");
         nacho = Content.Load<Texture2D>("nachosprites2");
         font = Content.Load<SpriteFont>("DefaultFont1");
         cheeseLaunch = Content.Load<Texture2D>("cheeselaunch");
@@ -197,7 +201,6 @@ public class Game1 : Game
                 cheeseDisableTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
                 if (cheeseDisableTimer >= 1f)
                 {
-                    // Reset cheese position to the nacho's mouth
                     cheesePosition = GetNachoMouthPosition();
                     cheeseVisible = true;
                     hasCheeseDealtDamage = false;
@@ -224,12 +227,27 @@ public class Game1 : Game
         var kstate = Keyboard.GetState();
         bool isMoving = false;
 
+        Rectangle donutRect = new Rectangle(
+    (int)ballPosition.X - 48,
+    (int)ballPosition.Y - 64,
+     96,
+    128
+     );
+
+        Rectangle nachoRect = new Rectangle(
+      (int)nachoPosition.X - 48,
+      (int)nachoPosition.Y - 64,
+        96,
+        128
+        );
+
         if (kstate.IsKeyDown(Keys.Space))
         {
             if (!isSpacebarAnimationActive)
             {
                 isSpacebarAnimationActive = true;
                 spacebarAnimationTimer = 0f;
+                nachoDamagedThisCycle = false; // Reset damage flag
             }
         }
         else
@@ -254,7 +272,6 @@ public class Game1 : Game
                 spacebarAnimationTimer = 0f;
             }
         }
-
 
         Vector2 movement = Vector2.Zero;
 
@@ -356,6 +373,13 @@ public class Game1 : Game
 
         cheeseLauncher(currentRect, updatedNachoSpeed, gameTime);
 
+
+        if (isSpacebarAnimationActive && donutRect.Intersects(nachoRect) && !nachoDamagedThisCycle)
+        {
+            nachoHealth = Math.Max(0, nachoHealth - 1);
+            nachoDamagedThisCycle = true;
+        }
+
         base.Update(gameTime);
     }
 
@@ -414,13 +438,38 @@ public class Game1 : Game
             );
         }
 
-        string healthText = $"Health: {health}";
-        Vector2 healthPosition = new Vector2(_graphics.PreferredBackBufferWidth - font.MeasureString(healthText).X - 10, 10);
-        _spriteBatch.DrawString(font, healthText, healthPosition, Color.Black);
+        float maxNachoHealth = 4f;
+        int nachoHealthBarWidth = 200;
+        int nachoHealthBarHeight = 20;
+        Vector2 nachoHealthBarPosition = new Vector2(10, 10);
+
+        if (nachoHealthBarWidth != 0)
+        {
+            _spriteBatch.Draw(
+                Texture2DHelper.CreateRectangle(GraphicsDevice, nachoHealthBarWidth, nachoHealthBarHeight, Color.Gray),
+                new Rectangle((int)nachoHealthBarPosition.X, (int)nachoHealthBarPosition.Y, nachoHealthBarWidth, nachoHealthBarHeight),
+                Color.Gray
+            );
+        }
+
+        int nachoHealthCurrentWidth = (int)((nachoHealth / maxNachoHealth) * nachoHealthBarWidth);
+        if (nachoHealthCurrentWidth != 0)
+        {
+            _spriteBatch.Draw(
+                Texture2DHelper.CreateRectangle(GraphicsDevice, nachoHealthCurrentWidth, nachoHealthBarHeight, Color.WhiteSmoke),
+                new Rectangle((int)nachoHealthBarPosition.X, (int)nachoHealthBarPosition.Y, nachoHealthCurrentWidth, nachoHealthBarHeight),
+                Color.WhiteSmoke
+            );
+        }
+
+        string donutHealthText = $"Health: {health}";
+        Vector2 donutHealthPosition = new Vector2(_graphics.PreferredBackBufferWidth - font.MeasureString(donutHealthText).X - 10, 10);
+        _spriteBatch.DrawString(font, donutHealthText, donutHealthPosition, Color.Black);
 
         _spriteBatch.End();
         base.Draw(gameTime);
     }
+
 
     private Rectangle[] GetCurrentRectanglesNacho()
     {
@@ -476,7 +525,6 @@ public class Game1 : Game
             },
         };
 
-        // Add blinking frame logic if needed
         if (useBlinkingFrame && currentDirection != Direction.Up)
         {
             baseRectangles[2] = new Rectangle(baseRectangles[2].X, 384, 96, 128);
@@ -545,5 +593,20 @@ public class Game1 : Game
         }
 
         return baseRectangles;
+    }
+
+    public static class Texture2DHelper
+    {
+        public static Texture2D CreateRectangle(GraphicsDevice graphicsDevice, int width, int height, Color color)
+        {
+            Texture2D texture = new Texture2D(graphicsDevice, width, height);
+            Color[] colorData = new Color[width * height];
+            for (int i = 0; i < colorData.Length; i++)
+            {
+                colorData[i] = color;
+            }
+            texture.SetData(colorData);
+            return texture;
+        }
     }
 }
