@@ -62,6 +62,8 @@ public class Game1 : Game
     private int doubleWidth = 192;
     float nachoHealth;
     private bool nachoDamagedThisCycle = false;
+    private KeyboardState previousKeyboardState;
+
 
     public Game1()
     {
@@ -157,60 +159,65 @@ public class Game1 : Game
         int cheeseWidth = 20;
         int cheeseHeight = 20;
 
-        Vector2 donutVelocity = ballPosition - lastDonutPosition;
-        lastDonutPosition = ballPosition;
+        // Check the distance between Nacho and Donut
+        float distanceToDonut = Vector2.Distance(nachoPosition, ballPosition);
 
-        Vector2 predictedDonutPosition = ballPosition + donutVelocity * 1f;
-
-        Vector2 directionToDonutfromCheese = ballPosition - cheesePosition;
-        if (cheeseVisible)
+        if (distanceToDonut <= 150) // Only launch cheese if within 150 units
         {
-            Vector2 directionToPredictedPosition = predictedDonutPosition - cheesePosition;
-            if (directionToPredictedPosition != Vector2.Zero)
-            {
-                cheeseRotation = (float)Math.Atan2(directionToDonutfromCheese.Y, directionToDonutfromCheese.X);
-                directionToPredictedPosition.Normalize();
-                cheesePosition += directionToPredictedPosition * updatedNachoSpeed * 2.5f; // Adjust speed multiplier as needed
-            }
 
-            Rectangle cheeseRect = new Rectangle(
-                (int)cheesePosition.X - cheeseWidth / 2,
-                (int)cheesePosition.Y - cheeseHeight / 2,
-                cheeseWidth,
-                cheeseHeight
-            );
-
-            Rectangle donutRect = new Rectangle(
-                (int)ballPosition.X - currentRect.Width / 2,
-                (int)ballPosition.Y - currentRect.Height / 2,
-                currentRect.Width,
-                currentRect.Height
-            );
-
-            if (cheeseRect.Intersects(donutRect) && !hasCheeseDealtDamage)
+            if (cheeseVisible)
             {
-                health -= 0.5f;
-                cheeseVisible = false;
-                hasCheeseDealtDamage = true;
-            }
-        }
-        else
-        {
-            if (!cheeseVisible)
-            {
-                cheeseDisableTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
-                if (cheeseDisableTimer >= 1f)
+                Vector2 donutVelocity = ballPosition - lastDonutPosition;
+                lastDonutPosition = ballPosition;
+
+                Vector2 predictedDonutPosition = ballPosition + donutVelocity * 1f;
+
+                Vector2 directionToDonutFromCheese = ballPosition - cheesePosition;
+
+                Vector2 directionToPredictedPosition = predictedDonutPosition - cheesePosition;
+                if (directionToPredictedPosition != Vector2.Zero)
                 {
-                    cheesePosition = GetNachoMouthPosition();
-                    cheeseVisible = true;
-                    hasCheeseDealtDamage = false;
-                    cheeseDisableTimer = 0f;
+                    cheeseRotation = (float)Math.Atan2(directionToDonutFromCheese.Y, directionToDonutFromCheese.X);
+                    directionToPredictedPosition.Normalize();
+                    cheesePosition += directionToPredictedPosition * updatedNachoSpeed * 2.5f; // Adjust speed multiplier as needed
+                }
+
+                Rectangle cheeseRect = new Rectangle(
+                    (int)cheesePosition.X - cheeseWidth / 2,
+                    (int)cheesePosition.Y - cheeseHeight / 2,
+                    cheeseWidth,
+                    cheeseHeight
+                );
+
+                Rectangle donutRect = new Rectangle(
+                    (int)ballPosition.X - currentRect.Width / 2,
+                    (int)ballPosition.Y - currentRect.Height / 2,
+                    currentRect.Width,
+                    currentRect.Height
+                );
+
+                if (cheeseRect.Intersects(donutRect) && !hasCheeseDealtDamage)
+                {
+                    health -= 0.5f;
+                    cheeseVisible = false;
+                    hasCheeseDealtDamage = true;
                 }
             }
-
-
+            else
+            {
+                if (!cheeseVisible)
+                {
+                    cheeseDisableTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+                    if (cheeseDisableTimer >= 1f)
+                    {
+                        cheesePosition = GetNachoMouthPosition();
+                        cheeseVisible = true;
+                        hasCheeseDealtDamage = false;
+                        cheeseDisableTimer = 0f;
+                    }
+                }
+            }
         }
-
     }
 
 
@@ -225,23 +232,25 @@ public class Game1 : Game
         float updatedNachoSpeed = nachoSpeed * elapsedTime;
 
         var kstate = Keyboard.GetState();
+        KeyboardState currentKeyboardState = Keyboard.GetState();
+
         bool isMoving = false;
 
         Rectangle donutRect = new Rectangle(
-    (int)ballPosition.X - 48,
-    (int)ballPosition.Y - 64,
-     96,
-    128
-     );
+            (int)ballPosition.X - 48,
+            (int)ballPosition.Y - 64,
+            96,
+            128
+            );
 
         Rectangle nachoRect = new Rectangle(
-      (int)nachoPosition.X - 48,
-      (int)nachoPosition.Y - 64,
-        96,
-        128
-        );
+            (int)nachoPosition.X - 48,
+            (int)nachoPosition.Y - 64,
+                96,
+                128
+                );
 
-        if (kstate.IsKeyDown(Keys.Space))
+        if (currentKeyboardState.IsKeyDown(Keys.Space) && !previousKeyboardState.IsKeyDown(Keys.Space))
         {
             if (!isSpacebarAnimationActive)
             {
@@ -249,10 +258,6 @@ public class Game1 : Game
                 spacebarAnimationTimer = 0f;
                 nachoDamagedThisCycle = false; // Reset damage flag
             }
-        }
-        else
-        {
-            isSpacebarAnimationActive = false;
         }
 
         if (isSpacebarAnimationActive)
@@ -270,6 +275,7 @@ public class Game1 : Game
             else
             {
                 spacebarAnimationTimer = 0f;
+                isSpacebarAnimationActive = false; // End the animation
             }
         }
 
@@ -374,11 +380,14 @@ public class Game1 : Game
         cheeseLauncher(currentRect, updatedNachoSpeed, gameTime);
 
 
-        if (isSpacebarAnimationActive && donutRect.Intersects(nachoRect) && !nachoDamagedThisCycle)
+        if (useSpacebarFrame && donutRect.Intersects(nachoRect) && !nachoDamagedThisCycle)
         {
             nachoHealth = Math.Max(0, nachoHealth - 1);
             nachoDamagedThisCycle = true;
         }
+
+        previousKeyboardState = currentKeyboardState;
+
 
         base.Update(gameTime);
     }
@@ -394,6 +403,7 @@ public class Game1 : Game
       new Rectangle(0, 0, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight),
       Color.White
   );
+        _spriteBatch.Draw(nacho, nachoPosition, GetCurrentRectanglesNacho()[currentAnimationIndex], Color.White);
 
         _spriteBatch.Draw(charaset, ballPosition, GetCurrentRectangles()[currentAnimationIndex], Color.White);
 
@@ -410,11 +420,9 @@ public class Game1 : Game
         //     SpriteEffects.None,
         //     0f
         // );
-
-        _spriteBatch.Draw(nacho, nachoPosition, GetCurrentRectanglesNacho()[currentAnimationIndex], Color.White);
         // }
 
-        if (Vector2.Distance(nachoPosition, ballPosition) <= 100)
+        if (Vector2.Distance(nachoPosition, ballPosition) <= 150)
         {
             useOpenMouthFrame = true;
         }
@@ -532,7 +540,6 @@ public class Game1 : Game
 
         return baseRectangles;
     }
-
 
 
     private Rectangle[] GetCurrentRectangles()
