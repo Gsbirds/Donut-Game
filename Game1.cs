@@ -151,7 +151,7 @@ public class Game1 : Game
     {
         Rectangle currentRect = GetCurrentRectanglesNacho()[currentAnimationIndex];
 
-        Vector2 mouthOffset = new Vector2(currentRect.Width / 2, currentRect.Height - 20); // Adjust `-20` for your mouth's exact position.
+        Vector2 mouthOffset = new Vector2(currentRect.Width / 2, (currentRect.Height/2) -70);
 
         float sin = (float)Math.Sin(nachoRotation);
         float cos = (float)Math.Cos(nachoRotation);
@@ -217,7 +217,7 @@ public class Game1 : Game
             }
 
             Vector2 directionToDonut = ballPosition - cheesePosition;
-            if (directionToDonut != Vector2.Zero && directionToDonut.LengthSquared() > 1f) // Prevent small movements
+            if (directionToDonut != Vector2.Zero && directionToDonut.LengthSquared() > 1f)
             {
                 directionToDonut.Normalize();
                 cheeseRotation = (float)Math.Atan2(directionToDonut.Y, directionToDonut.X);
@@ -256,64 +256,13 @@ public class Game1 : Game
         }
     }
 
-
-    protected override void Update(GameTime gameTime)
+    private bool keyboardTracker(float elapsedTime, GameTime gameTime)
     {
-        if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
-            Keyboard.GetState().IsKeyDown(Keys.Escape))
-            Exit();
-
-        float elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
-        float updatedBallSpeed = ballSpeed * elapsedTime;
-        float updatedNachoSpeed = nachoSpeed * elapsedTime;
-
-        var kstate = Keyboard.GetState();
-        KeyboardState currentKeyboardState = Keyboard.GetState();
 
         bool isMoving = false;
+        float updatedBallSpeed = ballSpeed * elapsedTime;
 
-        Rectangle donutRect = new Rectangle(
-            (int)ballPosition.X - 48,
-            (int)ballPosition.Y - 64,
-            96,
-            128
-            );
-
-        Rectangle nachoRect = new Rectangle(
-            (int)nachoPosition.X - 48,
-            (int)nachoPosition.Y - 64,
-                96,
-                128
-                );
-
-        if (currentKeyboardState.IsKeyDown(Keys.Space) && !previousKeyboardState.IsKeyDown(Keys.Space))
-        {
-            if (!isSpacebarAnimationActive)
-            {
-                isSpacebarAnimationActive = true;
-                spacebarAnimationTimer = 0f;
-                nachoDamagedThisCycle = false; // Reset damage flag
-            }
-        }
-
-        if (isSpacebarAnimationActive)
-        {
-            spacebarAnimationTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-            if (spacebarAnimationTimer <= spacebarFirstFrameDuration)
-            {
-                useSpacebarFrame = true;
-            }
-            else if (spacebarAnimationTimer <= spacebarFirstFrameDuration + spacebarSecondFrameDuration)
-            {
-                useSpacebarFrame = false;
-            }
-            else
-            {
-                spacebarAnimationTimer = 0f;
-                isSpacebarAnimationActive = false;
-            }
-        }
+        var kstate = Keyboard.GetState();
 
         Vector2 movement = Vector2.Zero;
 
@@ -352,45 +301,35 @@ public class Game1 : Game
 
         if (nachoDirectionDelayTimer >= NachoDirectionDelayDuration)
         {
-            currentDirectionNacho2 = currentDirection; // Update nacho's direction after the delay
+            currentDirectionNacho2 = currentDirection;
             nachoDirectionDelayTimer = 0f;
         }
 
+        return isMoving;
+    }
 
-        Rectangle currentRect = GetCurrentRectangles()[currentAnimationIndex];
-        ballPosition.X = MathHelper.Clamp(ballPosition.X, currentRect.Width / 2, _graphics.PreferredBackBufferWidth - currentRect.Width / 2);
-        ballPosition.Y = MathHelper.Clamp(ballPosition.Y, currentRect.Height / 2, _graphics.PreferredBackBufferHeight - currentRect.Height / 2);
-
-        Vector2 directionToDonut = ballPosition - nachoPosition;
-
-        if (directionToDonut != Vector2.Zero)
-        {
-            directionToDonut.Normalize();
-            nachoPosition += directionToDonut * updatedNachoSpeed;
-        }
-
-        nachoPosition.X = MathHelper.Clamp(nachoPosition.X, nacho.Width / 2, _graphics.PreferredBackBufferWidth - nacho.Width / 2);
-        nachoPosition.Y = MathHelper.Clamp(nachoPosition.Y, nacho.Height / 2, _graphics.PreferredBackBufferHeight - nacho.Height / 2);
-
-
+    private void nachoRotater()
+    {
         if (rotatingRight)
         {
-            nachoRotation += 0.01f; // Smaller increment for smoother rotation
-            if (nachoRotation >= 0.1f) // Reduced maximum rotation
+            nachoRotation += 0.01f;
+            if (nachoRotation >= 0.1f)
             {
                 rotatingRight = false;
             }
         }
         else
         {
-            nachoRotation -= 0.01f; // Smaller decrement for smoother rotation
-            if (nachoRotation <= -0.1f) // Reduced minimum rotation
+            nachoRotation -= 0.01f;
+            if (nachoRotation <= -0.1f)
             {
                 rotatingRight = true;
             }
         }
+    }
 
-
+    private void animationBlinker(bool isMoving, GameTime gameTime)
+    {
         if (isMoving || isSpacebarAnimationActive)
         {
             if (timer > threshold)
@@ -424,14 +363,98 @@ public class Game1 : Game
             currentAnimationIndex = 1;
         }
 
-        cheeseLauncher(updatedNachoSpeed, gameTime);
+    }
 
+    private void spacebarAttack(GameTime gameTime, KeyboardState currentKeyboardState)
+    {
+
+        Rectangle donutRect = new Rectangle(
+    (int)ballPosition.X - 48,
+    (int)ballPosition.Y - 64,
+    96,
+    128
+    );
+
+        Rectangle nachoRect = new Rectangle(
+            (int)nachoPosition.X - 48,
+            (int)nachoPosition.Y - 64,
+                96,
+                128
+                );
+
+        if (currentKeyboardState.IsKeyDown(Keys.Space) && !previousKeyboardState.IsKeyDown(Keys.Space))
+        {
+            if (!isSpacebarAnimationActive)
+            {
+                isSpacebarAnimationActive = true;
+                spacebarAnimationTimer = 0f;
+                nachoDamagedThisCycle = false;
+            }
+        }
+        if (isSpacebarAnimationActive)
+        {
+            spacebarAnimationTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            if (spacebarAnimationTimer <= spacebarFirstFrameDuration)
+            {
+                useSpacebarFrame = true;
+            }
+            else if (spacebarAnimationTimer <= spacebarFirstFrameDuration + spacebarSecondFrameDuration)
+            {
+                useSpacebarFrame = false;
+            }
+            else
+            {
+                spacebarAnimationTimer = 0f;
+                isSpacebarAnimationActive = false;
+            }
+        }
 
         if (useSpacebarFrame && donutRect.Intersects(nachoRect) && !nachoDamagedThisCycle)
         {
             nachoHealth = Math.Max(0, nachoHealth - 1);
             nachoDamagedThisCycle = true;
         }
+    }
+
+    protected override void Update(GameTime gameTime)
+    {
+        if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
+            Keyboard.GetState().IsKeyDown(Keys.Escape))
+            Exit();
+
+        float elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+        float updatedNachoSpeed = nachoSpeed * elapsedTime;
+
+        KeyboardState currentKeyboardState = Keyboard.GetState();
+
+
+        spacebarAttack(gameTime, currentKeyboardState);
+
+        Rectangle currentRect = GetCurrentRectangles()[currentAnimationIndex];
+        ballPosition.X = MathHelper.Clamp(ballPosition.X, currentRect.Width / 2, _graphics.PreferredBackBufferWidth - currentRect.Width / 2);
+        ballPosition.Y = MathHelper.Clamp(ballPosition.Y, currentRect.Height / 2, _graphics.PreferredBackBufferHeight - currentRect.Height / 2);
+
+        Vector2 directionToDonut = ballPosition - nachoPosition;
+
+        if (directionToDonut != Vector2.Zero)
+        {
+            directionToDonut.Normalize();
+            nachoPosition += directionToDonut * updatedNachoSpeed;
+        }
+
+        nachoPosition.X = MathHelper.Clamp(nachoPosition.X, nacho.Width / 2, _graphics.PreferredBackBufferWidth - nacho.Width / 2);
+        nachoPosition.Y = MathHelper.Clamp(nachoPosition.Y, nacho.Height / 2, _graphics.PreferredBackBufferHeight - nacho.Height / 2);
+
+
+        bool isMoving = keyboardTracker(elapsedTime, gameTime);
+
+        nachoRotater();
+
+        animationBlinker(isMoving, gameTime);
+
+        cheeseLauncher(updatedNachoSpeed, gameTime);
+
 
         previousKeyboardState = currentKeyboardState;
 
@@ -493,10 +516,9 @@ public class Game1 : Game
 
         if (cheeseVisible && !showSplashCheese)
         {
-            Vector2 cheeseOffset = new Vector2(30, 70);
             _spriteBatch.Draw(
                 cheeseLaunch,
-                cheesePosition -cheeseOffset,
+                cheesePosition,
                 null,
                 Color.White,
                 cheeseRotation,
