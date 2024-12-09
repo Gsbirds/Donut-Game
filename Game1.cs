@@ -74,8 +74,6 @@ public class Game1 : Game
     private float nachoDirectionDelayTimer = 0f;
     private const float NachoDirectionDelayDuration = 2f;
 
-
-
     public Game1()
     {
         _graphics = new GraphicsDeviceManager(this);
@@ -457,9 +455,9 @@ public class Game1 : Game
             nachoPosition,
             GetCurrentRectanglesNacho()[currentAnimationIndex],
             Color.White,
-            nachoRotation, // Apply rotation
-            new Vector2(downRectangles[0].Width / 2, downRectangles[0].Height / 2), // Rotation origin: center of sprite
-            1.0f, // Scale
+            nachoRotation,
+            new Vector2(downRectangles[0].Width / 2, downRectangles[0].Height / 2),
+            1.0f,
             SpriteEffects.None,
             0f
         );
@@ -478,9 +476,10 @@ public class Game1 : Game
 
         if (showSplashCheese)
         {
+            Vector2 splashOffset = new Vector2(30, 40);
             _spriteBatch.Draw(
                 splashCheese,
-                splashPosition,
+                splashPosition + splashOffset,
                 null,
                 Color.White,
                 0f,
@@ -490,6 +489,7 @@ public class Game1 : Game
                 0f
             );
         }
+
 
         if (cheeseVisible && !showSplashCheese)
         {
