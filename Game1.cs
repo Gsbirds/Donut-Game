@@ -193,6 +193,8 @@ public class Game1 : Game
             if (cheeseVisibilityTimer >= 4f)
             {
                 cheeseVisible = false;
+                // showSplashCheese = true;
+                // splashPosition = ballPosition;
                 cheeseVisibilityTimer = 0f;
                 cheesePosition = GetNachoMouthPosition();
                 hasCheeseDealtDamage = false;
@@ -223,7 +225,7 @@ public class Game1 : Game
             {
                 directionToDonut.Normalize();
                 cheeseRotation = (float)Math.Atan2(directionToDonut.Y, directionToDonut.X);
-                cheesePosition += directionToDonut * updatedNachoSpeed * 1.5f;
+                cheesePosition += directionToDonut * updatedNachoSpeed * 2.5f;
             }
 
 
@@ -252,13 +254,13 @@ public class Game1 : Game
             }
 
 
-            if (distanceToDonut <= 70 && !hasCheeseDealtDamage)
-            {
-                cheeseVisible = false;
-                showSplashCheese = true;
-                health -= 0.5f;
-                hasCheeseDealtDamage = true;
-            }
+            // if (distanceToDonut <= 70 && !hasCheeseDealtDamage)
+            // {
+            //     cheeseVisible = false;
+            //     showSplashCheese = true;
+            //     health -= 0.5f;
+            //     hasCheeseDealtDamage = true;
+            // }
         }
         else
         {
