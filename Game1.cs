@@ -493,9 +493,10 @@ public class Game1 : Game
 
         if (cheeseVisible && !showSplashCheese)
         {
+            Vector2 cheeseOffset = new Vector2(30, 70);
             _spriteBatch.Draw(
                 cheeseLaunch,
-                cheesePosition,
+                cheesePosition -cheeseOffset,
                 null,
                 Color.White,
                 cheeseRotation,
