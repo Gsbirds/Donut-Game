@@ -193,8 +193,6 @@ public class Game1 : Game
             if (cheeseVisibilityTimer >= 4f)
             {
                 cheeseVisible = false;
-                // showSplashCheese = true;
-                // splashPosition = ballPosition;
                 cheeseVisibilityTimer = 0f;
                 cheesePosition = GetNachoMouthPosition();
                 hasCheeseDealtDamage = false;
@@ -252,15 +250,6 @@ public class Game1 : Game
                 health -= 0.5f;
                 hasCheeseDealtDamage = true;
             }
-
-
-            // if (distanceToDonut <= 70 && !hasCheeseDealtDamage)
-            // {
-            //     cheeseVisible = false;
-            //     showSplashCheese = true;
-            //     health -= 0.5f;
-            //     hasCheeseDealtDamage = true;
-            // }
         }
         else
         {
@@ -375,6 +364,7 @@ public class Game1 : Game
         ballPosition.Y = MathHelper.Clamp(ballPosition.Y, currentRect.Height / 2, _graphics.PreferredBackBufferHeight - currentRect.Height / 2);
 
         Vector2 directionToDonut = ballPosition - nachoPosition;
+
         if (directionToDonut != Vector2.Zero)
         {
             directionToDonut.Normalize();
@@ -387,20 +377,21 @@ public class Game1 : Game
 
         if (rotatingRight)
         {
-            nachoRotation += 0.05f;
-            if (nachoRotation >= 0.3f)
+            nachoRotation += 0.01f; // Smaller increment for smoother rotation
+            if (nachoRotation >= 0.1f) // Reduced maximum rotation
             {
                 rotatingRight = false;
             }
         }
         else
         {
-            nachoRotation -= 0.05f;
-            if (nachoRotation <= -0.3f)
+            nachoRotation -= 0.01f; // Smaller decrement for smoother rotation
+            if (nachoRotation <= -0.1f) // Reduced minimum rotation
             {
                 rotatingRight = true;
             }
         }
+
 
         if (isMoving || isSpacebarAnimationActive)
         {
@@ -461,7 +452,17 @@ public class Game1 : Game
       new Rectangle(0, 0, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight),
       Color.White
     );
-        _spriteBatch.Draw(nacho, nachoPosition, GetCurrentRectanglesNacho()[currentAnimationIndex], Color.White);
+        _spriteBatch.Draw(
+            nacho,
+            nachoPosition,
+            GetCurrentRectanglesNacho()[currentAnimationIndex],
+            Color.White,
+            nachoRotation, // Apply rotation
+            new Vector2(downRectangles[0].Width / 2, downRectangles[0].Height / 2), // Rotation origin: center of sprite
+            1.0f, // Scale
+            SpriteEffects.None,
+            0f
+        );
 
         _spriteBatch.Draw(charaset, ballPosition, GetCurrentRectangles()[currentAnimationIndex], Color.White);
 
