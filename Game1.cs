@@ -40,6 +40,8 @@ public class Game1 : Game
 
     byte currentAnimationIndex;
 
+    byte currentAnimationIndexNacho;
+
     enum Direction { Down, Up, Left, Right }
     Direction currentDirection;
 
@@ -64,6 +66,10 @@ public class Game1 : Game
     private bool nachoDamagedThisCycle = false;
     private KeyboardState previousKeyboardState;
 
+    float cheeseVisibilityTimer = 0f;
+
+    private float nachoAnimateDelayTimer = 0f;
+    private const float NachoAnimateDelayDuration = 2f;
 
     public Game1()
     {
@@ -138,7 +144,7 @@ public class Game1 : Game
 
     private Vector2 GetNachoMouthPosition()
     {
-        Rectangle currentRect = GetCurrentRectanglesNacho()[currentAnimationIndex];
+        Rectangle currentRect = GetCurrentRectanglesNacho()[currentAnimationIndexNacho];
 
         Vector2 mouthOffset = new Vector2(currentRect.Width / 2, currentRect.Height - 20); // Adjust `-20` for your mouth's exact position.
 
@@ -160,6 +166,20 @@ public class Game1 : Game
         int cheeseHeight = 20;
 
         float distanceToDonut = Vector2.Distance(nachoPosition, ballPosition);
+
+        if (cheeseVisible)
+        {
+            cheeseVisibilityTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            if (cheeseVisibilityTimer >= 4f)
+            {
+                cheeseVisible = false;
+                cheeseVisibilityTimer = 0f;
+                cheesePosition = GetNachoMouthPosition();
+                hasCheeseDealtDamage = false;
+                return;
+            }
+        }
 
         if (distanceToDonut <= 150)
         {
@@ -198,10 +218,11 @@ public class Game1 : Game
                 health -= 0.5f;
                 hasCheeseDealtDamage = true;
             }
-            if (distanceToDonut <= 50)
+            if (distanceToDonut <= 70 && !hasCheeseDealtDamage)
             {
                 cheeseVisible = false;
-
+                health -= 0.5f;
+                hasCheeseDealtDamage = true;
             }
         }
         else
@@ -210,6 +231,47 @@ public class Game1 : Game
             hasCheeseDealtDamage = false;
         }
     }
+
+    // //////////////////////////////////////////////////////////////////////////////////////
+    private void nachoAnimate(GameTime gameTime)
+    {
+
+        if (isSpacebarAnimationActive)
+        {
+            if (timer > threshold)
+            {
+                currentAnimationIndexNacho = (byte)((currentAnimationIndexNacho + 1) % 3);
+
+                if (currentAnimationIndexNacho == 0)
+                {
+                    animationCycleCount++;
+
+                    if (animationCycleCount % 3 == 0)
+                    {
+                        useBlinkingFrame = true;
+                    }
+                    else
+                    {
+                        useBlinkingFrame = false;
+                    }
+                }
+
+                timer = 0;
+            }
+            else
+            {
+                timer += (float)gameTime.ElapsedGameTime.TotalMilliseconds;
+            }
+        }
+        else
+        {
+            currentAnimationIndexNacho = 1;
+        }
+    }
+
+    private Direction currentDirectionNacho2 = Direction.Down; // Delayed Nacho direction
+    private float nachoDirectionDelayTimer = 0f; // Timer for direction delay
+    private const float NachoDirectionDelayDuration = 1f; // Delay duration in seconds
 
 
 
@@ -267,7 +329,7 @@ public class Game1 : Game
             else
             {
                 spacebarAnimationTimer = 0f;
-                isSpacebarAnimationActive = false; // End the animation
+                isSpacebarAnimationActive = false;
             }
         }
 
@@ -302,6 +364,14 @@ public class Game1 : Game
         {
             movement.Normalize();
             ballPosition += movement * updatedBallSpeed;
+        }
+
+        nachoDirectionDelayTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+        if (nachoDirectionDelayTimer >= NachoDirectionDelayDuration)
+        {
+            currentDirectionNacho2 = currentDirection;
+            nachoDirectionDelayTimer = 0f;
         }
 
 
@@ -339,6 +409,14 @@ public class Game1 : Game
 
         if (isMoving || isSpacebarAnimationActive)
         {
+            nachoAnimateDelayTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            if (nachoAnimateDelayTimer >= NachoAnimateDelayDuration)
+            {
+                nachoAnimate(gameTime);
+                nachoAnimateDelayTimer = 0f;
+            }
+
             if (timer > threshold)
             {
                 currentAnimationIndex = (byte)((currentAnimationIndex + 1) % 3);
@@ -364,6 +442,7 @@ public class Game1 : Game
                 timer += (float)gameTime.ElapsedGameTime.TotalMilliseconds;
             }
         }
+
         else
         {
             currentAnimationIndex = 1;
@@ -395,7 +474,7 @@ public class Game1 : Game
       new Rectangle(0, 0, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight),
       Color.White
     );
-        _spriteBatch.Draw(nacho, nachoPosition, GetCurrentRectanglesNacho()[currentAnimationIndex], Color.White);
+        _spriteBatch.Draw(nacho, nachoPosition, GetCurrentRectanglesNacho()[currentAnimationIndexNacho], Color.White);
 
         _spriteBatch.Draw(charaset, ballPosition, GetCurrentRectangles()[currentAnimationIndex], Color.White);
 
@@ -458,7 +537,7 @@ public class Game1 : Game
 
     private Rectangle[] GetCurrentRectanglesNacho()
     {
-        Rectangle[] baseRectangles = currentDirection switch
+        Rectangle[] baseRectangles = currentDirectionNacho2 switch
         {
             Direction.Up => new Rectangle[]
             {
@@ -510,7 +589,7 @@ public class Game1 : Game
             },
         };
 
-        if (useBlinkingFrame && currentDirection != Direction.Up)
+        if (useBlinkingFrame && currentDirectionNacho2 != Direction.Up)
         {
             baseRectangles[2] = new Rectangle(baseRectangles[2].X, 384, 96, 128);
         }
