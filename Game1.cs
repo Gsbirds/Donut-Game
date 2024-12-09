@@ -68,9 +68,6 @@ public class Game1 : Game
 
     float cheeseVisibilityTimer = 0f;
 
-    private float nachoAnimateDelayTimer = 0f;
-    private const float NachoAnimateDelayDuration = 2f;
-
     public Game1()
     {
         _graphics = new GraphicsDeviceManager(this);
@@ -144,7 +141,7 @@ public class Game1 : Game
 
     private Vector2 GetNachoMouthPosition()
     {
-        Rectangle currentRect = GetCurrentRectanglesNacho()[currentAnimationIndexNacho];
+        Rectangle currentRect = GetCurrentRectanglesNacho()[currentAnimationIndex];
 
         Vector2 mouthOffset = new Vector2(currentRect.Width / 2, currentRect.Height - 20); // Adjust `-20` for your mouth's exact position.
 
@@ -232,46 +229,10 @@ public class Game1 : Game
         }
     }
 
-    // //////////////////////////////////////////////////////////////////////////////////////
-    private void nachoAnimate(GameTime gameTime)
-    {
 
-        if (isSpacebarAnimationActive)
-        {
-            if (timer > threshold)
-            {
-                currentAnimationIndexNacho = (byte)((currentAnimationIndexNacho + 1) % 3);
-
-                if (currentAnimationIndexNacho == 0)
-                {
-                    animationCycleCount++;
-
-                    if (animationCycleCount % 3 == 0)
-                    {
-                        useBlinkingFrame = true;
-                    }
-                    else
-                    {
-                        useBlinkingFrame = false;
-                    }
-                }
-
-                timer = 0;
-            }
-            else
-            {
-                timer += (float)gameTime.ElapsedGameTime.TotalMilliseconds;
-            }
-        }
-        else
-        {
-            currentAnimationIndexNacho = 1;
-        }
-    }
-
-    private Direction currentDirectionNacho2 = Direction.Down; // Delayed Nacho direction
-    private float nachoDirectionDelayTimer = 0f; // Timer for direction delay
-    private const float NachoDirectionDelayDuration = 1f; // Delay duration in seconds
+    private Direction currentDirectionNacho2 = Direction.Down;
+    private float nachoDirectionDelayTimer = 0f;
+    private const float NachoDirectionDelayDuration = 2f;
 
 
 
@@ -370,7 +331,7 @@ public class Game1 : Game
 
         if (nachoDirectionDelayTimer >= NachoDirectionDelayDuration)
         {
-            currentDirectionNacho2 = currentDirection;
+            currentDirectionNacho2 = currentDirection; // Update nacho's direction after the delay
             nachoDirectionDelayTimer = 0f;
         }
 
@@ -409,14 +370,6 @@ public class Game1 : Game
 
         if (isMoving || isSpacebarAnimationActive)
         {
-            nachoAnimateDelayTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-            if (nachoAnimateDelayTimer >= NachoAnimateDelayDuration)
-            {
-                nachoAnimate(gameTime);
-                nachoAnimateDelayTimer = 0f;
-            }
-
             if (timer > threshold)
             {
                 currentAnimationIndex = (byte)((currentAnimationIndex + 1) % 3);
@@ -474,7 +427,7 @@ public class Game1 : Game
       new Rectangle(0, 0, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight),
       Color.White
     );
-        _spriteBatch.Draw(nacho, nachoPosition, GetCurrentRectanglesNacho()[currentAnimationIndexNacho], Color.White);
+        _spriteBatch.Draw(nacho, nachoPosition, GetCurrentRectanglesNacho()[currentAnimationIndex], Color.White);
 
         _spriteBatch.Draw(charaset, ballPosition, GetCurrentRectangles()[currentAnimationIndex], Color.White);
 
