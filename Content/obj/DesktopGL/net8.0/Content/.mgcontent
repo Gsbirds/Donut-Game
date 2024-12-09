@@ -24,8 +24,10 @@
     <File>/home/gux/monogame-game/monogame/Content/nachosprites2.png</File>
     <File>/home/gux/monogame-game/monogame/Content/openmountnacho2.png</File>
     <File>/home/gux/monogame-game/monogame/Content/sombrerosetting.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/splashcheese.png</File>
   </SourceFiles>
   <DestFiles>
+    <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -40,12 +39,9 @@ public class Game1 : Game
 
     byte currentAnimationIndex;
 
-    byte currentAnimationIndexNacho;
 
     enum Direction { Down, Up, Left, Right }
     Direction currentDirection;
-
-    float cheeseDisableTimer = 0f;
 
     bool hasCheeseDealtDamage = false;
     float cheeseRotation = 0f;
@@ -67,6 +63,18 @@ public class Game1 : Game
     private KeyboardState previousKeyboardState;
 
     float cheeseVisibilityTimer = 0f;
+
+    Texture2D splashCheese;
+    bool showSplashCheese = false;
+    float splashCheeseTimer = 0f;
+    const float splashCheeseDuration = 1f;
+    Vector2 splashPosition;
+
+    private Direction currentDirectionNacho2 = Direction.Down;
+    private float nachoDirectionDelayTimer = 0f;
+    private const float NachoDirectionDelayDuration = 2f;
+
+
 
     public Game1()
     {
@@ -100,6 +108,8 @@ public class Game1 : Game
         cheeseLaunch = Content.Load<Texture2D>("cheeselaunch");
         nachoMouth = Content.Load<Texture2D>("openmountnacho2");
         sombreroWallpaper = Content.Load<Texture2D>("sombrerosetting");
+        splashCheese = Content.Load<Texture2D>("splashcheese");
+
 
 
         health = 4;
@@ -164,7 +174,19 @@ public class Game1 : Game
 
         float distanceToDonut = Vector2.Distance(nachoPosition, ballPosition);
 
-        if (cheeseVisible)
+        cheeseVisibilityTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+        if (showSplashCheese)
+        {
+            splashCheeseTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+            if (splashCheeseTimer >= splashCheeseDuration)
+            {
+                showSplashCheese = false;
+                splashCheeseTimer = 0f;
+            }
+        }
+
+        if (cheeseVisible && !showSplashCheese)
         {
             cheeseVisibilityTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
 
@@ -174,13 +196,23 @@ public class Game1 : Game
                 cheeseVisibilityTimer = 0f;
                 cheesePosition = GetNachoMouthPosition();
                 hasCheeseDealtDamage = false;
+
+                if (cheeseVisible)
+                {
+                    cheesePosition = GetNachoMouthPosition();
+                    hasCheeseDealtDamage = false;
+                }
+                else
+                {
+                    splashPosition = cheesePosition;
+                }
                 return;
             }
         }
 
         if (distanceToDonut <= 150)
         {
-            if (!cheeseVisible)
+            if (!cheeseVisible && !showSplashCheese)
             {
                 cheesePosition = GetNachoMouthPosition();
                 cheeseVisible = true;
@@ -211,13 +243,19 @@ public class Game1 : Game
 
             if (cheeseRect.Intersects(donutRect) && !hasCheeseDealtDamage)
             {
+                showSplashCheese = true;
                 cheeseVisible = false;
+                splashPosition = ballPosition;
+                splashCheeseTimer = 0f;
                 health -= 0.5f;
                 hasCheeseDealtDamage = true;
             }
+
+
             if (distanceToDonut <= 70 && !hasCheeseDealtDamage)
             {
                 cheeseVisible = false;
+                showSplashCheese = true;
                 health -= 0.5f;
                 hasCheeseDealtDamage = true;
             }
@@ -228,12 +266,6 @@ public class Game1 : Game
             hasCheeseDealtDamage = false;
         }
     }
-
-
-    private Direction currentDirectionNacho2 = Direction.Down;
-    private float nachoDirectionDelayTimer = 0f;
-    private const float NachoDirectionDelayDuration = 2f;
-
 
 
     protected override void Update(GameTime gameTime)
@@ -440,7 +472,23 @@ public class Game1 : Game
             useOpenMouthFrame = false;
 
         }
-        if (cheeseVisible)
+
+        if (showSplashCheese)
+        {
+            _spriteBatch.Draw(
+                splashCheese,
+                splashPosition,
+                null,
+                Color.White,
+                0f,
+                new Vector2(splashCheese.Width / 2, splashCheese.Height / 2),
+                1.0f,
+                SpriteEffects.None,
+                0f
+            );
+        }
+
+        if (cheeseVisible && !showSplashCheese)
         {
             _spriteBatch.Draw(
                 cheeseLaunch,
