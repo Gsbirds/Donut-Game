@@ -74,6 +74,10 @@ public class Game1 : Game
     private float nachoDirectionDelayTimer = 0f;
     private const float NachoDirectionDelayDuration = 2f;
 
+    private bool usePostHitFrame = false;
+    private float postHitAnimationTimer = 0f;
+    private const float postHitAnimationDuration = 0.5f;
+
     public Game1()
     {
         _graphics = new GraphicsDeviceManager(this);
@@ -101,7 +105,7 @@ public class Game1 : Game
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
         charaset = Content.Load<Texture2D>("donutsprites17");
-        nacho = Content.Load<Texture2D>("nachosprites2");
+        nacho = Content.Load<Texture2D>("nachosprites4");
         font = Content.Load<SpriteFont>("DefaultFont1");
         cheeseLaunch = Content.Load<Texture2D>("cheeselaunch");
         nachoMouth = Content.Load<Texture2D>("openmountnacho2");
@@ -151,7 +155,7 @@ public class Game1 : Game
     {
         Rectangle currentRect = GetCurrentRectanglesNacho()[currentAnimationIndex];
 
-        Vector2 mouthOffset = new Vector2(currentRect.Width / 2, (currentRect.Height/2) -70);
+        Vector2 mouthOffset = new Vector2(currentRect.Width / 2, (currentRect.Height / 2) - 70);
 
         float sin = (float)Math.Sin(nachoRotation);
         float cos = (float)Math.Cos(nachoRotation);
@@ -367,20 +371,19 @@ public class Game1 : Game
 
     private void spacebarAttack(GameTime gameTime, KeyboardState currentKeyboardState)
     {
-
         Rectangle donutRect = new Rectangle(
-    (int)ballPosition.X - 48,
-    (int)ballPosition.Y - 64,
-    96,
-    128
-    );
+            (int)ballPosition.X - 48,
+            (int)ballPosition.Y - 64,
+            96,
+            128
+        );
 
         Rectangle nachoRect = new Rectangle(
             (int)nachoPosition.X - 48,
             (int)nachoPosition.Y - 64,
-                96,
-                128
-                );
+            96,
+            128
+        );
 
         if (currentKeyboardState.IsKeyDown(Keys.Space) && !previousKeyboardState.IsKeyDown(Keys.Space))
         {
@@ -391,6 +394,7 @@ public class Game1 : Game
                 nachoDamagedThisCycle = false;
             }
         }
+
         if (isSpacebarAnimationActive)
         {
             spacebarAnimationTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -414,8 +418,12 @@ public class Game1 : Game
         {
             nachoHealth = Math.Max(0, nachoHealth - 1);
             nachoDamagedThisCycle = true;
+
+            usePostHitFrame = true;
+            postHitAnimationTimer = 0f;
         }
     }
+
 
     protected override void Update(GameTime gameTime)
     {
@@ -428,15 +436,23 @@ public class Game1 : Game
 
         KeyboardState currentKeyboardState = Keyboard.GetState();
 
-
         spacebarAttack(gameTime, currentKeyboardState);
+
+        if (usePostHitFrame)
+        {
+            postHitAnimationTimer += elapsedTime;
+            if (postHitAnimationTimer >= postHitAnimationDuration)
+            {
+                usePostHitFrame = false;
+                postHitAnimationTimer = 0f;
+            }
+        }
 
         Rectangle currentRect = GetCurrentRectangles()[currentAnimationIndex];
         ballPosition.X = MathHelper.Clamp(ballPosition.X, currentRect.Width / 2, _graphics.PreferredBackBufferWidth - currentRect.Width / 2);
         ballPosition.Y = MathHelper.Clamp(ballPosition.Y, currentRect.Height / 2, _graphics.PreferredBackBufferHeight - currentRect.Height / 2);
 
         Vector2 directionToDonut = ballPosition - nachoPosition;
-
         if (directionToDonut != Vector2.Zero)
         {
             directionToDonut.Normalize();
@@ -446,21 +462,17 @@ public class Game1 : Game
         nachoPosition.X = MathHelper.Clamp(nachoPosition.X, nacho.Width / 2, _graphics.PreferredBackBufferWidth - nacho.Width / 2);
         nachoPosition.Y = MathHelper.Clamp(nachoPosition.Y, nacho.Height / 2, _graphics.PreferredBackBufferHeight - nacho.Height / 2);
 
-
         bool isMoving = keyboardTracker(elapsedTime, gameTime);
 
         nachoRotater();
-
         animationBlinker(isMoving, gameTime);
-
         cheeseLauncher(updatedNachoSpeed, gameTime);
-
 
         previousKeyboardState = currentKeyboardState;
 
-
         base.Update(gameTime);
     }
+
 
 
     protected override void Draw(GameTime gameTime)
@@ -567,62 +579,82 @@ public class Game1 : Game
         Rectangle[] baseRectangles = currentDirectionNacho2 switch
         {
             Direction.Up => new Rectangle[]
-            {
+              {
             new Rectangle(0, 0, 96, 128),
             new Rectangle(0, 0, 96, 128),
             new Rectangle(0, 0, 96, 128)
-            },
+              },
             Direction.Down => new Rectangle[]
             {
-            useOpenMouthFrame
-                ? new Rectangle(96, 128, 96, 128)
-                : new Rectangle(96, 256, 96, 128),
-            useOpenMouthFrame
-                ? new Rectangle(96, 128, 96, 128)
-                : new Rectangle(96, 256, 96, 128),
-            useOpenMouthFrame
-                ? new Rectangle(96, 128, 96, 128)
-                : new Rectangle(96, 256, 96, 128)
+            usePostHitFrame
+                ? new Rectangle(96, 512, 96, 128) // Post-hit frame for "Down"
+                : (useOpenMouthFrame
+                    ? new Rectangle(96, 128, 96, 128) // Open mouth frame
+                    : new Rectangle(96, 256, 96, 128)),
+            usePostHitFrame
+                ? new Rectangle(96, 512, 96, 128) // Post-hit frame for "Down"
+                : (useOpenMouthFrame
+                    ? new Rectangle(96, 128, 96, 128)
+                    : new Rectangle(96, 256, 96, 128)),
+            usePostHitFrame
+                ? new Rectangle(96, 512, 96, 128) // Post-hit frame for "Down"
+                : (useOpenMouthFrame
+                    ? new Rectangle(96, 128, 96, 128)
+                    : new Rectangle(96, 256, 96, 128))
             },
             Direction.Left => new Rectangle[]
             {
-            useOpenMouthFrame
-                ? new Rectangle(192, 128, 96, 128)
-                : new Rectangle(192, 256, 96, 128),
-            useOpenMouthFrame
-                ? new Rectangle(192, 128, 96, 128)
-                : new Rectangle(192, 256, 96, 128),
-            useOpenMouthFrame
-                ? new Rectangle(192, 128, 96, 128)
-                : new Rectangle(192, 256, 96, 128)
+            usePostHitFrame
+                ? new Rectangle(0, 512, 96, 128) // Post-hit frame for "Left"
+                : (useOpenMouthFrame
+                    ? new Rectangle(192, 128, 96, 128)
+                    : new Rectangle(192, 256, 96, 128)),
+            usePostHitFrame
+                ? new Rectangle(0, 512, 96, 128) // Post-hit frame for "Left"
+                : (useOpenMouthFrame
+                    ? new Rectangle(192, 128, 96, 128)
+                    : new Rectangle(192, 256, 96, 128)),
+            usePostHitFrame
+                ? new Rectangle(0, 512, 96, 128) // Post-hit frame for "Left"
+                : (useOpenMouthFrame
+                    ? new Rectangle(192, 128, 96, 128)
+                    : new Rectangle(192, 256, 96, 128))
             },
             Direction.Right => new Rectangle[]
             {
-            useOpenMouthFrame
-                ? new Rectangle(0, 128, 96, 128)
-                : new Rectangle(0, 256, 96, 128),
-            useOpenMouthFrame
-                ? new Rectangle(0, 128, 96, 128)
-                : new Rectangle(0, 256, 96, 128),
-            useOpenMouthFrame
-                ? new Rectangle(0, 128, 96, 128)
-                : new Rectangle(0, 256, 96, 128)
+            usePostHitFrame
+                ? new Rectangle(192, 512, 96, 128) // Post-hit frame for "Right"
+                : (useOpenMouthFrame
+                    ? new Rectangle(0, 128, 96, 128)
+                    : new Rectangle(0, 256, 96, 128)),
+            usePostHitFrame
+                ? new Rectangle(192, 512, 96, 128) // Post-hit frame for "Right"
+                : (useOpenMouthFrame
+                    ? new Rectangle(0, 128, 96, 128)
+                    : new Rectangle(0, 256, 96, 128)),
+            usePostHitFrame
+                ? new Rectangle(192, 512, 96, 128) // Post-hit frame for "Right"
+                : (useOpenMouthFrame
+                    ? new Rectangle(0, 128, 96, 128)
+                    : new Rectangle(0, 256, 96, 128))
             },
             _ => new Rectangle[]
             {
-            new Rectangle(0, 384, 96, 128),
-            new Rectangle(96, 384, 96, 128),
-            new Rectangle(192, 384, 96, 128)
+            new Rectangle(0, 384, 96, 128),  // Default "Down" row
+            new Rectangle(96, 384, 96, 128), // Default second frame
+            new Rectangle(192, 384, 96, 128) // Default third frame
             },
         };
 
-        if (useBlinkingFrame && currentDirectionNacho2 != Direction.Up)
+        if (useBlinkingFrame && !usePostHitFrame && currentDirectionNacho2 != Direction.Up)
         {
             baseRectangles[2] = new Rectangle(baseRectangles[2].X, 384, 96, 128);
         }
 
         return baseRectangles;
     }
+
+
 
 
     private Rectangle[] GetCurrentRectangles()

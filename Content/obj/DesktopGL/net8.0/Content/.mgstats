@@ -17,6 +17,7 @@ Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Siz
 "/home/gux/monogame-game/monogame/Content/nachofrontstant2.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/nachofrontstant2.xnb","TextureProcessor","Texture2DContent",11547,160085,0.0043228
 "/home/gux/monogame-game/monogame/Content/nachosprites.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/nachosprites.xnb","TextureProcessor","Texture2DContent",88116,589909,0.0142028
 "/home/gux/monogame-game/monogame/Content/nachosprites2.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/nachosprites2.xnb","TextureProcessor","Texture2DContent",84995,589909,0.1019221
+"/home/gux/monogame-game/monogame/Content/nachosprites4.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/nachosprites4.xnb","TextureProcessor","Texture2DContent",109429,737365,0.1462878
 "/home/gux/monogame-game/monogame/Content/openmountnacho2.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/openmountnacho2.xnb","TextureProcessor","Texture2DContent",11558,160085,0.0053216
 "/home/gux/monogame-game/monogame/Content/sombrerosetting.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/sombrerosetting.xnb","TextureProcessor","Texture2DContent",308849,1690085,0.0409224
 "/home/gux/monogame-game/monogame/Content/splashcheese.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/splashcheese.xnb","TextureProcessor","Texture2DContent",4952,160085,0.1066234
