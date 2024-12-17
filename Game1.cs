@@ -83,7 +83,6 @@ public class Game1 : Game
     private bool nachoDefeated = false;
     private float nachoDefeatedTimer = 0f;
     private const float nachoDefeatedDuration = 3f;
-    private bool transitionToGame2 = false;
     enum GameState
     {
         Game1,
