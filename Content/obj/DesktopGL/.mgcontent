@@ -16,15 +16,21 @@
     <File>/home/gux/monogame-game/monogame/Content/donutsprites15.png</File>
     <File>/home/gux/monogame-game/monogame/Content/donutsprites16.png</File>
     <File>/home/gux/monogame-game/monogame/Content/donutsprites17.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/donutsprites18.png</File>
     <File>/home/gux/monogame-game/monogame/Content/donutsss.png</File>
     <File>/home/gux/monogame-game/monogame/Content/nachofrontstant1.png</File>
     <File>/home/gux/monogame-game/monogame/Content/nachofrontstant2.png</File>
     <File>/home/gux/monogame-game/monogame/Content/nachosprites.png</File>
     <File>/home/gux/monogame-game/monogame/Content/nachosprites2.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/nachosprites4.png</File>
     <File>/home/gux/monogame-game/monogame/Content/openmountnacho2.png</File>
     <File>/home/gux/monogame-game/monogame/Content/sombrerosetting.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/splashcheese.png</File>
   </SourceFiles>
   <DestFiles>
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />

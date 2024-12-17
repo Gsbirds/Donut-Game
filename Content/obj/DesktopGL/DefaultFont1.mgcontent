@@ -3,7 +3,7 @@
   <SourceFile>/home/gux/monogame-game/monogame/Content/DefaultFont1.spritefont</SourceFile>
   <SourceTime>2024-11-26T07:18:44.1504728-07:00</SourceTime>
   <DestFile>/home/gux/monogame-game/monogame/Content/bin/DesktopGL/DefaultFont1.xnb</DestFile>
-  <DestTime>2024-12-02T20:22:24.9578925-07:00</DestTime>
+  <DestTime>2024-12-16T15:48:11.3543988-07:00</DestTime>
   <Importer>FontDescriptionImporter</Importer>
   <ImporterTime>2024-08-16T11:05:56-06:00</ImporterTime>
   <Processor>FontDescriptionProcessor</Processor>

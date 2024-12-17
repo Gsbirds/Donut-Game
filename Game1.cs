@@ -9,6 +9,7 @@ public class Game1 : Game
 {
     Texture2D charaset;
     Texture2D nacho;
+    Texture2D sushi;
     Vector2 ballPosition;
     Texture2D cheeseLaunch;
     Texture2D nachoMouth;
@@ -17,6 +18,7 @@ public class Game1 : Game
     Vector2 cheesePosition;
 
     Texture2D sombreroWallpaper;
+    Texture2D sushiWallpaper;
     float ballSpeed;
     float nachoSpeed = 40f;
     float nachoRotation = 0f;
@@ -78,6 +80,20 @@ public class Game1 : Game
     private float postHitAnimationTimer = 0f;
     private const float postHitAnimationDuration = 0.5f;
 
+    private bool nachoDefeated = false;
+    private float nachoDefeatedTimer = 0f;
+    private const float nachoDefeatedDuration = 3f;
+    private bool transitionToGame2 = false;
+    enum GameState
+    {
+        Game1,
+        Game2,
+    }
+
+    GameState _state;
+
+
+
     public Game1()
     {
         _graphics = new GraphicsDeviceManager(this);
@@ -101,18 +117,24 @@ public class Game1 : Game
         base.Initialize();
     }
 
+    private void LaunchGame2()
+    {
+        _state = GameState.Game2;
+    }
+
+
     protected override void LoadContent()
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
         charaset = Content.Load<Texture2D>("donutsprites17");
         nacho = Content.Load<Texture2D>("nachosprites4");
+        sushi = Content.Load<Texture2D>("nachosprites4");
         font = Content.Load<SpriteFont>("DefaultFont1");
         cheeseLaunch = Content.Load<Texture2D>("cheeselaunch");
         nachoMouth = Content.Load<Texture2D>("openmountnacho2");
         sombreroWallpaper = Content.Load<Texture2D>("sombrerosetting");
+        sushiWallpaper = Content.Load<Texture2D>("japaneselevel2");
         splashCheese = Content.Load<Texture2D>("splashcheese");
-
-
 
         health = 4;
 
@@ -424,12 +446,46 @@ public class Game1 : Game
         }
     }
 
-
-    protected override void Update(GameTime gameTime)
+    private void LoadGame2Content()
     {
+        nachoDefeated = false;
+        nachoHealth = 4;
+        health = 4;
+
+        ballPosition = new Vector2(300, 300);
+        nachoPosition = new Vector2(150, 150);
+        _graphics.PreferredBackBufferWidth = 650;
+        _graphics.PreferredBackBufferHeight = 650;
+        _graphics.ApplyChanges();
+    }
+
+
+    protected void UpdateGameplay1(GameTime gameTime)
+    {
+
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
             Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
+
+        if (nachoDefeated)
+        {
+            nachoDefeatedTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            if (nachoDefeatedTimer >= nachoDefeatedDuration)
+            {
+                LaunchGame2();
+                LoadGame2Content();
+                return;
+            }
+            return;
+        }
+
+        if (nachoHealth <= 0)
+        {
+            nachoDefeated = true;
+            nachoDefeatedTimer = 0f;
+            return;
+        }
 
         float elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
         float updatedNachoSpeed = nachoSpeed * elapsedTime;
@@ -459,8 +515,70 @@ public class Game1 : Game
             nachoPosition += directionToDonut * updatedNachoSpeed;
         }
 
-        nachoPosition.X = MathHelper.Clamp(nachoPosition.X, nacho.Width / 2, _graphics.PreferredBackBufferWidth - nacho.Width / 2);
-        nachoPosition.Y = MathHelper.Clamp(nachoPosition.Y, nacho.Height / 2, _graphics.PreferredBackBufferHeight - nacho.Height / 2);
+        bool isMoving = keyboardTracker(elapsedTime, gameTime);
+
+        nachoRotater();
+        animationBlinker(isMoving, gameTime);
+        cheeseLauncher(updatedNachoSpeed, gameTime);
+
+        previousKeyboardState = currentKeyboardState;
+
+        base.Update(gameTime);
+    }
+
+    protected void UpdateGameplay2(GameTime gameTime)
+    {
+
+        if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
+            Keyboard.GetState().IsKeyDown(Keys.Escape))
+            Exit();
+
+        if (nachoDefeated)
+        {
+            nachoDefeatedTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            if (nachoDefeatedTimer >= nachoDefeatedDuration)
+            {
+                LaunchGame2();
+                return;
+            }
+            return;
+        }
+
+        if (nachoHealth <= 0)
+        {
+            nachoDefeated = true;
+            nachoDefeatedTimer = 0f;
+            return;
+        }
+
+        float elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+        float updatedNachoSpeed = nachoSpeed * elapsedTime;
+
+        KeyboardState currentKeyboardState = Keyboard.GetState();
+
+        spacebarAttack(gameTime, currentKeyboardState);
+
+        if (usePostHitFrame)
+        {
+            postHitAnimationTimer += elapsedTime;
+            if (postHitAnimationTimer >= postHitAnimationDuration)
+            {
+                usePostHitFrame = false;
+                postHitAnimationTimer = 0f;
+            }
+        }
+
+        Rectangle currentRect = GetCurrentRectangles()[currentAnimationIndex];
+        ballPosition.X = MathHelper.Clamp(ballPosition.X, currentRect.Width / 2, _graphics.PreferredBackBufferWidth - currentRect.Width / 2);
+        ballPosition.Y = MathHelper.Clamp(ballPosition.Y, currentRect.Height / 2, _graphics.PreferredBackBufferHeight - currentRect.Height / 2);
+
+        Vector2 directionToDonut = ballPosition - nachoPosition;
+        if (directionToDonut != Vector2.Zero)
+        {
+            directionToDonut.Normalize();
+            nachoPosition += directionToDonut * updatedNachoSpeed;
+        }
 
         bool isMoving = keyboardTracker(elapsedTime, gameTime);
 
@@ -474,17 +592,64 @@ public class Game1 : Game
     }
 
 
+    protected override void Update(GameTime gameTime)
+    {
+        base.Update(gameTime);
+        switch (_state)
+        {
+            // case GameState.MainMenu:
+            //     UpdateMainMenu(gameTime);
+            //     break;
+            case GameState.Game1:
+                UpdateGameplay1(gameTime);
+                break;
+            case GameState.Game2:
+                UpdateGameplay2(gameTime);
+                break;
+
+        }
+    }
 
     protected override void Draw(GameTime gameTime)
     {
+        base.Draw(gameTime);
+        switch (_state)
+        {
+            case GameState.Game1:
+                DrawGame1(gameTime);
+                break;
+            case GameState.Game2:
+                DrawGame2(gameTime);
+                break;
+        }
+    }
+
+    protected void DrawGame1(GameTime gameTime)
+    {
+
+        if (nachoDefeated)
+        {
+            _graphics.GraphicsDevice.Clear(Color.Black);
+            _spriteBatch.Begin();
+            string defeatMessage = "Nacho Defeated";
+            Vector2 textSize = font.MeasureString(defeatMessage);
+            Vector2 textPosition = new Vector2(
+                (_graphics.PreferredBackBufferWidth - textSize.X) / 2,
+                (_graphics.PreferredBackBufferHeight - textSize.Y) / 2
+            );
+            _spriteBatch.DrawString(font, defeatMessage, textPosition, Color.White);
+            _spriteBatch.End();
+            return;
+        }
+
         _graphics.GraphicsDevice.Clear(Color.Tan);
         _spriteBatch.Begin();
 
         _spriteBatch.Draw(
-      sombreroWallpaper,
-      new Rectangle(0, 0, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight),
-      Color.White
-    );
+            sombreroWallpaper,
+            new Rectangle(0, 0, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight),
+            Color.White
+        );
         _spriteBatch.Draw(
             nacho,
             nachoPosition,
@@ -506,7 +671,6 @@ public class Game1 : Game
         else
         {
             useOpenMouthFrame = false;
-
         }
 
         if (showSplashCheese)
@@ -525,6 +689,117 @@ public class Game1 : Game
             );
         }
 
+        if (cheeseVisible && !showSplashCheese)
+        {
+            _spriteBatch.Draw(
+                cheeseLaunch,
+                cheesePosition,
+                null,
+                Color.White,
+                cheeseRotation,
+                new Vector2(cheeseLaunch.Width / 2, cheeseLaunch.Height / 2),
+                1.0f,
+                SpriteEffects.None,
+                0f
+            );
+        }
+
+        float maxNachoHealth = 4f;
+        int nachoHealthBarWidth = 200;
+        int nachoHealthBarHeight = 20;
+        Vector2 nachoHealthBarPosition = new Vector2(10, 10);
+
+        if (nachoHealthBarWidth != 0)
+        {
+            _spriteBatch.Draw(
+                Texture2DHelper.CreateRectangle(GraphicsDevice, nachoHealthBarWidth, nachoHealthBarHeight, Color.Gray),
+                new Rectangle((int)nachoHealthBarPosition.X, (int)nachoHealthBarPosition.Y, nachoHealthBarWidth, nachoHealthBarHeight),
+                Color.Gray
+            );
+        }
+
+        int nachoHealthCurrentWidth = (int)((nachoHealth / maxNachoHealth) * nachoHealthBarWidth);
+        if (nachoHealthCurrentWidth != 0)
+        {
+            _spriteBatch.Draw(
+                Texture2DHelper.CreateRectangle(GraphicsDevice, nachoHealthCurrentWidth, nachoHealthBarHeight, Color.WhiteSmoke),
+                new Rectangle((int)nachoHealthBarPosition.X, (int)nachoHealthBarPosition.Y, nachoHealthCurrentWidth, nachoHealthBarHeight),
+                Color.WhiteSmoke
+            );
+        }
+
+        string donutHealthText = $"Health: {health}";
+        Vector2 donutHealthPosition = new Vector2(_graphics.PreferredBackBufferWidth - font.MeasureString(donutHealthText).X - 10, 10);
+        _spriteBatch.DrawString(font, donutHealthText, donutHealthPosition, Color.Black);
+
+        _spriteBatch.End();
+        base.Draw(gameTime);
+    }
+    
+    protected void DrawGame2(GameTime gameTime)
+    {
+
+        if (nachoDefeated)
+        {
+            _graphics.GraphicsDevice.Clear(Color.Black);
+            _spriteBatch.Begin();
+            string defeatMessage = "Sushi Defeated";
+            Vector2 textSize = font.MeasureString(defeatMessage);
+            Vector2 textPosition = new Vector2(
+                (_graphics.PreferredBackBufferWidth - textSize.X) / 2,
+                (_graphics.PreferredBackBufferHeight - textSize.Y) / 2
+            );
+            _spriteBatch.DrawString(font, defeatMessage, textPosition, Color.White);
+            _spriteBatch.End();
+            return;
+        }
+
+        _graphics.GraphicsDevice.Clear(Color.Tan);
+        _spriteBatch.Begin();
+
+        _spriteBatch.Draw(
+            sushiWallpaper,
+            new Rectangle(0, 0, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight),
+            Color.White
+        );
+        _spriteBatch.Draw(
+            nacho,
+            nachoPosition,
+            GetCurrentRectanglesNacho()[currentAnimationIndex],
+            Color.White,
+            nachoRotation,
+            new Vector2(downRectangles[0].Width / 2, downRectangles[0].Height / 2),
+            1.0f,
+            SpriteEffects.None,
+            0f
+        );
+
+        _spriteBatch.Draw(charaset, ballPosition, GetCurrentRectangles()[currentAnimationIndex], Color.White);
+
+        if (Vector2.Distance(nachoPosition, ballPosition) <= 150)
+        {
+            useOpenMouthFrame = true;
+        }
+        else
+        {
+            useOpenMouthFrame = false;
+        }
+
+        if (showSplashCheese)
+        {
+            Vector2 splashOffset = new Vector2(30, 40);
+            _spriteBatch.Draw(
+                splashCheese,
+                splashPosition + splashOffset,
+                null,
+                Color.White,
+                0f,
+                new Vector2(splashCheese.Width / 2, splashCheese.Height / 2),
+                1.0f,
+                SpriteEffects.None,
+                0f
+            );
+        }
 
         if (cheeseVisible && !showSplashCheese)
         {
