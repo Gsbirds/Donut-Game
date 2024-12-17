@@ -454,7 +454,7 @@ public class Game1 : Game
 
         ballPosition = new Vector2(300, 300);
         nachoPosition = new Vector2(150, 150);
-        _graphics.PreferredBackBufferWidth = 650;
+        _graphics.PreferredBackBufferWidth = 854;
         _graphics.PreferredBackBufferHeight = 650;
         _graphics.ApplyChanges();
     }
@@ -735,7 +735,7 @@ public class Game1 : Game
         _spriteBatch.End();
         base.Draw(gameTime);
     }
-    
+
     protected void DrawGame2(GameTime gameTime)
     {
 
