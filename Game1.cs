@@ -67,6 +67,7 @@ public class Game1 : Game
     float cheeseVisibilityTimer = 0f;
 
     Texture2D splashCheese;
+    private Texture2D mainmenu;
     bool showSplashCheese = false;
     float splashCheeseTimer = 0f;
     const float splashCheeseDuration = 1f;
@@ -134,6 +135,7 @@ public class Game1 : Game
         sombreroWallpaper = Content.Load<Texture2D>("sombrerosetting");
         sushiWallpaper = Content.Load<Texture2D>("japaneselevel2");
         splashCheese = Content.Load<Texture2D>("splashcheese");
+        mainmenu= Content.Load<Texture2D>("mainmenudonut");
 
         health = 4;
 

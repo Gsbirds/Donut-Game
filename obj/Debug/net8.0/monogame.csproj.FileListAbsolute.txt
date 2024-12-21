@@ -49,3 +49,6 @@
 /home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/japaneselevel.xnb
 /home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/japaneselevel2.xnb
 /home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/sushisprites.xnb
+/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/japaneselevel3.xnb
+/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/japaneselevel4.xnb
+/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/mainmenudonut.xnb

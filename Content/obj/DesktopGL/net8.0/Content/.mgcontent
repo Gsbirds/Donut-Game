@@ -4,6 +4,7 @@
   <Platform>DesktopGL</Platform>
   <Config />
   <SourceFiles>
+    <File>/home/gux/monogame-game/monogame/Content/../../../Desktop/mainmenudonut.png</File>
     <File>/home/gux/monogame-game/monogame/Content/angrydonut.png</File>
     <File>/home/gux/monogame-game/monogame/Content/ball.png</File>
     <File>/home/gux/monogame-game/monogame/Content/cheeselaunch.png</File>
@@ -20,6 +21,9 @@
     <File>/home/gux/monogame-game/monogame/Content/donutsss.png</File>
     <File>/home/gux/monogame-game/monogame/Content/japaneselevel.png</File>
     <File>/home/gux/monogame-game/monogame/Content/japaneselevel2.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/japaneselevel3.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/japaneselevel4.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/mainmenudonut.png</File>
     <File>/home/gux/monogame-game/monogame/Content/nachofrontstant1.png</File>
     <File>/home/gux/monogame-game/monogame/Content/nachofrontstant2.png</File>
     <File>/home/gux/monogame-game/monogame/Content/nachosprites.png</File>
@@ -31,6 +35,10 @@
     <File>/home/gux/monogame-game/monogame/Content/sushisprites.png</File>
   </SourceFiles>
   <DestFiles>
+    <File>mainmenudonut.png</File>
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />

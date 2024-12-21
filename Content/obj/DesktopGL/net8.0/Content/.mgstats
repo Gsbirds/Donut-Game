@@ -1,4 +1,5 @@
 Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Size,Build Seconds
+"/home/gux/monogame-game/monogame/Content/../../../Desktop/mainmenudonut.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/mainmenudonut.xnb","TextureProcessor","Texture2DContent",81766,1690085,0.1865775
 "/home/gux/monogame-game/monogame/Content/angrydonut.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/angrydonut.xnb","TextureProcessor","Texture2DContent",1634334,36000085,0.6857494
 "/home/gux/monogame-game/monogame/Content/ball.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/ball.xnb","TextureProcessor","Texture2DContent",8368,16469,0.0885307
 "/home/gux/monogame-game/monogame/Content/cheeselaunch.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/cheeselaunch.xnb","TextureProcessor","Texture2DContent",5418,160085,0.0102583
@@ -15,6 +16,9 @@ Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Siz
 "/home/gux/monogame-game/monogame/Content/donutsss.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/donutsss.xnb","TextureProcessor","Texture2DContent",768026,12960085,0.1939808
 "/home/gux/monogame-game/monogame/Content/japaneselevel.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/japaneselevel.xnb","TextureProcessor","Texture2DContent",313902,5200085,0.2646596
 "/home/gux/monogame-game/monogame/Content/japaneselevel2.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/japaneselevel2.xnb","TextureProcessor","Texture2DContent",202385,2197085,0.1408796
+"/home/gux/monogame-game/monogame/Content/japaneselevel3.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/japaneselevel3.xnb","TextureProcessor","Texture2DContent",304143,2197085,0.1548403
+"/home/gux/monogame-game/monogame/Content/japaneselevel4.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/japaneselevel4.xnb","TextureProcessor","Texture2DContent",304398,2197085,0.1377911
+"/home/gux/monogame-game/monogame/Content/mainmenudonut.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/mainmenudonut.xnb","TextureProcessor","Texture2DContent",81766,1690085,0.0744731
 "/home/gux/monogame-game/monogame/Content/nachofrontstant1.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/nachofrontstant1.xnb","TextureProcessor","Texture2DContent",10573,160085,0.0051352
 "/home/gux/monogame-game/monogame/Content/nachofrontstant2.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/nachofrontstant2.xnb","TextureProcessor","Texture2DContent",11547,160085,0.0043228
 "/home/gux/monogame-game/monogame/Content/nachosprites.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/nachosprites.xnb","TextureProcessor","Texture2DContent",88116,589909,0.0142028
