@@ -24,6 +24,9 @@
     <File>/home/gux/monogame-game/monogame/Content/japaneselevel3.png</File>
     <File>/home/gux/monogame-game/monogame/Content/japaneselevel4.png</File>
     <File>/home/gux/monogame-game/monogame/Content/mainmenudonut.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/mainmenudonut2.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/mainmenudonut3.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/mainmenudonut4.png</File>
     <File>/home/gux/monogame-game/monogame/Content/nachofrontstant1.png</File>
     <File>/home/gux/monogame-game/monogame/Content/nachofrontstant2.png</File>
     <File>/home/gux/monogame-game/monogame/Content/nachosprites.png</File>
@@ -36,6 +39,9 @@
   </SourceFiles>
   <DestFiles>
     <File>mainmenudonut.png</File>
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />
