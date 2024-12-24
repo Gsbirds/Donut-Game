@@ -36,9 +36,11 @@
     <File>/home/gux/monogame-game/monogame/Content/sombrerosetting.png</File>
     <File>/home/gux/monogame-game/monogame/Content/splashcheese.png</File>
     <File>/home/gux/monogame-game/monogame/Content/sushisprites.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/sushisprites10.png</File>
   </SourceFiles>
   <DestFiles>
     <File>mainmenudonut.png</File>
+    <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />

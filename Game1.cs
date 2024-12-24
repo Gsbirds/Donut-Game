@@ -84,6 +84,12 @@ public class Game1 : Game
     private bool nachoDefeated = false;
     private float nachoDefeatedTimer = 0f;
     private const float nachoDefeatedDuration = 3f;
+    Vector2 sushiPosition;
+    private Direction currentDirectionSushi = Direction.Down;
+    private float sushiDirectionDelayTimer = 0f;
+    private const float SushiDirectionDelayDuration = 1f;
+
+
     enum GameState
     {
         Game1,
@@ -106,14 +112,17 @@ public class Game1 : Game
 
         _graphics.PreferredBackBufferWidth = 650;
         _graphics.PreferredBackBufferHeight = 650;
-        _graphics.ApplyChanges();
         ballPosition = new Vector2(_graphics.PreferredBackBufferWidth / 2,
                                    _graphics.PreferredBackBufferHeight / 2);
         nachoPosition = new Vector2(100, 100);
+        sushiPosition = new Vector2(100, 100); // Place the sushi far from the ball
+
         ballSpeed = 100f;
         lastDonutPosition = ballPosition;
 
         nachoHealth = 4;
+        _graphics.ApplyChanges();
+
         base.Initialize();
     }
 
@@ -128,14 +137,14 @@ public class Game1 : Game
         _spriteBatch = new SpriteBatch(GraphicsDevice);
         charaset = Content.Load<Texture2D>("donutsprites17");
         nacho = Content.Load<Texture2D>("nachosprites4");
-        sushi = Content.Load<Texture2D>("nachosprites4");
+        sushi = Content.Load<Texture2D>("sushisprites10");
         font = Content.Load<SpriteFont>("DefaultFont1");
         cheeseLaunch = Content.Load<Texture2D>("cheeselaunch");
         nachoMouth = Content.Load<Texture2D>("openmountnacho2");
         sombreroWallpaper = Content.Load<Texture2D>("sombrerosetting");
         sushiWallpaper = Content.Load<Texture2D>("japaneselevel2");
         splashCheese = Content.Load<Texture2D>("splashcheese");
-        mainmenu= Content.Load<Texture2D>("mainmenudonut");
+        mainmenu = Content.Load<Texture2D>("mainmenudonut");
 
         health = 4;
 
@@ -589,6 +598,25 @@ public class Game1 : Game
 
         previousKeyboardState = currentKeyboardState;
 
+        float updatedSushiSpeed = nachoSpeed * elapsedTime; // Reuse nachoSpeed for sushi speed
+        Vector2 directionToDonutFromSushi = ballPosition - sushiPosition;
+
+        if (directionToDonutFromSushi != Vector2.Zero)
+        {
+            directionToDonutFromSushi.Normalize();
+            sushiPosition += directionToDonutFromSushi * updatedSushiSpeed;
+            currentAnimationIndex=currentAnimationIndex++;
+        }
+
+        sushiDirectionDelayTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+        if (sushiDirectionDelayTimer >= SushiDirectionDelayDuration)
+        {
+            currentDirectionSushi = currentDirection;
+            sushiDirectionDelayTimer = 0f;
+        }
+
+
         base.Update(gameTime);
     }
 
@@ -763,17 +791,19 @@ public class Game1 : Game
             new Rectangle(0, 0, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight),
             Color.White
         );
+
         _spriteBatch.Draw(
-            nacho,
-            nachoPosition,
-            GetCurrentRectanglesNacho()[currentAnimationIndex],
+            sushi,
+            sushiPosition,
+            GetCurrentRectangleSushi()[currentAnimationIndex],
             Color.White,
-            nachoRotation,
-            new Vector2(downRectangles[0].Width / 2, downRectangles[0].Height / 2),
+            0f,
+            new Vector2(70, 66),
             1.0f,
             SpriteEffects.None,
             0f
         );
+
 
         _spriteBatch.Draw(charaset, ballPosition, GetCurrentRectangles()[currentAnimationIndex], Color.White);
 
@@ -855,15 +885,15 @@ public class Game1 : Game
         Rectangle[] baseRectangles = currentDirectionNacho2 switch
         {
             Direction.Up => new Rectangle[]
-              {
+            {
             new Rectangle(0, 0, 96, 128),
             new Rectangle(0, 0, 96, 128),
             new Rectangle(0, 0, 96, 128)
-              },
+            },
             Direction.Down => new Rectangle[]
             {
             usePostHitFrame
-                ? new Rectangle(96, 512, 96, 128) // Post-hit frame for "Down"
+                ? new Rectangle(96, 512, 96, 128)
                 : (useOpenMouthFrame
                     ? new Rectangle(96, 128, 96, 128) // Open mouth frame
                     : new Rectangle(96, 256, 96, 128)),
@@ -930,7 +960,69 @@ public class Game1 : Game
         return baseRectangles;
     }
 
+    private Rectangle[] GetCurrentRectangleSushi()
+    {
+        int frameWidth = 110;
+        int frameHeight = 130;
+        int doubleWidth = frameWidth * 2;
 
+        Rectangle[] baseRectangles = currentDirection switch
+        {
+            Direction.Up => new Rectangle[]
+            {
+            isSpacebarAnimationActive
+                ? (useSpacebarFrame
+                    ? new Rectangle(frameWidth * 4, 0, frameWidth, frameHeight)  // Fifth column
+                    : new Rectangle(frameWidth * 5, 0, doubleWidth, frameHeight))  // Sixth column
+                : new Rectangle(0, 0, frameWidth, frameHeight),
+            new Rectangle(frameWidth, 0, frameWidth, frameHeight),
+            new Rectangle(frameWidth * 2, 0, frameWidth, frameHeight)
+            },
+            Direction.Down => new Rectangle[]
+            {
+            isSpacebarAnimationActive
+                ? (useSpacebarFrame
+                    ? new Rectangle(frameWidth * 4, frameHeight * 2, frameWidth, frameHeight) // Fifth column
+                    : new Rectangle(frameWidth * 5, frameHeight * 2, doubleWidth, frameHeight)) // Sixth column
+                : new Rectangle(0, frameHeight * 2, frameWidth, frameHeight),
+            new Rectangle(frameWidth, frameHeight * 2, frameWidth, frameHeight),
+            new Rectangle(frameWidth * 2, frameHeight * 2, frameWidth, frameHeight)
+            },
+            Direction.Left => new Rectangle[]
+            {
+            isSpacebarAnimationActive
+                ? (useSpacebarFrame
+                    ? new Rectangle(frameWidth * 4, frameHeight * 3, frameWidth, frameHeight) // Fifth column
+                    : new Rectangle(frameWidth * 5, frameHeight * 3, doubleWidth, frameHeight)) // Sixth column
+                : new Rectangle(0, frameHeight * 3, frameWidth, frameHeight),
+            new Rectangle(frameWidth, frameHeight * 3, frameWidth, frameHeight),
+            new Rectangle(frameWidth * 2, frameHeight * 3, frameWidth, frameHeight)
+            },
+            Direction.Right => new Rectangle[]
+            {
+            isSpacebarAnimationActive
+                ? (useSpacebarFrame
+                    ? new Rectangle(frameWidth * 4, frameHeight, frameWidth, frameHeight) // Fifth column
+                    : new Rectangle(frameWidth * 5, frameHeight, doubleWidth, frameHeight)) // Sixth column
+                : new Rectangle(0, frameHeight, frameWidth, frameHeight),
+            new Rectangle(frameWidth, frameHeight, frameWidth, frameHeight),
+            new Rectangle(frameWidth * 2, frameHeight, frameWidth, frameHeight)
+            },
+            _ => new Rectangle[]
+            {
+            new Rectangle(0, frameHeight, frameWidth, frameHeight),
+            new Rectangle(frameWidth, frameHeight, frameWidth, frameHeight),
+            new Rectangle(frameWidth * 2, frameHeight, frameWidth, frameHeight)
+            },
+        };
+
+        if (useBlinkingFrame && !isSpacebarAnimationActive)
+        {
+            baseRectangles[2] = new Rectangle(frameWidth * 3, baseRectangles[2].Y, frameWidth, frameHeight); // Blinking frame
+        }
+
+        return baseRectangles;
+    }
 
 
     private Rectangle[] GetCurrentRectangles()

@@ -42,8 +42,8 @@ namespace monogame
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             mainmenu = Content.Load<Texture2D>("mainmenudonut4");
 
-            startButtonArea = new Rectangle(300, 250, 200, 50);
-            endButtonArea = new Rectangle(300, 320, 200, 50);
+            startButtonArea = new Rectangle(300, 270, 200, 50);
+            endButtonArea = new Rectangle(300, 380, 200, 50);
 
             SwitchGameState(GameStateType.MainMenu);
         }
