@@ -1,120 +1,131 @@
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
+// using Microsoft.Xna.Framework;
+// using Microsoft.Xna.Framework.Graphics;
+// using Microsoft.Xna.Framework.Input;
 
-namespace monogame
-{
-    public class MainGame : Game
-    {
-        private GraphicsDeviceManager _graphics;
-        private SpriteBatch _spriteBatch;
-        private Texture2D mainmenu;
-        private Rectangle startButtonArea;
-        private Rectangle endButtonArea;
-        private IGameState currentGameState;
-        private bool inMainMenu = true;
+// namespace monogame
+// {
+//     public class MainGame : Game
+//     {
+//         private GraphicsDeviceManager _graphics;
+//         private SpriteBatch _spriteBatch;
+//         private Texture2D mainmenu;
+//         private Rectangle startButtonArea;
+//         private Rectangle endButtonArea;
+//         private IGameState currentGameState;
+//         private bool inMainMenu = true;
+//         Vector2 ballPosition;
+//         Vector2 nachoPosition;
+//         Vector2 sushiPosition;
 
-        public enum GameStateType
-        {
-            MainMenu,
-            Game1,
-            Game2
-        }
+//         public enum GameStateType
+//         {
+//             MainMenu,
+//             Game1,
+//             Game2
+//         }
 
-        public MainGame()
-        {
-            _graphics = new GraphicsDeviceManager(this);
-            Content.RootDirectory = "Content";
-            IsMouseVisible = true;
-        }
+//         public MainGame()
+//         {
+//             _graphics = new GraphicsDeviceManager(this);
+//             Content.RootDirectory = "Content";
+//             IsMouseVisible = true;
+//         }
 
-        protected override void Initialize()
-        {
-            _graphics.PreferredBackBufferWidth = 800;
-            _graphics.PreferredBackBufferHeight = 600;
-            _graphics.ApplyChanges();
+//         protected override void Initialize()
+//         {
+//             _graphics.PreferredBackBufferWidth = 800;
+//             _graphics.PreferredBackBufferHeight = 600;
+//             _graphics.ApplyChanges();
 
-            base.Initialize();
-        }
+//             base.Initialize();
+//         }
 
-        protected override void LoadContent()
-        {
-            _spriteBatch = new SpriteBatch(GraphicsDevice);
-            mainmenu = Content.Load<Texture2D>("mainmenudonut4");
 
-            startButtonArea = new Rectangle(300, 270, 200, 50);
-            endButtonArea = new Rectangle(300, 380, 200, 50);
+//         protected override void LoadContent()
+//         {
+//             _spriteBatch = new SpriteBatch(GraphicsDevice);
+//             mainmenu = Content.Load<Texture2D>("mainmenudonut4");
 
-            SwitchGameState(GameStateType.MainMenu);
-        }
+//             startButtonArea = new Rectangle(300, 270, 200, 50);
+//             endButtonArea = new Rectangle(300, 380, 200, 50);
 
-        public void SwitchGameState(GameStateType newState)
-        {
-            if (newState == GameStateType.MainMenu)
-            {
-                inMainMenu = true;
-                currentGameState = null;
-            }
-            else
-            {
-                inMainMenu = false;
-                switch (newState)
-                {
-                    // case GameStateType.Game1:
-                    //     currentGameState = new Game1(this, _spriteBatch);
-                    //     break;
-                    case GameStateType.Game2:
-                        currentGameState = new Game2(this, _spriteBatch);
-                        break;
-                }
-                currentGameState.LoadContent();
-            }
-        }
+//             SwitchGameState(GameStateType.MainMenu);
+//         }
 
-        protected override void Update(GameTime gameTime)
-        {
-            if (inMainMenu)
-            {
-                MouseState mouseState = Mouse.GetState();
-                if (mouseState.LeftButton == ButtonState.Pressed)
-                {
-                    Point mousePosition = mouseState.Position;
-                    if (startButtonArea.Contains(mousePosition))
-                    {
-                        SwitchGameState(GameStateType.Game2);
-                    }
-                    else if (endButtonArea.Contains(mousePosition))
-                    {
-                        Exit();
-                    }
-                }
-            }
-            else
-            {
-                currentGameState?.Update(gameTime);
-            }
+//         public void SwitchGameState(GameStateType newState)
+//         {
+//             if (newState == GameStateType.MainMenu)
+//             {
+//                 inMainMenu = true;
+//                 currentGameState = null;
 
-            base.Update(gameTime);
-        }
+//             }
+//             else
+//             {
+//                 inMainMenu = false;
+//                 if (newState == GameStateType.Game2)
+//                 {
+//                     currentGameState = new Game2(this, _spriteBatch);
+//                     currentGameState.LoadContent(); // Ensure content and positions are loaded
+//                 }
+//                 switch (newState)
+//                 {
+//                     // case GameStateType.Game1:
+//                     //     currentGameState = new Game1(this, _spriteBatch);
+//                     //     break;
+//                     case GameStateType.Game2:
+//                         currentGameState = new Game2(this, _spriteBatch);
+//                         break;
+//                 }
+//                 currentGameState.LoadContent();
+//             }
+//         }
 
-        protected override void Draw(GameTime gameTime)
-        {
-            GraphicsDevice.Clear(Color.BlanchedAlmond);
+//         protected override void Update(GameTime gameTime)
+//         {
+//             if (inMainMenu)
+//             {
+//                 MouseState mouseState = Mouse.GetState();
+//                 if (mouseState.LeftButton == ButtonState.Pressed)
+//                 {
+//                     Point mousePosition = mouseState.Position;
+//                     if (startButtonArea.Contains(mousePosition))
+//                     {
+//                         SwitchGameState(GameStateType.Game2);
+//                     }
+//                     else if (endButtonArea.Contains(mousePosition))
+//                     {
+//                         Exit();
+//                     }
+//                 }
+//             }
+//             else
+//             {
+                
+//                 currentGameState?.Update(gameTime);
+//             }
 
-            _spriteBatch.Begin();
+//             base.Update(gameTime);
+//         }
 
-            if (inMainMenu)
-            {
-                _spriteBatch.Draw(mainmenu, new Rectangle(60, -10, 650, 650), Color.White);
-            }
-            else
-            {
-                currentGameState?.Draw(gameTime); 
-            }
+//         protected override void Draw(GameTime gameTime)
+//         {
+//             GraphicsDevice.Clear(Color.BlanchedAlmond);
 
-            _spriteBatch.End();
+//             _spriteBatch.Begin();
 
-            base.Draw(gameTime);
-        }
-    }
-}
+//             if (inMainMenu)
+//             {
+//                 _spriteBatch.Draw(mainmenu, new Rectangle(60, -10, 650, 650), Color.White);
+//             }
+//             else
+//             {
+//                 currentGameState?.Draw(gameTime);
+//             }
+
+//             _spriteBatch.End();
+
+//             base.Draw(gameTime);
+//         }
+//     }
+// }
