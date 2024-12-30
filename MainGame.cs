@@ -69,9 +69,15 @@ namespace monogame
                 switch (newState)
                 {
                     case GameStateType.Game1:
+                        _graphics.PreferredBackBufferWidth = 650;
+                        _graphics.PreferredBackBufferHeight = 650;
+                        _graphics.ApplyChanges();
                         currentGameState = new Game1(this, _spriteBatch);
                         break;
                     case GameStateType.Game2:
+                        _graphics.PreferredBackBufferWidth = 800;
+                        _graphics.PreferredBackBufferHeight = 600;
+                        _graphics.ApplyChanges();
                         currentGameState = new Game2(this, _spriteBatch);
                         break;
                 }
