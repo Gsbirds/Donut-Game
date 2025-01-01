@@ -134,7 +134,7 @@ namespace monogame
             };
 
             currentAnimationIndex = 1;
-            currentDirection = Direction.Down; // Initialize currentDirection
+            currentDirection = Direction.Down;
             nachoHealth = 4;
         }
 
@@ -155,73 +155,12 @@ namespace monogame
 
         }
 
-        private void CheeseLauncher(GameTime gameTime)
-        {
-            float distanceToBall = Vector2.Distance(nachoPosition, ballPosition);
-            if (distanceToBall <= 150)
-            {
-                if (!cheeseVisible)
-                {
-                    cheesePosition = GetNachoMouthPosition();
-                    cheeseVisible = true;
-                }
-
-                Vector2 directionToBall = ballPosition - cheesePosition;
-                directionToBall.Normalize();
-                cheeseRotation = (float)Math.Atan2(directionToBall.Y, directionToBall.X);
-                cheesePosition += directionToBall * nachoSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-                Rectangle cheeseRect = new Rectangle((int)cheesePosition.X - 10, (int)cheesePosition.Y - 10, 20, 20);
-                Rectangle ballRect = new Rectangle((int)ballPosition.X - 48, (int)ballPosition.Y - 64, 96, 128);
-
-                if (cheeseRect.Intersects(ballRect))
-                {
-                    showSplashCheese = true;
-                    splashPosition = ballPosition;
-                    nachoHealth -= 0.5f;
-                    cheeseVisible = false;
-                }
-            }
-        }
-
         private Vector2 GetNachoMouthPosition()
         {
             Rectangle currentRect = downRectangles[currentAnimationIndex];
             return nachoPosition + new Vector2(currentRect.Width / 2, -70);
         }
 
-        private void KeyboardTracker(GameTime gameTime)
-        {
-            KeyboardState kstate = Keyboard.GetState();
-            Vector2 movement = Vector2.Zero;
-
-            if (kstate.IsKeyDown(Keys.Up))
-            {
-                movement.Y -= 1;
-                currentDirection = Direction.Up; // Update direction
-            }
-            if (kstate.IsKeyDown(Keys.Down))
-            {
-                movement.Y += 1;
-                currentDirection = Direction.Down; // Update direction
-            }
-            if (kstate.IsKeyDown(Keys.Left))
-            {
-                movement.X -= 1;
-                currentDirection = Direction.Left; // Update direction
-            }
-            if (kstate.IsKeyDown(Keys.Right))
-            {
-                movement.X += 1;
-                currentDirection = Direction.Right; // Update direction
-            }
-
-            if (movement != Vector2.Zero)
-            {
-                movement.Normalize();
-                ballPosition += movement * ballSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
-            }
-        }
 
         private void spacebarAttack(GameTime gameTime, KeyboardState currentKeyboardState)
         {
@@ -531,6 +470,19 @@ namespace monogame
 
         public void Draw(GameTime gameTime)
         {
+
+            if (nachoDefeated)
+            {
+                _graphicsDevice.Clear(Color.Black);
+                string defeatMessage = "Sushi Defeated";
+                Vector2 textSize = font.MeasureString(defeatMessage);
+                Vector2 textPosition = new Vector2(
+                    300,
+                    300
+                );
+                _spriteBatch.DrawString(font, defeatMessage, textPosition, Color.White);
+                return;
+            }
             _graphicsDevice.Clear(Color.Black);
 
             _spriteBatch.Draw(sushiWallpaper, new Rectangle(0, 0, 800, 600), Color.White);
@@ -553,6 +505,49 @@ namespace monogame
            SpriteEffects.None,
            0f
        );
+            float maxNachoHealth = 4f;
+            int nachoHealthBarWidth = 200;
+            int nachoHealthBarHeight = 20;
+            Vector2 nachoHealthBarPosition = new Vector2(10, 10);
+
+            if (nachoHealthBarWidth != 0)
+            {
+                _spriteBatch.Draw(
+                    Texture2DHelper.CreateRectangle(_graphicsDevice, nachoHealthBarWidth, nachoHealthBarHeight, Color.Gray),
+                    new Rectangle((int)nachoHealthBarPosition.X, (int)nachoHealthBarPosition.Y, nachoHealthBarWidth, nachoHealthBarHeight),
+                    Color.Gray
+                );
+            }
+
+            int nachoHealthCurrentWidth = (int)((nachoHealth / maxNachoHealth) * nachoHealthBarWidth);
+            if (nachoHealthCurrentWidth != 0)
+            {
+                _spriteBatch.Draw(
+                    Texture2DHelper.CreateRectangle(_graphicsDevice, nachoHealthCurrentWidth, nachoHealthBarHeight, Color.WhiteSmoke),
+                    new Rectangle((int)nachoHealthBarPosition.X, (int)nachoHealthBarPosition.Y, nachoHealthCurrentWidth, nachoHealthBarHeight),
+                    Color.WhiteSmoke
+                );
+            }
+
+            string donutHealthText = $"Health: {health}";
+            Vector2 donutHealthPosition = new Vector2(650, 10);
+            _spriteBatch.DrawString(font, donutHealthText, donutHealthPosition, Color.Black);
+        }
+
+
+        public static class Texture2DHelper
+        {
+            public static Texture2D CreateRectangle(GraphicsDevice graphicsDevice, int width, int height, Color color)
+            {
+                Texture2D texture = new Texture2D(graphicsDevice, width, height);
+                Color[] colorData = new Color[width * height];
+                for (int i = 0; i < colorData.Length; i++)
+                {
+                    colorData[i] = color;
+                }
+                texture.SetData(colorData);
+                return texture;
+            }
         }
 
 

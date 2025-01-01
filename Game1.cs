@@ -118,10 +118,12 @@ namespace monogame
 
             timer = 0;
             threshold = 150;
-            // ballPosition = new Vector2(mainGame.GraphicsDevice.PreferredBackBufferWidth / 2,
-            //                    _graphics.PreferredBackBufferHeight / 2);
             nachoPosition = new Vector2(100, 100);
             sushiPosition = new Vector2(100, 100);
+            ballPosition = new Vector2(
+            _graphicsDevice.Viewport.Width / 2f - (96 / 2f),
+            _graphicsDevice.Viewport.Height / 2f - (128 / 2f)
+        );
 
             ballSpeed = 100f;
             lastDonutPosition = ballPosition;
@@ -370,7 +372,6 @@ namespace monogame
                     timer += (float)gameTime.ElapsedGameTime.TotalMilliseconds;
                 }
             }
-
             else
             {
                 currentAnimationIndex = 1;
@@ -497,27 +498,24 @@ namespace monogame
         public void Draw(GameTime gameTime)
         {
 
-            // if (nachoDefeated)
-            // {
-            //     // _graphics.GraphicsDevice.Clear(Color.Black);
+            if (nachoDefeated)
+            {
+                _graphicsDevice.Clear(Color.Black);
             //     // _spriteBatch.Begin();
-            //     string defeatMessage = "Nacho Defeated";
-            //     Vector2 textSize = font.MeasureString(defeatMessage);
-            //     Vector2 textPosition = new Vector2(
-            //         100,
-            //         100
-            //     );
-            //     _spriteBatch.DrawString(font, defeatMessage, textPosition, Color.White);
-            //     // _spriteBatch.End();
-            //     return;
-            // }
-
-            // _mainGame._graphics.GraphicsDevice.Clear(Color.Tan);
-            // _spriteBatch.Begin();
+                string defeatMessage = "Nacho Defeated";
+                Vector2 textSize = font.MeasureString(defeatMessage);
+                Vector2 textPosition = new Vector2(
+                    100,
+                    100
+                );
+                _spriteBatch.DrawString(font, defeatMessage, textPosition, Color.White);
+                return;
+            }
             _spriteBatch.Draw(
                 sombreroWallpaper,
                 new Rectangle(0, 0, 650, 650), Color.White
             );
+
             _spriteBatch.Draw(
                 nacho,
                 nachoPosition,
@@ -572,36 +570,33 @@ namespace monogame
                 );
             }
 
-            // float maxNachoHealth = 4f;
-            // int nachoHealthBarWidth = 200;
-            // int nachoHealthBarHeight = 20;
-            // Vector2 nachoHealthBarPosition = new Vector2(10, 10);
+            float maxNachoHealth = 4f;
+            int nachoHealthBarWidth = 200;
+            int nachoHealthBarHeight = 20;
+            Vector2 nachoHealthBarPosition = new Vector2(10, 10);
 
-            // if (nachoHealthBarWidth != 0)
-            // {
-            //     _spriteBatch.Draw(
-            //         Texture2DHelper.CreateRectangle(GraphicsDevice, nachoHealthBarWidth, nachoHealthBarHeight, Color.Gray),
-            //         new Rectangle((int)nachoHealthBarPosition.X, (int)nachoHealthBarPosition.Y, nachoHealthBarWidth, nachoHealthBarHeight),
-            //         Color.Gray
-            //     );
-            // }
+            if (nachoHealthBarWidth != 0)
+            {
+                _spriteBatch.Draw(
+                    Texture2DHelper.CreateRectangle(_graphicsDevice, nachoHealthBarWidth, nachoHealthBarHeight, Color.Gray),
+                    new Rectangle((int)nachoHealthBarPosition.X, (int)nachoHealthBarPosition.Y, nachoHealthBarWidth, nachoHealthBarHeight),
+                    Color.Gray
+                );
+            }
 
-            // int nachoHealthCurrentWidth = (int)((nachoHealth / maxNachoHealth) * nachoHealthBarWidth);
-            // if (nachoHealthCurrentWidth != 0)
-            // {
-            //     _spriteBatch.Draw(
-            //         Texture2DHelper.CreateRectangle(GraphicsDevice, nachoHealthCurrentWidth, nachoHealthBarHeight, Color.WhiteSmoke),
-            //         new Rectangle((int)nachoHealthBarPosition.X, (int)nachoHealthBarPosition.Y, nachoHealthCurrentWidth, nachoHealthBarHeight),
-            //         Color.WhiteSmoke
-            //     );
-            // }
+            int nachoHealthCurrentWidth = (int)((nachoHealth / maxNachoHealth) * nachoHealthBarWidth);
+            if (nachoHealthCurrentWidth != 0)
+            {
+                _spriteBatch.Draw(
+                    Texture2DHelper.CreateRectangle(_graphicsDevice, nachoHealthCurrentWidth, nachoHealthBarHeight, Color.WhiteSmoke),
+                    new Rectangle((int)nachoHealthBarPosition.X, (int)nachoHealthBarPosition.Y, nachoHealthCurrentWidth, nachoHealthBarHeight),
+                    Color.WhiteSmoke
+                );
+            }
 
-            // string donutHealthText = $"Health: {health}";
-            // Vector2 donutHealthPosition = new Vector2(_graphics.PreferredBackBufferWidth - font.MeasureString(donutHealthText).X - 10, 10);
-            // _spriteBatch.DrawString(font, donutHealthText, donutHealthPosition, Color.Black);
-
-            // _spriteBatch.End();
-            // base.Draw(gameTime);
+            string donutHealthText = $"Health: {health}";
+            Vector2 donutHealthPosition = new Vector2(530, 10);
+            _spriteBatch.DrawString(font, donutHealthText, donutHealthPosition, Color.Black);
         }
 
 
