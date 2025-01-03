@@ -501,7 +501,6 @@ namespace monogame
             if (nachoDefeated)
             {
                 _graphicsDevice.Clear(Color.Black);
-            //     // _spriteBatch.Begin();
                 string defeatMessage = "Nacho Defeated";
                 Vector2 textSize = font.MeasureString(defeatMessage);
                 Vector2 textPosition = new Vector2(

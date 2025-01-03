@@ -19,6 +19,7 @@
     <File>/home/gux/monogame-game/monogame/Content/donutsprites17.png</File>
     <File>/home/gux/monogame-game/monogame/Content/donutsprites18.png</File>
     <File>/home/gux/monogame-game/monogame/Content/donutsss.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/gingersprites.png</File>
     <File>/home/gux/monogame-game/monogame/Content/japaneselevel.png</File>
     <File>/home/gux/monogame-game/monogame/Content/japaneselevel2.png</File>
     <File>/home/gux/monogame-game/monogame/Content/japaneselevel3.png</File>
@@ -40,6 +41,7 @@
   </SourceFiles>
   <DestFiles>
     <File>mainmenudonut.png</File>
+    <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />

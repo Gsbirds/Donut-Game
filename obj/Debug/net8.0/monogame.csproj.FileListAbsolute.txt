@@ -56,3 +56,4 @@
 /home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/mainmenudonut3.xnb
 /home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/mainmenudonut4.xnb
 /home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/sushisprites10.xnb
+/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/gingersprites.xnb

@@ -87,8 +87,20 @@ namespace monogame
 
         protected override void Update(GameTime gameTime)
         {
+            KeyboardState keyboardState = Keyboard.GetState();
+
             if (inMainMenu)
             {
+                if (keyboardState.IsKeyDown(Keys.Enter))
+                {
+                    SwitchGameState(GameStateType.Game1);
+                }
+
+                // if (keyboardState.IsKeyDown(Keys.Escape))
+                // {
+                //     Exit();
+                // }
+
                 MouseState mouseState = Mouse.GetState();
                 if (mouseState.LeftButton == ButtonState.Pressed)
                 {
@@ -105,12 +117,17 @@ namespace monogame
             }
             else
             {
+                if (keyboardState.IsKeyDown(Keys.Escape))
+                {
+                    SwitchGameState(GameStateType.MainMenu);
+                }
 
                 currentGameState?.Update(gameTime);
             }
 
             base.Update(gameTime);
         }
+
 
 
         protected override void Draw(GameTime gameTime)

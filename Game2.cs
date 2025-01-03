@@ -21,7 +21,7 @@ namespace monogame
         Texture2D sombreroWallpaper;
         Texture2D sushiWallpaper;
         float ballSpeed;
-        float nachoSpeed = 40f;
+        float nachoSpeed = 30f;
         float nachoRotation = 0f;
         bool rotatingRight = true;
         private GraphicsDeviceManager _graphics;
@@ -68,6 +68,7 @@ namespace monogame
         float cheeseVisibilityTimer = 0f;
 
         Texture2D splashCheese;
+        private Texture2D ginger;
         private Texture2D mainmenu;
         bool showSplashCheese = false;
         float splashCheeseTimer = 0f;
@@ -89,10 +90,14 @@ namespace monogame
 
         private Direction currentDirectionSushi = Direction.Down;
         private float sushiDirectionDelayTimer = 0f;
-        private const float SushiDirectionDelayDuration = 1f;
+        private const float SushiDirectionDelayDuration = 2f;
         private GraphicsDevice _graphicsDevice;
         private MainGame _mainGame;
-
+        private bool sushiMoving;
+        private Vector2 gingerPosition;
+        private int gingerAnimationIndex;
+        private Direction currentDirectionGinger;
+        private float gingerAnimationTimer;
 
         public Game2(MainGame mainGame, SpriteBatch spriteBatch)
         {
@@ -151,6 +156,7 @@ namespace monogame
             sombreroWallpaper = _mainGame.Content.Load<Texture2D>("sombrerosetting");
             sushiWallpaper = _mainGame.Content.Load<Texture2D>("japaneselevel2");
             splashCheese = _mainGame.Content.Load<Texture2D>("splashcheese");
+            ginger = _mainGame.Content.Load<Texture2D>("gingersprites");
             threshold = 150;
 
         }
@@ -258,12 +264,18 @@ namespace monogame
                 ballPosition += movement * updatedBallSpeed;
             }
 
-            nachoDirectionDelayTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-            if (nachoDirectionDelayTimer >= NachoDirectionDelayDuration)
+            if ((currentDirection == Direction.Right && ballPosition.X > sushiPosition.X) ||
+            (currentDirection == Direction.Left && ballPosition.X < sushiPosition.X) ||
+            (currentDirection == Direction.Down && ballPosition.Y > sushiPosition.Y) ||
+            (currentDirection == Direction.Up && ballPosition.Y < sushiPosition.Y))
             {
-                currentDirectionNacho2 = currentDirection;
-                nachoDirectionDelayTimer = 0f;
+                nachoDirectionDelayTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+                if (nachoDirectionDelayTimer >= NachoDirectionDelayDuration)
+                {
+                    currentDirectionNacho2 = currentDirection;
+                    nachoDirectionDelayTimer = 0f;
+                }
             }
 
             return isMoving;
@@ -271,7 +283,7 @@ namespace monogame
 
         private void animationBlinker(bool isMoving, GameTime gameTime)
         {
-            if (isMoving || isSpacebarAnimationActive)
+            if (isMoving || isSpacebarAnimationActive || sushiMoving)
             {
                 if (timer > threshold)
                 {
@@ -400,7 +412,6 @@ namespace monogame
 
         public void Update(GameTime gameTime)
         {
-
             if (nachoDefeated)
             {
                 nachoDefeatedTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -415,7 +426,6 @@ namespace monogame
 
             float elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
             float updatedNachoSpeed = nachoSpeed * elapsedTime;
-
             KeyboardState currentKeyboardState = Keyboard.GetState();
 
             spacebarAttack(gameTime, currentKeyboardState);
@@ -430,42 +440,68 @@ namespace monogame
                 }
             }
 
-            Rectangle currentRect = GetCurrentRectangles()[currentAnimationIndex];
-            // ballPosition.X = MathHelper.Clamp(ballPosition.X, currentRect.Width / 2, _graphics.PreferredBackBufferWidth - currentRect.Width / 2);
-            // ballPosition.Y = MathHelper.Clamp(ballPosition.Y, currentRect.Height / 2, _graphics.PreferredBackBufferHeight - currentRect.Height / 2);
-
-            Vector2 directionToDonut = ballPosition - nachoPosition;
-            if (directionToDonut != Vector2.Zero)
-            {
-                directionToDonut.Normalize();
-                nachoPosition += directionToDonut * updatedNachoSpeed;
-            }
-
             bool isMoving = keyboardTracker(elapsedTime, gameTime);
 
             animationBlinker(isMoving, gameTime);
             cheeseLauncher(updatedNachoSpeed, gameTime);
-
             previousKeyboardState = currentKeyboardState;
 
-            float updatedSushiSpeed = nachoSpeed * elapsedTime; // Reuse nachoSpeed for sushi speed
+            float updatedSushiSpeed = nachoSpeed * elapsedTime;
             Vector2 directionToDonutFromSushi = ballPosition - sushiPosition;
 
             if (directionToDonutFromSushi != Vector2.Zero)
             {
                 directionToDonutFromSushi.Normalize();
                 sushiPosition += directionToDonutFromSushi * updatedSushiSpeed;
-                currentAnimationIndex = currentAnimationIndex++;
             }
 
             sushiDirectionDelayTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            if (sushiDirectionDelayTimer >= SushiDirectionDelayDuration)
+            if ((currentDirection == Direction.Right && ballPosition.X > sushiPosition.X) ||
+                (currentDirection == Direction.Left && ballPosition.X < sushiPosition.X) ||
+                (currentDirection == Direction.Down && ballPosition.Y > sushiPosition.Y) ||
+                (currentDirection == Direction.Up && ballPosition.Y < sushiPosition.Y))
             {
-                currentDirectionSushi = currentDirection;
-                sushiDirectionDelayTimer = 0f;
+                nachoDirectionDelayTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+                if (sushiDirectionDelayTimer >= SushiDirectionDelayDuration)
+                {
+                    currentDirectionSushi = currentDirection;
+                    sushiDirectionDelayTimer = 0f;
+                }
+            }
+
+            gingerUpdate(elapsedTime);
+        }
+
+
+        public void gingerUpdate(float elapsedTime){
+            const float GingerFrameDuration = 0.2f;
+            gingerAnimationTimer += elapsedTime;
+            if (gingerAnimationTimer >= GingerFrameDuration)
+            {
+                gingerAnimationIndex = (gingerAnimationIndex + 1) % 2;
+                gingerAnimationTimer = 0f;
+            }
+
+            Vector2 directionToDonutFromGinger = ballPosition - gingerPosition;
+            if (directionToDonutFromGinger.LengthSquared() > 1f)
+            {
+                directionToDonutFromGinger.Normalize();
+                float updatedGingerSpeed = nachoSpeed * elapsedTime;
+                gingerPosition += directionToDonutFromGinger * updatedGingerSpeed;
+
+                if (Math.Abs(directionToDonutFromGinger.X) > Math.Abs(directionToDonutFromGinger.Y))
+                {
+                    currentDirectionGinger = directionToDonutFromGinger.X > 0 ? Direction.Right : Direction.Left;
+                }
+                else
+                {
+                    currentDirectionGinger = directionToDonutFromGinger.Y > 0 ? Direction.Down : Direction.Up;
+                }
             }
         }
+
 
 
         public void Draw(GameTime gameTime)
@@ -491,6 +527,14 @@ namespace monogame
             {
                 _spriteBatch.Draw(splashCheese, splashPosition, null, Color.White);
             }
+
+            _spriteBatch.Draw(
+            ginger,
+            gingerPosition,
+            GetGingerRectangle(currentDirectionGinger, gingerAnimationIndex),
+            Color.White
+            );
+
 
             _spriteBatch.Draw(charaset, ballPosition, GetCurrentRectangles()[currentAnimationIndex], Color.White);
 
@@ -531,7 +575,7 @@ namespace monogame
 
             string donutHealthText = $"Health: {health}";
             Vector2 donutHealthPosition = new Vector2(650, 10);
-            _spriteBatch.DrawString(font, donutHealthText, donutHealthPosition, Color.Black);
+            _spriteBatch.DrawString(font, donutHealthText, donutHealthPosition, Color.White);
         }
 
 
@@ -603,20 +647,42 @@ namespace monogame
                 },
             };
 
-            if (useBlinkingFrame && !isSpacebarAnimationActive)
+            if (useBlinkingFrame && !isSpacebarAnimationActive && currentDirectionSushi != Direction.Up)
             {
-                baseRectangles[2] = new Rectangle(288, baseRectangles[2].Y, 96, 128); // Blinking frame
+                baseRectangles[2] = new Rectangle(288, baseRectangles[2].Y, 96, 128);
             }
 
             return baseRectangles;
         }
+
+        private Rectangle GetGingerRectangle(Direction direction, int animationIndex)
+        {
+            int frameWidth = 96;
+            int frameHeight = 85;
+
+            int row = direction switch
+            {
+                Direction.Up => 0,
+                Direction.Right => 1,
+                Direction.Down => 2,
+                Direction.Left => 3,
+                _ => 2
+            };
+
+            int column = animationIndex % 2;
+
+            return new Rectangle(column * frameWidth, row * frameHeight, frameWidth, frameHeight);
+        }
+
+
+
         private Rectangle[] GetCurrentRectangleSushi()
         {
             int frameWidth = 110;
             int frameHeight = 133;
             int doubleWidth = frameWidth * 2;
 
-            Rectangle[] baseRectangles = currentDirection switch
+            Rectangle[] baseRectangles = currentDirectionSushi switch
             {
                 Direction.Up => new Rectangle[]
                 {
