@@ -98,6 +98,11 @@ namespace monogame
         private int gingerAnimationIndex;
         private Direction currentDirectionGinger;
         private float gingerAnimationTimer;
+        private float sushiAttackCooldown = 1.5f;
+        private float sushiAttackTimer = 0f;
+        private bool isSushiAttacking = false;
+        private bool useSushiAttackFrame = false;
+        
 
         public Game2(MainGame mainGame, SpriteBatch spriteBatch)
         {
@@ -428,6 +433,7 @@ namespace monogame
             float updatedNachoSpeed = nachoSpeed * elapsedTime;
             KeyboardState currentKeyboardState = Keyboard.GetState();
 
+            // Donut spacebar attack
             spacebarAttack(gameTime, currentKeyboardState);
 
             if (usePostHitFrame)
@@ -446,6 +452,7 @@ namespace monogame
             cheeseLauncher(updatedNachoSpeed, gameTime);
             previousKeyboardState = currentKeyboardState;
 
+            // Sushi movement toward the donut
             float updatedSushiSpeed = nachoSpeed * elapsedTime;
             Vector2 directionToDonutFromSushi = ballPosition - sushiPosition;
 
@@ -454,6 +461,9 @@ namespace monogame
                 directionToDonutFromSushi.Normalize();
                 sushiPosition += directionToDonutFromSushi * updatedSushiSpeed;
             }
+
+            // Check sushi proximity and trigger attack
+            CheckSushiAttack(elapsedTime);
 
             sushiDirectionDelayTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
 
@@ -475,7 +485,34 @@ namespace monogame
         }
 
 
-        public void gingerUpdate(float elapsedTime){
+
+        private void CheckSushiAttack(float elapsedTime)
+        {
+            float attackRange = 50f;
+            float distanceToDonut = Vector2.Distance(sushiPosition, ballPosition);
+
+            if (isSushiAttacking)
+            {
+                sushiAttackTimer += elapsedTime;
+                if (sushiAttackTimer >= sushiAttackCooldown)
+                {
+                    isSushiAttacking = false;
+                    sushiAttackTimer = 0f;
+                }
+            }
+
+            if (distanceToDonut <= attackRange && !isSushiAttacking)
+            {
+                isSushiAttacking = true;
+                useSushiAttackFrame = true;
+                sushiAttackTimer = 0f;
+                health -= 0.5f;
+            }
+        }
+
+
+        public void gingerUpdate(float elapsedTime)
+        {
             const float GingerFrameDuration = 0.2f;
             gingerAnimationTimer += elapsedTime;
             if (gingerAnimationTimer >= GingerFrameDuration)
@@ -675,7 +712,6 @@ namespace monogame
         }
 
 
-
         private Rectangle[] GetCurrentRectangleSushi()
         {
             int frameWidth = 110;
@@ -686,40 +722,40 @@ namespace monogame
             {
                 Direction.Up => new Rectangle[]
                 {
-            isSpacebarAnimationActive
-                ? (useSpacebarFrame
-                    ? new Rectangle(frameWidth * 4, 0, frameWidth, frameHeight)  // Fifth column
-                    : new Rectangle(frameWidth * 5, 0, doubleWidth, frameHeight))  // Sixth column
+            isSushiAttacking
+                ? (useSushiAttackFrame
+                    ? new Rectangle(frameWidth * 4, 0, frameWidth, frameHeight)  // Attack frame
+                    : new Rectangle(frameWidth * 5, 0, doubleWidth, frameHeight)) // Second attack frame
                 : new Rectangle(0, 0, frameWidth, frameHeight),
             new Rectangle(frameWidth, 0, frameWidth, frameHeight),
             new Rectangle(frameWidth * 2, 0, frameWidth, frameHeight)
                 },
                 Direction.Down => new Rectangle[]
                 {
-            isSpacebarAnimationActive
-                ? (useSpacebarFrame
-                    ? new Rectangle(frameWidth * 4, frameHeight * 2, frameWidth, frameHeight) // Fifth column
-                    : new Rectangle(frameWidth * 5, frameHeight * 2, doubleWidth, frameHeight)) // Sixth column
+            isSushiAttacking
+                ? (useSushiAttackFrame
+                    ? new Rectangle(frameWidth * 4, frameHeight * 2, frameWidth, frameHeight)
+                    : new Rectangle(frameWidth * 5, frameHeight * 2, doubleWidth, frameHeight))
                 : new Rectangle(0, frameHeight * 2, frameWidth, frameHeight),
             new Rectangle(frameWidth, frameHeight * 2, frameWidth, frameHeight),
             new Rectangle(frameWidth * 2, frameHeight * 2, frameWidth, frameHeight)
                 },
                 Direction.Left => new Rectangle[]
                 {
-            isSpacebarAnimationActive
-                ? (useSpacebarFrame
-                    ? new Rectangle(frameWidth * 4, frameHeight * 3, frameWidth, frameHeight) // Fifth column
-                    : new Rectangle(frameWidth * 5, frameHeight * 3, doubleWidth, frameHeight)) // Sixth column
+            isSushiAttacking
+                ? (useSushiAttackFrame
+                    ? new Rectangle(frameWidth * 4, frameHeight * 3, frameWidth, frameHeight)
+                    : new Rectangle(frameWidth * 5, frameHeight * 3, doubleWidth, frameHeight))
                 : new Rectangle(0, frameHeight * 3, frameWidth, frameHeight),
             new Rectangle(frameWidth, frameHeight * 3, frameWidth, frameHeight),
             new Rectangle(frameWidth * 2, frameHeight * 3, frameWidth, frameHeight)
                 },
                 Direction.Right => new Rectangle[]
                 {
-            isSpacebarAnimationActive
-                ? (useSpacebarFrame
-                    ? new Rectangle(frameWidth * 4, frameHeight, frameWidth, frameHeight) // Fifth column
-                    : new Rectangle(frameWidth * 5, frameHeight, doubleWidth, frameHeight)) // Sixth column
+            isSushiAttacking
+                ? (useSushiAttackFrame
+                    ? new Rectangle(frameWidth * 4, frameHeight, frameWidth, frameHeight)
+                    : new Rectangle(frameWidth * 5, frameHeight, doubleWidth, frameHeight))
                 : new Rectangle(0, frameHeight, frameWidth, frameHeight),
             new Rectangle(frameWidth, frameHeight, frameWidth, frameHeight),
             new Rectangle(frameWidth * 2, frameHeight, frameWidth, frameHeight)
@@ -732,13 +768,12 @@ namespace monogame
                 },
             };
 
-            if (useBlinkingFrame && !isSpacebarAnimationActive)
+            if (useBlinkingFrame && !isSushiAttacking)
             {
                 baseRectangles[2] = new Rectangle(frameWidth * 3, baseRectangles[2].Y, frameWidth, frameHeight); // Blinking frame
             }
 
             return baseRectangles;
         }
-
     }
 }
