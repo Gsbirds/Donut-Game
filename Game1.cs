@@ -99,6 +99,8 @@ namespace monogame
         private float empanadaAttackTimer = 0f;
         private float empanadaSpeed = 60f;
         private Vector2 updatedEmpanadaSpeed;
+        const float MinDistanceBetweenNachoAndEmpanada = 170f;
+
 
         public Game1(MainGame mainGame, SpriteBatch spriteBatch)
         {
@@ -524,7 +526,11 @@ namespace monogame
                 directionToDonutFromEmpanada.Normalize();
                 empanadaPosition += directionToDonutFromEmpanada * empanadaSpeed * elapsedTime;
             }
-            
+
+            // Ensure minimum distance between nacho and empanada
+            MaintainMinimumDistance(ref nachoPosition, empanadaPosition, nachoSpeed, elapsedTime);
+            MaintainMinimumDistance(ref empanadaPosition, nachoPosition, empanadaSpeed, elapsedTime);
+
             CheckEmpanadaAttack(elapsedTime);
 
             bool isMoving = keyboardTracker(elapsedTime, gameTime);
@@ -536,6 +542,22 @@ namespace monogame
             previousKeyboardState = currentKeyboardState;
 
         }
+
+
+        private void MaintainMinimumDistance(ref Vector2 movingPosition, Vector2 otherPosition, float adjustmentSpeed, float elapsedTime)
+        {
+            float distance = Vector2.Distance(movingPosition, otherPosition);
+            if (distance < MinDistanceBetweenNachoAndEmpanada)
+            {
+                Vector2 directionAway = movingPosition - otherPosition;
+                if (directionAway != Vector2.Zero)
+                {
+                    directionAway.Normalize();
+                    movingPosition += directionAway * adjustmentSpeed * elapsedTime;
+                }
+            }
+        }
+
 
 
         public void Draw(GameTime gameTime)

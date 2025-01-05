@@ -414,6 +414,23 @@ namespace monogame
             }
         }
 
+        const float MinDistanceBetweenGingerAndSushi = 210f;
+
+        private void MaintainMinimumDistance(ref Vector2 movingPosition, Vector2 otherPosition, float adjustmentSpeed, float elapsedTime)
+        {
+            float distance = Vector2.Distance(movingPosition, otherPosition);
+            if (distance < MinDistanceBetweenGingerAndSushi)
+            {
+                Vector2 directionAway = movingPosition - otherPosition;
+                if (directionAway != Vector2.Zero)
+                {
+                    directionAway.Normalize();
+                    movingPosition += directionAway * adjustmentSpeed * elapsedTime;
+                }
+            }
+        }
+
+
 
         public void Update(GameTime gameTime)
         {
@@ -479,6 +496,9 @@ namespace monogame
             }
 
             gingerUpdate(elapsedTime);
+
+            MaintainMinimumDistance(ref sushiPosition, gingerPosition, updatedSushiSpeed, elapsedTime);
+            MaintainMinimumDistance(ref gingerPosition, sushiPosition, nachoSpeed, elapsedTime);
         }
 
 
