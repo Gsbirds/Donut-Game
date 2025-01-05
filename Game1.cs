@@ -91,7 +91,14 @@ namespace monogame
         private const float SushiDirectionDelayDuration = 1f;
         private GraphicsDevice _graphicsDevice;
         private MainGame _mainGame;
-
+        private Texture2D empanada;
+        private Vector2 empanadaPosition = new Vector2(200, 200);
+        private bool isEmpanadaAttacking = false;
+        private bool useEmpanadaAttackFrame = false;
+        private float empanadaAttackCooldown = 1.5f;
+        private float empanadaAttackTimer = 0f;
+        private float empanadaSpeed = 60f;
+        private Vector2 updatedEmpanadaSpeed;
 
         public Game1(MainGame mainGame, SpriteBatch spriteBatch)
         {
@@ -113,6 +120,7 @@ namespace monogame
             sombreroWallpaper = _mainGame.Content.Load<Texture2D>("sombrerosetting");
             splashCheese = _mainGame.Content.Load<Texture2D>("splashcheese");
             mainmenu = _mainGame.Content.Load<Texture2D>("mainmenudonut");
+            empanada = _mainGame.Content.Load<Texture2D>("empanadasprites2");
 
             health = 4;
 
@@ -178,6 +186,31 @@ namespace monogame
 
             return nachoPosition + rotatedOffset;
         }
+
+        private void CheckEmpanadaAttack(float elapsedTime)
+        {
+            float attackRange = 50f;
+            float distanceToDonut = Vector2.Distance(empanadaPosition, ballPosition);
+
+            if (isEmpanadaAttacking)
+            {
+                empanadaAttackTimer += elapsedTime;
+                if (empanadaAttackTimer >= empanadaAttackCooldown)
+                {
+                    isEmpanadaAttacking = false;
+                    empanadaAttackTimer = 0f;
+                }
+            }
+
+            if (distanceToDonut <= attackRange && !isEmpanadaAttacking)
+            {
+                isEmpanadaAttacking = true;
+                useEmpanadaAttackFrame = true;
+                empanadaAttackTimer = 0f;
+                health -= 0.5f;
+            }
+        }
+
 
 
         private void cheeseLauncher(float updatedNachoSpeed, GameTime gameTime)
@@ -484,6 +517,16 @@ namespace monogame
                 nachoPosition += directionToDonut * updatedNachoSpeed;
             }
 
+            // Move empanada toward the donut
+            Vector2 directionToDonutFromEmpanada = ballPosition - empanadaPosition;
+            if (directionToDonutFromEmpanada != Vector2.Zero)
+            {
+                directionToDonutFromEmpanada.Normalize();
+                empanadaPosition += directionToDonutFromEmpanada * empanadaSpeed * elapsedTime;
+            }
+            
+            CheckEmpanadaAttack(elapsedTime);
+
             bool isMoving = keyboardTracker(elapsedTime, gameTime);
 
             nachoRotater();
@@ -513,6 +556,18 @@ namespace monogame
             _spriteBatch.Draw(
                 sombreroWallpaper,
                 new Rectangle(0, 0, 650, 650), Color.White
+            );
+
+            _spriteBatch.Draw(
+            empanada,
+            empanadaPosition,
+            GetCurrentRectangleEmpanada()[currentAnimationIndex],
+            Color.White,
+            0f,
+            new Vector2(70, 66),
+            1.0f,
+            SpriteEffects.None,
+            0f
             );
 
             _spriteBatch.Draw(
@@ -675,6 +730,56 @@ namespace monogame
             {
                 baseRectangles[2] = new Rectangle(baseRectangles[2].X, 384, 96, 128);
             }
+
+            return baseRectangles;
+        }
+
+        private Rectangle[] GetCurrentRectangleEmpanada()
+        {
+            int frameWidth = 110;
+            int frameHeight = 133;
+
+            Rectangle[] baseRectangles = currentDirectionNacho2 switch
+            {
+                Direction.Up => new Rectangle[]
+                {
+            isEmpanadaAttacking
+                ? new Rectangle(frameWidth * 4, 0, frameWidth, frameHeight)  // Attack frame
+                : new Rectangle(0, 0, frameWidth, frameHeight),
+            new Rectangle(frameWidth, 0, frameWidth, frameHeight),
+            new Rectangle(frameWidth * 2, 0, frameWidth, frameHeight)
+                },
+                Direction.Down => new Rectangle[]
+                {
+            isEmpanadaAttacking
+                ? new Rectangle(frameWidth * 4, frameHeight * 2, frameWidth, frameHeight)
+                : new Rectangle(0, frameHeight * 2, frameWidth, frameHeight),
+            new Rectangle(frameWidth, frameHeight * 2, frameWidth, frameHeight),
+            new Rectangle(frameWidth * 2, frameHeight * 2, frameWidth, frameHeight)
+                },
+                Direction.Left => new Rectangle[]
+                {
+            isEmpanadaAttacking
+                ? new Rectangle(frameWidth * 4, frameHeight * 3, frameWidth, frameHeight)
+                : new Rectangle(0, frameHeight * 3, frameWidth, frameHeight),
+            new Rectangle(frameWidth, frameHeight * 3, frameWidth, frameHeight),
+            new Rectangle(frameWidth * 2, frameHeight * 3, frameWidth, frameHeight)
+                },
+                Direction.Right => new Rectangle[]
+                {
+            isEmpanadaAttacking
+                ? new Rectangle(frameWidth * 4, frameHeight, frameWidth, frameHeight)
+                : new Rectangle(0, frameHeight, frameWidth, frameHeight),
+            new Rectangle(frameWidth, frameHeight, frameWidth, frameHeight),
+            new Rectangle(frameWidth * 2, frameHeight, frameWidth, frameHeight)
+                },
+                _ => new Rectangle[]
+                {
+            new Rectangle(0, frameHeight, frameWidth, frameHeight),
+            new Rectangle(frameWidth, frameHeight, frameWidth, frameHeight),
+            new Rectangle(frameWidth * 2, frameHeight, frameWidth, frameHeight)
+                },
+            };
 
             return baseRectangles;
         }

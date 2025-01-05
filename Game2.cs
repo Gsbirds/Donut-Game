@@ -102,7 +102,7 @@ namespace monogame
         private float sushiAttackTimer = 0f;
         private bool isSushiAttacking = false;
         private bool useSushiAttackFrame = false;
-        
+
 
         public Game2(MainGame mainGame, SpriteBatch spriteBatch)
         {
@@ -433,7 +433,6 @@ namespace monogame
             float updatedNachoSpeed = nachoSpeed * elapsedTime;
             KeyboardState currentKeyboardState = Keyboard.GetState();
 
-            // Donut spacebar attack
             spacebarAttack(gameTime, currentKeyboardState);
 
             if (usePostHitFrame)
@@ -452,7 +451,6 @@ namespace monogame
             cheeseLauncher(updatedNachoSpeed, gameTime);
             previousKeyboardState = currentKeyboardState;
 
-            // Sushi movement toward the donut
             float updatedSushiSpeed = nachoSpeed * elapsedTime;
             Vector2 directionToDonutFromSushi = ballPosition - sushiPosition;
 
@@ -462,7 +460,6 @@ namespace monogame
                 sushiPosition += directionToDonutFromSushi * updatedSushiSpeed;
             }
 
-            // Check sushi proximity and trigger attack
             CheckSushiAttack(elapsedTime);
 
             sushiDirectionDelayTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
