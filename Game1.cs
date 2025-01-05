@@ -19,12 +19,10 @@ namespace monogame
         Vector2 cheesePosition;
 
         Texture2D sombreroWallpaper;
-        Texture2D sushiWallpaper;
         float ballSpeed;
         float nachoSpeed = 40f;
         float nachoRotation = 0f;
         bool rotatingRight = true;
-        private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
         float health;
         float timer;
@@ -68,7 +66,6 @@ namespace monogame
         float cheeseVisibilityTimer = 0f;
 
         Texture2D splashCheese;
-        private Texture2D mainmenu;
         bool showSplashCheese = false;
         float splashCheeseTimer = 0f;
         const float splashCheeseDuration = 1f;
@@ -83,22 +80,14 @@ namespace monogame
         private const float postHitAnimationDuration = 0.5f;
 
         private bool nachoDefeated = false;
-        private float nachoDefeatedTimer = 0f;
-        private const float nachoDefeatedDuration = 3f;
-        Vector2 sushiPosition;
-        private Direction currentDirectionSushi = Direction.Down;
-        private float sushiDirectionDelayTimer = 0f;
-        private const float SushiDirectionDelayDuration = 1f;
         private GraphicsDevice _graphicsDevice;
         private MainGame _mainGame;
         private Texture2D empanada;
         private Vector2 empanadaPosition = new Vector2(200, 200);
         private bool isEmpanadaAttacking = false;
-        private bool useEmpanadaAttackFrame = false;
         private float empanadaAttackCooldown = 1.5f;
         private float empanadaAttackTimer = 0f;
         private float empanadaSpeed = 60f;
-        private Vector2 updatedEmpanadaSpeed;
         const float MinDistanceBetweenNachoAndEmpanada = 170f;
 
 
@@ -121,7 +110,6 @@ namespace monogame
             nachoMouth = _mainGame.Content.Load<Texture2D>("openmountnacho2");
             sombreroWallpaper = _mainGame.Content.Load<Texture2D>("sombrerosetting");
             splashCheese = _mainGame.Content.Load<Texture2D>("splashcheese");
-            mainmenu = _mainGame.Content.Load<Texture2D>("mainmenudonut");
             empanada = _mainGame.Content.Load<Texture2D>("empanadasprites2");
 
             health = 4;
@@ -129,7 +117,6 @@ namespace monogame
             timer = 0;
             threshold = 150;
             nachoPosition = new Vector2(100, 100);
-            sushiPosition = new Vector2(100, 100);
             ballPosition = new Vector2(
             _graphicsDevice.Viewport.Width / 2f - (96 / 2f),
             _graphicsDevice.Viewport.Height / 2f - (128 / 2f)
@@ -207,7 +194,6 @@ namespace monogame
             if (distanceToDonut <= attackRange && !isEmpanadaAttacking)
             {
                 isEmpanadaAttacking = true;
-                useEmpanadaAttackFrame = true;
                 empanadaAttackTimer = 0f;
                 health -= 0.5f;
             }
@@ -478,14 +464,12 @@ namespace monogame
 
                 if (nachoDefeated)
                 {
-                    nachoDefeatedTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
                     return;
                 }
 
             if (nachoHealth <= 0)
             {
                 nachoDefeated = true;
-                nachoDefeatedTimer = 0f;
                 _mainGame.SwitchGameState(MainGame.GameStateType.Game2); // Notify MainGame to switch states
                 return;
             }

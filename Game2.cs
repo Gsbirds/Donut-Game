@@ -9,22 +9,14 @@ namespace monogame
     public class Game2 : IGameState
     {
         Texture2D charaset;
-        Texture2D nacho;
         Texture2D sushi;
         Vector2 ballPosition = new Vector2(300, 300);
         Texture2D cheeseLaunch;
-        Texture2D nachoMouth;
         Vector2 nachoPosition;
-
         Vector2 cheesePosition;
-
-        Texture2D sombreroWallpaper;
         Texture2D sushiWallpaper;
         float ballSpeed;
         float nachoSpeed = 30f;
-        float nachoRotation = 0f;
-        bool rotatingRight = true;
-        private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
         float health;
         float timer;
@@ -36,8 +28,6 @@ namespace monogame
         Rectangle[] leftRectangles;
         Rectangle[] rightRectangles;
 
-        Vector2 lastDonutPosition;
-
         bool cheeseVisible = true;
 
         byte currentAnimationIndex;
@@ -47,14 +37,10 @@ namespace monogame
         Direction currentDirection;
 
         bool hasCheeseDealtDamage = false;
-        float cheeseRotation = 0f;
-
         int animationCycleCount = 0;
         bool useBlinkingFrame = false;
 
         bool useSpacebarFrame = false;
-
-        bool useOpenMouthFrame = false;
 
         private bool isSpacebarAnimationActive = false;
         private float spacebarAnimationTimer = 0f;
@@ -69,25 +55,18 @@ namespace monogame
 
         Texture2D splashCheese;
         private Texture2D ginger;
-        private Texture2D mainmenu;
         bool showSplashCheese = false;
         float splashCheeseTimer = 0f;
         const float splashCheeseDuration = 1f;
         Vector2 splashPosition;
         Vector2 sushiPosition;
-
-        private Direction currentDirectionNacho2 = Direction.Down;
         private float nachoDirectionDelayTimer = 0f;
         private const float NachoDirectionDelayDuration = 2f;
 
         private bool usePostHitFrame = false;
         private float postHitAnimationTimer = 0f;
         private const float postHitAnimationDuration = 0.5f;
-
         private bool nachoDefeated = false;
-        private float nachoDefeatedTimer = 0f;
-        private const float nachoDefeatedDuration = 3f;
-
         private Direction currentDirectionSushi = Direction.Down;
         private float sushiDirectionDelayTimer = 0f;
         private const float SushiDirectionDelayDuration = 2f;
@@ -153,12 +132,9 @@ namespace monogame
         {
 
             charaset = _mainGame.Content.Load<Texture2D>("donutsprites17");
-            nacho = _mainGame.Content.Load<Texture2D>("nachosprites4");
             sushi = _mainGame.Content.Load<Texture2D>("sushisprites10");
             font = _mainGame.Content.Load<SpriteFont>("DefaultFont1");
             cheeseLaunch = _mainGame.Content.Load<Texture2D>("cheeselaunch");
-            nachoMouth = _mainGame.Content.Load<Texture2D>("openmountnacho2");
-            sombreroWallpaper = _mainGame.Content.Load<Texture2D>("sombrerosetting");
             sushiWallpaper = _mainGame.Content.Load<Texture2D>("japaneselevel2");
             splashCheese = _mainGame.Content.Load<Texture2D>("splashcheese");
             ginger = _mainGame.Content.Load<Texture2D>("gingersprites");
@@ -278,7 +254,6 @@ namespace monogame
 
                 if (nachoDirectionDelayTimer >= NachoDirectionDelayDuration)
                 {
-                    currentDirectionNacho2 = currentDirection;
                     nachoDirectionDelayTimer = 0f;
                 }
             }
@@ -378,7 +353,6 @@ namespace monogame
                 if (directionToDonut != Vector2.Zero && directionToDonut.LengthSquared() > 1f)
                 {
                     directionToDonut.Normalize();
-                    cheeseRotation = (float)Math.Atan2(directionToDonut.Y, directionToDonut.X);
                     cheesePosition += directionToDonut * updatedNachoSpeed * 2.5f;
                 }
 
@@ -431,18 +405,12 @@ namespace monogame
         }
 
 
-
         public void Update(GameTime gameTime)
         {
-            if (nachoDefeated)
-            {
-                nachoDefeatedTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
-            }
 
             if (nachoHealth <= 0)
             {
                 nachoDefeated = true;
-                nachoDefeatedTimer = 0f;
                 return;
             }
 
