@@ -59,3 +59,7 @@
 /home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/gingersprites.xnb
 /home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/empanadasprites1.xnb
 /home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/empanadasprites2.xnb
+/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/gingersprites2.xnb
+/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/gingersprites3.xnb
+/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/gingersprites4.xnb
+/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/gingersprites5.xnb

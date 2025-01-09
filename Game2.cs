@@ -1,4 +1,5 @@
 using System;
+using System.Transactions;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -69,7 +70,7 @@ namespace monogame
         private bool nachoDefeated = false;
         private Direction currentDirectionSushi = Direction.Down;
         private float sushiDirectionDelayTimer = 0f;
-        private const float SushiDirectionDelayDuration = 2f;
+        private const float SushiDirectionDelayDuration = 1f;
         private GraphicsDevice _graphicsDevice;
         private MainGame _mainGame;
         private bool sushiMoving;
@@ -81,7 +82,10 @@ namespace monogame
         private float sushiAttackTimer = 0f;
         private bool isSushiAttacking = false;
         private bool useSushiAttackFrame = false;
-
+        private byte currentAnimationIndexSushi;
+        private bool sushiStopped;
+        private float donutTimer = 0f;
+        private float sushiTimer = 0f;
 
         public Game2(MainGame mainGame, SpriteBatch spriteBatch)
         {
@@ -135,9 +139,9 @@ namespace monogame
             sushi = _mainGame.Content.Load<Texture2D>("sushisprites10");
             font = _mainGame.Content.Load<SpriteFont>("DefaultFont1");
             cheeseLaunch = _mainGame.Content.Load<Texture2D>("cheeselaunch");
-            sushiWallpaper = _mainGame.Content.Load<Texture2D>("japaneselevel2");
+            sushiWallpaper = _mainGame.Content.Load<Texture2D>("japaneselevel4");
             splashCheese = _mainGame.Content.Load<Texture2D>("splashcheese");
-            ginger = _mainGame.Content.Load<Texture2D>("gingersprites");
+            ginger = _mainGame.Content.Load<Texture2D>("gingersprites5");
             threshold = 150;
 
         }
@@ -261,11 +265,11 @@ namespace monogame
             return isMoving;
         }
 
-        private void animationBlinker(bool isMoving, GameTime gameTime)
+        private void animationBlinker(bool isDonutMoving, GameTime gameTime)
         {
-            if (isMoving || isSpacebarAnimationActive || sushiMoving)
+            if (isDonutMoving || isSpacebarAnimationActive)
             {
-                if (timer > threshold)
+                if (donutTimer > threshold)
                 {
                     currentAnimationIndex = (byte)((currentAnimationIndex + 1) % 3);
 
@@ -273,30 +277,46 @@ namespace monogame
                     {
                         animationCycleCount++;
 
-                        if (animationCycleCount % 3 == 0)
-                        {
-                            useBlinkingFrame = true;
-                        }
-                        else
-                        {
-                            useBlinkingFrame = false;
-                        }
+                        useBlinkingFrame = (animationCycleCount % 3 == 0);
                     }
 
-                    timer = 0;
+                    donutTimer = 0f;
                 }
                 else
                 {
-                    timer += (float)gameTime.ElapsedGameTime.TotalMilliseconds;
+                    donutTimer += (float)gameTime.ElapsedGameTime.TotalMilliseconds;
                 }
             }
-
             else
             {
                 currentAnimationIndex = 1;
             }
 
+            if (sushiMoving)
+            {
+                if (sushiTimer > threshold)
+                {
+                    currentAnimationIndexSushi = (byte)((currentAnimationIndexSushi + 1) % 3);
+
+                    if (currentAnimationIndexSushi == 0)
+                    {
+                        animationCycleCount++;
+                        useBlinkingFrame = animationCycleCount % 3 == 0;
+                    }
+
+                    sushiTimer = 0f;
+                }
+                else
+                {
+                    sushiTimer += (float)gameTime.ElapsedGameTime.TotalMilliseconds;
+                }
+            }
+            else
+            {
+                currentAnimationIndexSushi = 1;
+            }
         }
+
 
         private void cheeseLauncher(float updatedNachoSpeed, GameTime gameTime)
         {
@@ -432,7 +452,6 @@ namespace monogame
 
             bool isMoving = keyboardTracker(elapsedTime, gameTime);
 
-            animationBlinker(isMoving, gameTime);
             cheeseLauncher(updatedNachoSpeed, gameTime);
             previousKeyboardState = currentKeyboardState;
 
@@ -441,9 +460,17 @@ namespace monogame
 
             if (directionToDonutFromSushi != Vector2.Zero)
             {
+                sushiMoving = true;
                 directionToDonutFromSushi.Normalize();
                 sushiPosition += directionToDonutFromSushi * updatedSushiSpeed;
+
             }
+            else
+            {
+                sushiMoving = false;
+
+            }
+            animationBlinker(isMoving, gameTime);
 
             CheckSushiAttack(elapsedTime);
 
@@ -563,7 +590,7 @@ namespace monogame
             _spriteBatch.Draw(
            sushi,
            sushiPosition,
-           GetCurrentRectangleSushi()[currentAnimationIndex],
+           GetCurrentRectangleSushi()[currentAnimationIndexSushi],
            Color.White,
            0f,
            new Vector2(70, 66),
