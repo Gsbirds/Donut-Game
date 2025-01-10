@@ -706,7 +706,7 @@ namespace monogame
 
         private Rectangle GetGingerRectangle(Direction direction, int animationIndex)
         {
-            int frameWidth = 96;
+            int frameWidth = 98;
             int frameHeight = 85;
 
             int row = direction switch

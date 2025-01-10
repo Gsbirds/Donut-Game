@@ -93,7 +93,7 @@ namespace monogame
             {
                 if (keyboardState.IsKeyDown(Keys.Enter))
                 {
-                    SwitchGameState(GameStateType.Game2);
+                    SwitchGameState(GameStateType.Game1);
                 }
 
                 // if (keyboardState.IsKeyDown(Keys.Escape))
@@ -107,7 +107,7 @@ namespace monogame
                     Point mousePosition = mouseState.Position;
                     if (startButtonArea.Contains(mousePosition))
                     {
-                        SwitchGameState(GameStateType.Game2);
+                        SwitchGameState(GameStateType.Game1);
                     }
                     else if (endButtonArea.Contains(mousePosition))
                     {

@@ -73,7 +73,7 @@ namespace monogame
 
         private Direction currentDirectionNacho2 = Direction.Down;
         private float nachoDirectionDelayTimer = 0f;
-        private const float NachoDirectionDelayDuration = 2f;
+        private const float NachoDirectionDelayDuration = 1f;
 
         private bool usePostHitFrame = false;
         private float postHitAnimationTimer = 0f;
@@ -90,6 +90,10 @@ namespace monogame
         private float empanadaSpeed = 60f;
         const float MinDistanceBetweenNachoAndEmpanada = 170f;
 
+        private float donutTimer = 0f;
+        private float empanadaTimer = 0f;
+        private bool empanadaMoving;
+        private byte currentAnimationIndexEmpanada;
 
         public Game1(MainGame mainGame, SpriteBatch spriteBatch)
         {
@@ -364,11 +368,12 @@ namespace monogame
             }
         }
 
-        private void animationBlinker(bool isMoving, GameTime gameTime)
+
+        private void animationBlinker(bool isDonutMoving, GameTime gameTime)
         {
-            if (isMoving || isSpacebarAnimationActive)
+            if (isDonutMoving || isSpacebarAnimationActive)
             {
-                if (timer > threshold)
+                if (donutTimer > threshold)
                 {
                     currentAnimationIndex = (byte)((currentAnimationIndex + 1) % 3);
 
@@ -376,21 +381,14 @@ namespace monogame
                     {
                         animationCycleCount++;
 
-                        if (animationCycleCount % 3 == 0)
-                        {
-                            useBlinkingFrame = true;
-                        }
-                        else
-                        {
-                            useBlinkingFrame = false;
-                        }
+                        useBlinkingFrame = (animationCycleCount % 3 == 0);
                     }
 
-                    timer = 0;
+                    donutTimer = 0f;
                 }
                 else
                 {
-                    timer += (float)gameTime.ElapsedGameTime.TotalMilliseconds;
+                    donutTimer += (float)gameTime.ElapsedGameTime.TotalMilliseconds;
                 }
             }
             else
@@ -398,6 +396,29 @@ namespace monogame
                 currentAnimationIndex = 1;
             }
 
+            if (empanadaMoving)
+            {
+                if (empanadaTimer > threshold)
+                {
+                    currentAnimationIndexEmpanada = (byte)((currentAnimationIndexEmpanada + 1) % 3);
+
+                    if (currentAnimationIndexEmpanada == 0)
+                    {
+                        animationCycleCount++;
+                        useBlinkingFrame = animationCycleCount % 3 == 0;
+                    }
+
+                    empanadaTimer = 0f;
+                }
+                else
+                {
+                    empanadaTimer += (float)gameTime.ElapsedGameTime.TotalMilliseconds;
+                }
+            }
+            else
+            {
+                currentAnimationIndexEmpanada = 1;
+            }
         }
 
         private void spacebarAttack(GameTime gameTime, KeyboardState currentKeyboardState)
@@ -503,15 +524,14 @@ namespace monogame
                 nachoPosition += directionToDonut * updatedNachoSpeed;
             }
 
-            // Move empanada toward the donut
             Vector2 directionToDonutFromEmpanada = ballPosition - empanadaPosition;
             if (directionToDonutFromEmpanada != Vector2.Zero)
             {
+                empanadaMoving= true;
                 directionToDonutFromEmpanada.Normalize();
                 empanadaPosition += directionToDonutFromEmpanada * empanadaSpeed * elapsedTime;
             }
 
-            // Ensure minimum distance between nacho and empanada
             MaintainMinimumDistance(ref nachoPosition, empanadaPosition, nachoSpeed, elapsedTime);
             MaintainMinimumDistance(ref empanadaPosition, nachoPosition, empanadaSpeed, elapsedTime);
 
@@ -567,7 +587,7 @@ namespace monogame
             _spriteBatch.Draw(
             empanada,
             empanadaPosition,
-            GetCurrentRectangleEmpanada()[currentAnimationIndex],
+            GetCurrentRectangleEmpanada()[currentAnimationIndexEmpanada],
             Color.White,
             0f,
             new Vector2(70, 66),
