@@ -431,7 +431,7 @@ namespace monogame
             }
         }
 
-        private void spacebarAttack(GameTime gameTime, KeyboardState currentKeyboardState)
+        private void LeftClickAttack(GameTime gameTime, MouseState currentMouseState)
         {
             Rectangle donutRect = new Rectangle(
                 (int)ballPosition.X - 48,
@@ -447,7 +447,7 @@ namespace monogame
                 128
             );
 
-            if (currentKeyboardState.IsKeyDown(Keys.Space) && !previousKeyboardState.IsKeyDown(Keys.Space))
+            if (currentMouseState.LeftButton == ButtonState.Pressed)
             {
                 if (!isSpacebarAnimationActive)
                 {
@@ -486,53 +486,31 @@ namespace monogame
             }
         }
 
-        private void sombreroUpdate(float elapsedTime)
-        {
-            MouseState mouseState = Mouse.GetState();
-            if (mouseState.LeftButton == ButtonState.Pressed)
-            {
-                Vector2 mouseClickPosition = new Vector2(mouseState.X, mouseState.Y);
 
-                if (Vector2.Distance(mouseClickPosition, sombreroPosition) <= 50f)
-                {
-                    donutMovingToSombrero = true;
-                }
+        private void sombreroUpdate(float elapsedTime, KeyboardState currentKeyboardState)
+        {
+            if (currentKeyboardState.IsKeyDown(Keys.Space) && !previousKeyboardState.IsKeyDown(Keys.Space))
+            {
+                donutMovingToSombrero = true;
             }
 
             if (donutMovingToSombrero)
             {
                 Vector2 directionToSombrero = sombreroPosition - ballPosition;
 
-                if (directionToSombrero.Length() > 5f)
+                if (directionToSombrero.Length() > 50f)
                 {
                     directionToSombrero.Normalize();
                     ballPosition += directionToSombrero * donutJumpSpeed * elapsedTime;
                 }
                 else
                 {
+                    ballPosition = sombreroPosition;
                     donutMovingToSombrero = false;
                 }
             }
-
-            if (!donutMovingToSombrero && Vector2.Distance(ballPosition, sombreroPosition) <= 5f)
-            {
-                Vector2 directionToDonutFromEmpanada = ballPosition - empanadaPosition;
-                if (directionToDonutFromEmpanada.Length() > 5f)
-                {
-                    directionToDonutFromEmpanada.Normalize();
-                    empanadaPosition += directionToDonutFromEmpanada * empanadaSpeed * elapsedTime;
-                }
-
-                Vector2 directionToDonutFromNacho = ballPosition - nachoPosition;
-                if (directionToDonutFromNacho.Length() > 5f)
-                {
-                    directionToDonutFromNacho.Normalize();
-                    nachoPosition += directionToDonutFromNacho * nachoSpeed * elapsedTime;
-                }
-            }
-
-
         }
+
 
 
         public void Update(GameTime gameTime)
@@ -558,10 +536,11 @@ namespace monogame
             float updatedNachoSpeed = nachoSpeed * elapsedTime;
 
             KeyboardState currentKeyboardState = Keyboard.GetState();
+            MouseState currentMouseState = Mouse.GetState();
 
-            spacebarAttack(gameTime, currentKeyboardState);
+            LeftClickAttack(gameTime, currentMouseState);
 
-            // sombreroUpdate(elapsedTime);
+            sombreroUpdate(elapsedTime, currentKeyboardState);
 
             if (usePostHitFrame)
             {
