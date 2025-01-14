@@ -784,7 +784,7 @@ namespace monogame
 
             if (useBlinkingFrame && !isSushiAttacking)
             {
-                baseRectangles[2] = new Rectangle(frameWidth * 3, baseRectangles[2].Y, frameWidth, frameHeight); // Blinking frame
+                baseRectangles[2] = new Rectangle(frameWidth * 3, baseRectangles[2].Y, frameWidth, frameHeight);
             }
 
             return baseRectangles;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Timers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -94,6 +95,12 @@ namespace monogame
         private float empanadaTimer = 0f;
         private bool empanadaMoving;
         private byte currentAnimationIndexEmpanada;
+        private Texture2D sombrero;
+        private Vector2 sombreroPosition = new Vector2(300, 300);
+        private bool donutMovingToSombrero = false;
+        private float donutJumpSpeed = 100f;
+        private bool showSecondFrame = false;
+
 
         public Game1(MainGame mainGame, SpriteBatch spriteBatch)
         {
@@ -114,7 +121,9 @@ namespace monogame
             nachoMouth = _mainGame.Content.Load<Texture2D>("openmountnacho2");
             sombreroWallpaper = _mainGame.Content.Load<Texture2D>("sombrerosetting");
             splashCheese = _mainGame.Content.Load<Texture2D>("splashcheese");
-            empanada = _mainGame.Content.Load<Texture2D>("empanadasprites3");
+            empanada = _mainGame.Content.Load<Texture2D>("empanadasprites7");
+            sombrero = _mainGame.Content.Load<Texture2D>("sombrero");
+
 
             health = 4;
 
@@ -182,7 +191,7 @@ namespace monogame
 
         private void CheckEmpanadaAttack(float elapsedTime)
         {
-            float attackRange = 50f;
+            float attackRange = 100f;
             float distanceToDonut = Vector2.Distance(empanadaPosition, ballPosition);
 
             if (isEmpanadaAttacking)
@@ -201,6 +210,7 @@ namespace monogame
                 empanadaAttackTimer = 0f;
                 health -= 0.5f;
             }
+
         }
 
 
@@ -476,6 +486,54 @@ namespace monogame
             }
         }
 
+        private void sombreroUpdate(float elapsedTime)
+        {
+            MouseState mouseState = Mouse.GetState();
+            if (mouseState.LeftButton == ButtonState.Pressed)
+            {
+                Vector2 mouseClickPosition = new Vector2(mouseState.X, mouseState.Y);
+
+                if (Vector2.Distance(mouseClickPosition, sombreroPosition) <= 50f)
+                {
+                    donutMovingToSombrero = true;
+                }
+            }
+
+            if (donutMovingToSombrero)
+            {
+                Vector2 directionToSombrero = sombreroPosition - ballPosition;
+
+                if (directionToSombrero.Length() > 5f)
+                {
+                    directionToSombrero.Normalize();
+                    ballPosition += directionToSombrero * donutJumpSpeed * elapsedTime;
+                }
+                else
+                {
+                    donutMovingToSombrero = false;
+                }
+            }
+
+            if (!donutMovingToSombrero && Vector2.Distance(ballPosition, sombreroPosition) <= 5f)
+            {
+                Vector2 directionToDonutFromEmpanada = ballPosition - empanadaPosition;
+                if (directionToDonutFromEmpanada.Length() > 5f)
+                {
+                    directionToDonutFromEmpanada.Normalize();
+                    empanadaPosition += directionToDonutFromEmpanada * empanadaSpeed * elapsedTime;
+                }
+
+                Vector2 directionToDonutFromNacho = ballPosition - nachoPosition;
+                if (directionToDonutFromNacho.Length() > 5f)
+                {
+                    directionToDonutFromNacho.Normalize();
+                    nachoPosition += directionToDonutFromNacho * nachoSpeed * elapsedTime;
+                }
+            }
+
+
+        }
+
 
         public void Update(GameTime gameTime)
         {
@@ -502,6 +560,8 @@ namespace monogame
             KeyboardState currentKeyboardState = Keyboard.GetState();
 
             spacebarAttack(gameTime, currentKeyboardState);
+
+            // sombreroUpdate(elapsedTime);
 
             if (usePostHitFrame)
             {
@@ -584,22 +644,38 @@ namespace monogame
                 _spriteBatch.DrawString(font, defeatMessage, textPosition, Color.White);
                 return;
             }
-            _spriteBatch.Draw(
-                sombreroWallpaper,
-                new Rectangle(0, 0, 650, 650), Color.White
-            );
+            // _spriteBatch.Draw(
+            //     sombreroWallpaper,
+            //     new Rectangle(0, 0, 650, 650), Color.White
+            // );
 
             _spriteBatch.Draw(
-            empanada,
-            empanadaPosition,
-            GetCurrentRectangleEmpanada()[currentAnimationIndexEmpanada],
-            Color.White,
-            0f,
-            new Vector2(70, 66),
-            1.0f,
-            SpriteEffects.None,
-            0f
+                sombrero,
+                sombreroPosition,
+                null,
+                Color.White,
+                0f,
+                new Vector2(sombrero.Width / 2, sombrero.Height / 2), // Center origin
+                1.0f,
+                SpriteEffects.None,
+                0f
             );
+
+            Rectangle[] empanadaFrames = GetCurrentRectangleEmpanada();
+            int frameIndex = currentAnimationIndexEmpanada % empanadaFrames.Length; // Ensure index is always valid
+
+            _spriteBatch.Draw(
+                empanada,
+                empanadaPosition,
+                empanadaFrames[frameIndex],  // Use the corrected index
+                Color.White,
+                0f,
+                new Vector2(70, 66),
+                1.0f,
+                SpriteEffects.None,
+                0f
+            );
+
 
             _spriteBatch.Draw(
                 nacho,
@@ -765,64 +841,80 @@ namespace monogame
             return baseRectangles;
         }
 
+
         private Rectangle[] GetCurrentRectangleEmpanada()
         {
             int frameWidth = 110;
             int frameHeight = 133;
 
-            Rectangle[] baseRectangles = currentDirectionNacho2 switch
+            if (isEmpanadaAttacking)
             {
-                Direction.Up => new Rectangle[]
+                return currentDirectionNacho2 switch
                 {
-            isEmpanadaAttacking
-                ? (currentAnimationIndexEmpanada % 2 == 0
-                    ? new Rectangle(frameWidth * 4, 0, frameWidth, frameHeight)   // First attack frame
-                    : new Rectangle(frameWidth * 5, 0, frameWidth, frameHeight)) // Second attack frame
-                : new Rectangle(0, 0, frameWidth, frameHeight),
-            new Rectangle(frameWidth, 0, frameWidth, frameHeight),
-            new Rectangle(frameWidth * 2, 0, frameWidth, frameHeight)
-                },
-                Direction.Down => new Rectangle[]
+                    Direction.Up => new Rectangle[]
+                    {
+                new Rectangle(frameWidth * 4, 0, frameWidth, frameHeight),     // First attack frame
+                new Rectangle(frameWidth * 5, 0, frameWidth * 2, frameHeight)  // Second attack frame (double width)
+                    },
+                    Direction.Down => new Rectangle[]
+                    {
+                new Rectangle(frameWidth * 4, frameHeight * 2, frameWidth, frameHeight),
+                new Rectangle(frameWidth * 5, frameHeight * 2, frameWidth * 2, frameHeight)
+                    },
+                    Direction.Left => new Rectangle[]
+                    {
+                new Rectangle(frameWidth * 4, frameHeight * 3, frameWidth, frameHeight),
+                new Rectangle(frameWidth * 5, frameHeight * 3, frameWidth * 2, frameHeight)
+                    },
+                    Direction.Right => new Rectangle[]
+                    {
+                new Rectangle(frameWidth * 4, frameHeight, frameWidth, frameHeight),
+                new Rectangle(frameWidth * 5, frameHeight, frameWidth * 2, frameHeight)
+                    },
+                    _ => new Rectangle[]
+                    {
+                new Rectangle(frameWidth * 4, frameHeight, frameWidth, frameHeight),
+                new Rectangle(frameWidth * 5, frameHeight, frameWidth * 2, frameHeight)
+                    }
+                };
+            }
+            else
+            {
+                return currentDirectionNacho2 switch
                 {
-            isEmpanadaAttacking
-                ? (currentAnimationIndexEmpanada % 2 == 0
-                    ? new Rectangle(frameWidth * 4, frameHeight * 2, frameWidth, frameHeight)   // First attack frame
-                    : new Rectangle(frameWidth * 5, frameHeight * 2, frameWidth, frameHeight)) // Second attack frame
-                : new Rectangle(0, frameHeight * 2, frameWidth, frameHeight),
-            new Rectangle(frameWidth, frameHeight * 2, frameWidth, frameHeight),
-            new Rectangle(frameWidth * 2, frameHeight * 2, frameWidth, frameHeight)
-                },
-                Direction.Left => new Rectangle[]
-                {
-            isEmpanadaAttacking
-                ? (currentAnimationIndexEmpanada % 2 == 0
-                    ? new Rectangle(frameWidth * 4, frameHeight * 3, frameWidth, frameHeight)   // First attack frame
-                    : new Rectangle(frameWidth * 5, frameHeight * 3, frameWidth, frameHeight)) // Second attack frame
-                : new Rectangle(0, frameHeight * 3, frameWidth, frameHeight),
-            new Rectangle(frameWidth, frameHeight * 3, frameWidth, frameHeight),
-            new Rectangle(frameWidth * 2, frameHeight * 3, frameWidth, frameHeight)
-                },
-                Direction.Right => new Rectangle[]
-                {
-            isEmpanadaAttacking
-                ? (currentAnimationIndexEmpanada % 2 == 0
-                    ? new Rectangle(frameWidth * 4, frameHeight, frameWidth, frameHeight)   // First attack frame
-                    : new Rectangle(frameWidth * 5, frameHeight, frameWidth, frameHeight)) // Second attack frame
-                : new Rectangle(0, frameHeight, frameWidth, frameHeight),
-            new Rectangle(frameWidth, frameHeight, frameWidth, frameHeight),
-            new Rectangle(frameWidth * 2, frameHeight, frameWidth, frameHeight)
-                },
-                _ => new Rectangle[]
-                {
-            new Rectangle(0, frameHeight, frameWidth, frameHeight),
-            new Rectangle(frameWidth, frameHeight, frameWidth, frameHeight),
-            new Rectangle(frameWidth * 2, frameHeight, frameWidth, frameHeight)
-                },
-            };
-
-            return baseRectangles;
+                    Direction.Up => new Rectangle[]
+                    {
+                new Rectangle(0, 0, frameWidth, frameHeight),
+                new Rectangle(frameWidth, 0, frameWidth, frameHeight),
+                new Rectangle(frameWidth * 2, 0, frameWidth, frameHeight)
+                    },
+                    Direction.Down => new Rectangle[]
+                    {
+                new Rectangle(0, frameHeight * 2, frameWidth, frameHeight),
+                new Rectangle(frameWidth, frameHeight * 2, frameWidth, frameHeight),
+                new Rectangle(frameWidth * 2, frameHeight * 2, frameWidth, frameHeight)
+                    },
+                    Direction.Left => new Rectangle[]
+                    {
+                new Rectangle(0, frameHeight * 3, frameWidth, frameHeight),
+                new Rectangle(frameWidth, frameHeight * 3, frameWidth, frameHeight),
+                new Rectangle(frameWidth * 2, frameHeight * 3, frameWidth, frameHeight)
+                    },
+                    Direction.Right => new Rectangle[]
+                    {
+                new Rectangle(0, frameHeight, frameWidth, frameHeight),
+                new Rectangle(frameWidth, frameHeight, frameWidth, frameHeight),
+                new Rectangle(frameWidth * 2, frameHeight, frameWidth, frameHeight)
+                    },
+                    _ => new Rectangle[]
+                    {
+                new Rectangle(0, frameHeight, frameWidth, frameHeight),
+                new Rectangle(frameWidth, frameHeight, frameWidth, frameHeight),
+                new Rectangle(frameWidth * 2, frameHeight, frameWidth, frameHeight)
+                    }
+                };
+            }
         }
-
 
 
         private Rectangle[] GetCurrentRectangles()
@@ -863,8 +955,8 @@ namespace monogame
                 {
             isSpacebarAnimationActive
                 ? (useSpacebarFrame
-                    ? new Rectangle(480, 128, doubleWidth, 128) // Fifth column
-                    : new Rectangle(384, 128, 96, 128)) // Sixth column
+                    ? new Rectangle(480, 128, doubleWidth, 128)
+                    : new Rectangle(384, 128, 96, 128))
                 : new Rectangle(0, 128, 96, 128),
                 new Rectangle(96, 128, 96, 128),
                 new Rectangle(192, 128, 96, 128)

@@ -64,3 +64,8 @@
 /home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/gingersprites4.xnb
 /home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/gingersprites5.xnb
 /home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/empanadasprites3.xnb
+/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/sombrero.xnb
+/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/empanadasprites5.xnb
+/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/empanadasprites6.xnb
+/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/empanadasprites7.xnb
+/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/empanadasprites8.xnb
