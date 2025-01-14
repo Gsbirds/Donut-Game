@@ -114,7 +114,7 @@ namespace monogame
             nachoMouth = _mainGame.Content.Load<Texture2D>("openmountnacho2");
             sombreroWallpaper = _mainGame.Content.Load<Texture2D>("sombrerosetting");
             splashCheese = _mainGame.Content.Load<Texture2D>("splashcheese");
-            empanada = _mainGame.Content.Load<Texture2D>("empanadasprites2");
+            empanada = _mainGame.Content.Load<Texture2D>("empanadasprites3");
 
             health = 4;
 
@@ -491,7 +491,7 @@ namespace monogame
             if (nachoHealth <= 0)
             {
                 nachoDefeated = true;
-                _mainGame.SwitchGameState(MainGame.GameStateType.Game2); // Notify MainGame to switch states
+                _mainGame.SwitchGameState(MainGame.GameStateType.Game2);
                 return;
             }
 
@@ -517,20 +517,25 @@ namespace monogame
             // ballPosition.X = MathHelper.Clamp(ballPosition.X, currentRect.Width / 2, _graphics.PreferredBackBufferWidth - currentRect.Width / 2);
             // ballPosition.Y = MathHelper.Clamp(ballPosition.Y, currentRect.Height / 2, _graphics.PreferredBackBufferHeight - currentRect.Height / 2);
 
-            Vector2 directionToDonut = ballPosition - nachoPosition;
+            float donutOffsetY = 60f;
+
+            Vector2 adjustedDonutPosition = new Vector2(ballPosition.X, ballPosition.Y + donutOffsetY);
+
+            Vector2 directionToDonut = adjustedDonutPosition - nachoPosition;
             if (directionToDonut != Vector2.Zero)
             {
                 directionToDonut.Normalize();
                 nachoPosition += directionToDonut * updatedNachoSpeed;
             }
 
-            Vector2 directionToDonutFromEmpanada = ballPosition - empanadaPosition;
+            Vector2 directionToDonutFromEmpanada = adjustedDonutPosition - empanadaPosition;
             if (directionToDonutFromEmpanada != Vector2.Zero)
             {
-                empanadaMoving= true;
+                empanadaMoving = true;
                 directionToDonutFromEmpanada.Normalize();
                 empanadaPosition += directionToDonutFromEmpanada * empanadaSpeed * elapsedTime;
             }
+
 
             MaintainMinimumDistance(ref nachoPosition, empanadaPosition, nachoSpeed, elapsedTime);
             MaintainMinimumDistance(ref empanadaPosition, nachoPosition, empanadaSpeed, elapsedTime);
@@ -770,7 +775,9 @@ namespace monogame
                 Direction.Up => new Rectangle[]
                 {
             isEmpanadaAttacking
-                ? new Rectangle(frameWidth * 4, 0, frameWidth, frameHeight)  // Attack frame
+                ? (currentAnimationIndexEmpanada % 2 == 0
+                    ? new Rectangle(frameWidth * 4, 0, frameWidth, frameHeight)   // First attack frame
+                    : new Rectangle(frameWidth * 5, 0, frameWidth, frameHeight)) // Second attack frame
                 : new Rectangle(0, 0, frameWidth, frameHeight),
             new Rectangle(frameWidth, 0, frameWidth, frameHeight),
             new Rectangle(frameWidth * 2, 0, frameWidth, frameHeight)
@@ -778,7 +785,9 @@ namespace monogame
                 Direction.Down => new Rectangle[]
                 {
             isEmpanadaAttacking
-                ? new Rectangle(frameWidth * 4, frameHeight * 2, frameWidth, frameHeight)
+                ? (currentAnimationIndexEmpanada % 2 == 0
+                    ? new Rectangle(frameWidth * 4, frameHeight * 2, frameWidth, frameHeight)   // First attack frame
+                    : new Rectangle(frameWidth * 5, frameHeight * 2, frameWidth, frameHeight)) // Second attack frame
                 : new Rectangle(0, frameHeight * 2, frameWidth, frameHeight),
             new Rectangle(frameWidth, frameHeight * 2, frameWidth, frameHeight),
             new Rectangle(frameWidth * 2, frameHeight * 2, frameWidth, frameHeight)
@@ -786,7 +795,9 @@ namespace monogame
                 Direction.Left => new Rectangle[]
                 {
             isEmpanadaAttacking
-                ? new Rectangle(frameWidth * 4, frameHeight * 3, frameWidth, frameHeight)
+                ? (currentAnimationIndexEmpanada % 2 == 0
+                    ? new Rectangle(frameWidth * 4, frameHeight * 3, frameWidth, frameHeight)   // First attack frame
+                    : new Rectangle(frameWidth * 5, frameHeight * 3, frameWidth, frameHeight)) // Second attack frame
                 : new Rectangle(0, frameHeight * 3, frameWidth, frameHeight),
             new Rectangle(frameWidth, frameHeight * 3, frameWidth, frameHeight),
             new Rectangle(frameWidth * 2, frameHeight * 3, frameWidth, frameHeight)
@@ -794,7 +805,9 @@ namespace monogame
                 Direction.Right => new Rectangle[]
                 {
             isEmpanadaAttacking
-                ? new Rectangle(frameWidth * 4, frameHeight, frameWidth, frameHeight)
+                ? (currentAnimationIndexEmpanada % 2 == 0
+                    ? new Rectangle(frameWidth * 4, frameHeight, frameWidth, frameHeight)   // First attack frame
+                    : new Rectangle(frameWidth * 5, frameHeight, frameWidth, frameHeight)) // Second attack frame
                 : new Rectangle(0, frameHeight, frameWidth, frameHeight),
             new Rectangle(frameWidth, frameHeight, frameWidth, frameHeight),
             new Rectangle(frameWidth * 2, frameHeight, frameWidth, frameHeight)
@@ -811,6 +824,7 @@ namespace monogame
         }
 
 
+
         private Rectangle[] GetCurrentRectangles()
         {
             Rectangle[] baseRectangles = currentDirection switch
@@ -819,8 +833,8 @@ namespace monogame
                 {
             isSpacebarAnimationActive
                 ? (useSpacebarFrame
-                    ? new Rectangle(384, 0, 96, 128)  // Fifth column
-                    : new Rectangle(480, 0, doubleWidth, 128))  // Sixth column
+                    ? new Rectangle( 80, 0, doubleWidth, 128)  // Fifth column
+                    : new Rectangle(384, 0, 96, 128))  // Sixth column
                 : new Rectangle(0, 0, 96, 128),
             new Rectangle(96, 0, 96, 128),
             new Rectangle(192, 0, 96, 128)
@@ -829,8 +843,8 @@ namespace monogame
                 {
             isSpacebarAnimationActive
                 ? (useSpacebarFrame
-                    ? new Rectangle(384, 256, 96, 128) // Fifth column
-                    : new Rectangle(480, 256, doubleWidth, 128)) // Sixth column
+                    ? new Rectangle(480, 256, doubleWidth, 128) // Fifth column
+                    : new Rectangle(384, 256, 96, 128)) // Sixth column
                 : new Rectangle(0, 256, 96, 128),
             new Rectangle(96, 256, 96, 128),
             new Rectangle(192, 256, 96, 128)
@@ -839,8 +853,8 @@ namespace monogame
                 {
             isSpacebarAnimationActive
                 ? (useSpacebarFrame
-                    ? new Rectangle(384, 384, 96, 128) // Fifth column
-                    : new Rectangle(480, 384, doubleWidth, 128)) // Sixth column
+                    ? new Rectangle(480, 384, doubleWidth, 128) // Fifth column
+                    : new Rectangle(384, 384, 96, 128)) // Sixth column
                 : new Rectangle(0, 384, 96, 128),
             new Rectangle(96, 384, 96, 128),
             new Rectangle(192, 384, 96, 128)
@@ -849,11 +863,11 @@ namespace monogame
                 {
             isSpacebarAnimationActive
                 ? (useSpacebarFrame
-                    ? new Rectangle(384, 128, 96, 128) // Fifth column
-                    : new Rectangle(480, 128, doubleWidth, 128)) // Sixth column
+                    ? new Rectangle(480, 128, doubleWidth, 128) // Fifth column
+                    : new Rectangle(384, 128, 96, 128)) // Sixth column
                 : new Rectangle(0, 128, 96, 128),
-            new Rectangle(96, 128, 96, 128),
-            new Rectangle(192, 128, 96, 128)
+                new Rectangle(96, 128, 96, 128),
+                new Rectangle(192, 128, 96, 128)
                 },
                 _ => new Rectangle[]
                 {

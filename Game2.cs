@@ -455,21 +455,23 @@ namespace monogame
             cheeseLauncher(updatedNachoSpeed, gameTime);
             previousKeyboardState = currentKeyboardState;
 
+            float sushiOffsetY = 60f;
+            Vector2 adjustedSushiTarget = new Vector2(ballPosition.X, ballPosition.Y + sushiOffsetY);
+
             float updatedSushiSpeed = nachoSpeed * elapsedTime;
-            Vector2 directionToDonutFromSushi = ballPosition - sushiPosition;
+            Vector2 directionToDonutFromSushi = adjustedSushiTarget - sushiPosition;
 
             if (directionToDonutFromSushi != Vector2.Zero)
             {
                 sushiMoving = true;
                 directionToDonutFromSushi.Normalize();
                 sushiPosition += directionToDonutFromSushi * updatedSushiSpeed;
-
             }
             else
             {
                 sushiMoving = false;
-
             }
+
             animationBlinker(isMoving, gameTime);
 
             CheckSushiAttack(elapsedTime);
@@ -495,7 +497,6 @@ namespace monogame
             MaintainMinimumDistance(ref sushiPosition, gingerPosition, updatedSushiSpeed, elapsedTime);
             MaintainMinimumDistance(ref gingerPosition, sushiPosition, nachoSpeed, elapsedTime);
         }
-
 
 
         private void CheckSushiAttack(float elapsedTime)
@@ -652,8 +653,8 @@ namespace monogame
                 {
             isSpacebarAnimationActive
                 ? (useSpacebarFrame
-                    ? new Rectangle(384, 0, 96, 128)  // Fifth column
-                    : new Rectangle(480, 0, doubleWidth, 128))  // Sixth column
+                    ? new Rectangle( 80, 0, doubleWidth, 128)
+                    : new Rectangle(384, 0, 96, 128))
                 : new Rectangle(0, 0, 96, 128),
             new Rectangle(96, 0, 96, 128),
             new Rectangle(192, 0, 96, 128)
@@ -662,8 +663,8 @@ namespace monogame
                 {
             isSpacebarAnimationActive
                 ? (useSpacebarFrame
-                    ? new Rectangle(384, 256, 96, 128) // Fifth column
-                    : new Rectangle(480, 256, doubleWidth, 128)) // Sixth column
+                    ? new Rectangle(480, 256, doubleWidth, 128)
+                    : new Rectangle(384, 256, 96, 128))
                 : new Rectangle(0, 256, 96, 128),
             new Rectangle(96, 256, 96, 128),
             new Rectangle(192, 256, 96, 128)
@@ -672,8 +673,8 @@ namespace monogame
                 {
             isSpacebarAnimationActive
                 ? (useSpacebarFrame
-                    ? new Rectangle(384, 384, 96, 128) // Fifth column
-                    : new Rectangle(480, 384, doubleWidth, 128)) // Sixth column
+                    ? new Rectangle(480, 384, doubleWidth, 128)
+                    : new Rectangle(384, 384, 96, 128))
                 : new Rectangle(0, 384, 96, 128),
             new Rectangle(96, 384, 96, 128),
             new Rectangle(192, 384, 96, 128)
@@ -682,11 +683,11 @@ namespace monogame
                 {
             isSpacebarAnimationActive
                 ? (useSpacebarFrame
-                    ? new Rectangle(384, 128, 96, 128) // Fifth column
-                    : new Rectangle(480, 128, doubleWidth, 128)) // Sixth column
+                    ? new Rectangle(480, 128, doubleWidth, 128)
+                    : new Rectangle(384, 128, 96, 128))
                 : new Rectangle(0, 128, 96, 128),
-            new Rectangle(96, 128, 96, 128),
-            new Rectangle(192, 128, 96, 128)
+                new Rectangle(96, 128, 96, 128),
+                new Rectangle(192, 128, 96, 128)
                 },
                 _ => new Rectangle[]
                 {
@@ -696,13 +697,14 @@ namespace monogame
                 },
             };
 
-            if (useBlinkingFrame && !isSpacebarAnimationActive && currentDirectionSushi != Direction.Up)
+            if (useBlinkingFrame && !isSpacebarAnimationActive)
             {
                 baseRectangles[2] = new Rectangle(288, baseRectangles[2].Y, 96, 128);
             }
 
             return baseRectangles;
         }
+
 
         private Rectangle GetGingerRectangle(Direction direction, int animationIndex)
         {
@@ -736,8 +738,8 @@ namespace monogame
                 {
             isSushiAttacking
                 ? (useSushiAttackFrame
-                    ? new Rectangle(frameWidth * 4, 0, frameWidth, frameHeight)  // Attack frame
-                    : new Rectangle(frameWidth * 5, 0, doubleWidth, frameHeight)) // Second attack frame
+                    ? new Rectangle(frameWidth * 4, 0, frameWidth, frameHeight)
+                    : new Rectangle(frameWidth * 5, 0, doubleWidth, frameHeight))
                 : new Rectangle(0, 0, frameWidth, frameHeight),
             new Rectangle(frameWidth, 0, frameWidth, frameHeight),
             new Rectangle(frameWidth * 2, 0, frameWidth, frameHeight)

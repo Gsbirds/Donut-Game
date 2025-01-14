@@ -21,6 +21,7 @@
     <File>/home/gux/monogame-game/monogame/Content/donutsss.png</File>
     <File>/home/gux/monogame-game/monogame/Content/empanadasprites1.png</File>
     <File>/home/gux/monogame-game/monogame/Content/empanadasprites2.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/empanadasprites3.png</File>
     <File>/home/gux/monogame-game/monogame/Content/gingersprites.png</File>
     <File>/home/gux/monogame-game/monogame/Content/gingersprites2.png</File>
     <File>/home/gux/monogame-game/monogame/Content/gingersprites3.png</File>
@@ -47,6 +48,7 @@
   </SourceFiles>
   <DestFiles>
     <File>mainmenudonut.png</File>
+    <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />
