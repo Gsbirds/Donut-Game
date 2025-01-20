@@ -163,9 +163,9 @@ namespace monogame
             threshold = 150;
             nachoPosition = new Vector2(100, 100);
             ballPosition = new Vector2(
-            _graphicsDevice.Viewport.Width / 2f - (96 / 2f),
-            _graphicsDevice.Viewport.Height / 2f - (128 / 2f)
-        );
+            _graphicsDevice.Viewport.Width - 96,
+            _graphicsDevice.Viewport.Height - 128
+            );
 
             ballSpeed = 100f;
             lastDonutPosition = ballPosition;
@@ -196,8 +196,8 @@ namespace monogame
             leftRectangles = new Rectangle[3]
             {
             new Rectangle(0, 384, 96, 128),
-            new Rectangle(96, 384, 96, 128), 
-            new Rectangle(192, 384, 96, 128) 
+            new Rectangle(96, 384, 96, 128),
+            new Rectangle(192, 384, 96, 128)
             };
 
             currentAnimationIndex = 1;
@@ -378,7 +378,7 @@ namespace monogame
                 (int)sombreroPosition.X - 150,
                 (int)sombreroPosition.Y - 50,
                 300,
-                100 
+                100
             );
 
 
@@ -920,8 +920,8 @@ namespace monogame
                     },
                     Direction.Left => new Rectangle[]
                     {
-                new Rectangle(frameWidth * 4, frameHeight * 3, frameWidth * (3/2), frameHeight),
-                new Rectangle(frameWidth * 11/2, frameHeight * 3, frameWidth, frameHeight)
+                new Rectangle(475, frameHeight * 3, frameWidth * (3/2), frameHeight),
+                new Rectangle(605, frameHeight * 3, frameWidth, frameHeight)
                     },
                     Direction.Right => new Rectangle[]
                     {
