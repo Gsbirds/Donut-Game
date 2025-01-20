@@ -69,8 +69,8 @@ namespace monogame
                 switch (newState)
                 {
                     case GameStateType.Game1:
-                        _graphics.PreferredBackBufferWidth = 650;
-                        _graphics.PreferredBackBufferHeight = 650;
+                        _graphics.PreferredBackBufferWidth = 850;
+                        _graphics.PreferredBackBufferHeight = 850;
                         _graphics.ApplyChanges();
                         currentGameState = new Game1(this, _spriteBatch);
                         break;
@@ -132,7 +132,7 @@ namespace monogame
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.BlanchedAlmond);
+            GraphicsDevice.Clear(Color.Black);
 
             _spriteBatch.Begin();
 

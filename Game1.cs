@@ -1,4 +1,6 @@
 ﻿using System;
+using System.ComponentModel;
+using System.IO.Pipes;
 using System.Timers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -96,10 +98,22 @@ namespace monogame
         private bool empanadaMoving;
         private byte currentAnimationIndexEmpanada;
         private Texture2D sombrero;
+        private Texture2D background;
+        private Texture2D weed;
+        private Texture2D pipe;
+        private Texture2D churroTree;
         private Vector2 sombreroPosition = new Vector2(300, 300);
         private bool donutMovingToSombrero = false;
         private float donutJumpSpeed = 100f;
-        private bool showSecondFrame = false;
+        private bool hasJumped = false;
+        private float pipeAnimationTimer = 0f;
+        private float pipeFrameDuration = 0.2f;
+        private int currentPipeFrameIndex = 0;
+        private Texture2D[] pipes;
+        private Vector2[] pipePositions;
+        private int[] currentPipeFrameIndices;
+        private float[] pipeAnimationTimers;
+
 
 
         public Game1(MainGame mainGame, SpriteBatch spriteBatch)
@@ -121,9 +135,28 @@ namespace monogame
             nachoMouth = _mainGame.Content.Load<Texture2D>("openmountnacho2");
             sombreroWallpaper = _mainGame.Content.Load<Texture2D>("sombrerosetting");
             splashCheese = _mainGame.Content.Load<Texture2D>("splashcheese");
-            empanada = _mainGame.Content.Load<Texture2D>("empanadasprites7");
+            empanada = _mainGame.Content.Load<Texture2D>("empanadasprites11");
             sombrero = _mainGame.Content.Load<Texture2D>("sombrero");
+            background = _mainGame.Content.Load<Texture2D>("background");
+            weed = _mainGame.Content.Load<Texture2D>("weed");
+            churroTree = _mainGame.Content.Load<Texture2D>("churroTree");
+            pipe = _mainGame.Content.Load<Texture2D>("pipe2");
 
+            // Initialize multiple pipes
+            pipes = new Texture2D[3];
+            pipes[0] = pipe;
+            pipes[1] = _mainGame.Content.Load<Texture2D>("pipe2"); // Load additional pipe textures if needed
+            pipes[2] = _mainGame.Content.Load<Texture2D>("pipe2");
+
+            pipePositions = new Vector2[]
+            {
+            new Vector2(670, 570),
+            new Vector2(250, 300),
+            new Vector2(465, 300),
+            };
+
+            currentPipeFrameIndices = new int[3];
+            pipeAnimationTimers = new float[3];
 
             health = 4;
 
@@ -308,7 +341,6 @@ namespace monogame
 
         private bool keyboardTracker(float elapsedTime, GameTime gameTime)
         {
-
             bool isMoving = false;
             float updatedBallSpeed = ballSpeed * elapsedTime;
 
@@ -341,6 +373,23 @@ namespace monogame
                 isMoving = true;
             }
 
+            Vector2 nextPosition = ballPosition + movement * updatedBallSpeed;
+
+            Rectangle sombreroRect = new Rectangle(
+                (int)sombreroPosition.X - 150,  // Adjust X based on the actual visible area
+                (int)sombreroPosition.Y - 50,  // Adjust Y based on the visible area
+                300,  // Width of the sombrero
+                100   // Height of the sombrero
+            );
+
+
+            Rectangle donutRect = new Rectangle(
+                (int)nextPosition.X,
+                (int)nextPosition.Y,
+                96,
+                128
+            );
+
             if (movement != Vector2.Zero)
             {
                 movement.Normalize();
@@ -357,6 +406,7 @@ namespace monogame
 
             return isMoving;
         }
+
 
         private void nachoRotater()
         {
@@ -391,7 +441,7 @@ namespace monogame
                     {
                         animationCycleCount++;
 
-                        useBlinkingFrame = (animationCycleCount % 3 == 0);
+                        useBlinkingFrame = animationCycleCount % 3 == 0;
                     }
 
                     donutTimer = 0f;
@@ -487,7 +537,7 @@ namespace monogame
         }
 
 
-        private void sombreroUpdate(float elapsedTime, KeyboardState currentKeyboardState)
+        private void SombreroUpdate(float elapsedTime, KeyboardState currentKeyboardState)
         {
             if (currentKeyboardState.IsKeyDown(Keys.Space) && !previousKeyboardState.IsKeyDown(Keys.Space))
             {
@@ -507,10 +557,10 @@ namespace monogame
                 {
                     ballPosition = sombreroPosition;
                     donutMovingToSombrero = false;
+                    hasJumped = false;
                 }
             }
         }
-
 
 
         public void Update(GameTime gameTime)
@@ -538,9 +588,20 @@ namespace monogame
             KeyboardState currentKeyboardState = Keyboard.GetState();
             MouseState currentMouseState = Mouse.GetState();
 
+            for (int i = 0; i < pipes.Length; i++)
+            {
+                pipeAnimationTimers[i] += elapsedTime;
+                if (pipeAnimationTimers[i] >= pipeFrameDuration)
+                {
+                    pipeAnimationTimers[i] -= pipeFrameDuration;
+                    currentPipeFrameIndices[i] = (currentPipeFrameIndices[i] + 1) % 3;
+                }
+            }
+
+
             LeftClickAttack(gameTime, currentMouseState);
 
-            sombreroUpdate(elapsedTime, currentKeyboardState);
+            SombreroUpdate(elapsedTime, currentKeyboardState);
 
             if (usePostHitFrame)
             {
@@ -610,7 +671,6 @@ namespace monogame
 
         public void Draw(GameTime gameTime)
         {
-
             if (nachoDefeated)
             {
                 _graphicsDevice.Clear(Color.Black);
@@ -623,10 +683,16 @@ namespace monogame
                 _spriteBatch.DrawString(font, defeatMessage, textPosition, Color.White);
                 return;
             }
-            // _spriteBatch.Draw(
-            //     sombreroWallpaper,
-            //     new Rectangle(0, 0, 650, 650), Color.White
-            // );
+
+            _spriteBatch.Draw(
+                background,
+                new Rectangle(0, 0, 850, 850), Color.White
+            );
+
+            _spriteBatch.Draw(
+                churroTree,
+                new Rectangle(500, 350, 400, 400), Color.White
+            );
 
             _spriteBatch.Draw(
                 sombrero,
@@ -634,19 +700,31 @@ namespace monogame
                 null,
                 Color.White,
                 0f,
-                new Vector2(sombrero.Width / 2, sombrero.Height / 2), // Center origin
+                new Vector2(300, -20),
                 1.0f,
                 SpriteEffects.None,
                 0f
             );
 
+            for (int i = 0; i < pipes.Length; i++)
+            {
+                Rectangle[] pipeFrames = GetCurrentRectanglePipe();
+                _spriteBatch.Draw(
+                    pipes[i],
+                    pipePositions[i],
+                    pipeFrames[currentPipeFrameIndices[i]],
+                    Color.White
+                );
+            }
+
+
             Rectangle[] empanadaFrames = GetCurrentRectangleEmpanada();
-            int frameIndex = currentAnimationIndexEmpanada % empanadaFrames.Length; // Ensure index is always valid
+            int frameIndex = currentAnimationIndexEmpanada % empanadaFrames.Length;
 
             _spriteBatch.Draw(
                 empanada,
                 empanadaPosition,
-                empanadaFrames[frameIndex],  // Use the corrected index
+                empanadaFrames[frameIndex],
                 Color.White,
                 0f,
                 new Vector2(70, 66),
@@ -654,7 +732,6 @@ namespace monogame
                 SpriteEffects.None,
                 0f
             );
-
 
             _spriteBatch.Draw(
                 nacho,
@@ -683,6 +760,7 @@ namespace monogame
             {
                 Vector2 splashOffset = new Vector2(30, 40);
                 _spriteBatch.Draw(
+
                     splashCheese,
                     splashPosition + splashOffset,
                     null,
@@ -738,6 +816,7 @@ namespace monogame
             Vector2 donutHealthPosition = new Vector2(530, 10);
             _spriteBatch.DrawString(font, donutHealthText, donutHealthPosition, Color.Black);
         }
+
 
 
         private Rectangle[] GetCurrentRectanglesNacho()
@@ -832,8 +911,8 @@ namespace monogame
                 {
                     Direction.Up => new Rectangle[]
                     {
-                new Rectangle(frameWidth * 4, 0, frameWidth, frameHeight),     // First attack frame
-                new Rectangle(frameWidth * 5, 0, frameWidth * 2, frameHeight)  // Second attack frame (double width)
+                new Rectangle(frameWidth * 4, 0, frameWidth, frameHeight),
+                new Rectangle(frameWidth * 5, 0, frameWidth * 2, frameHeight)
                     },
                     Direction.Down => new Rectangle[]
                     {
@@ -842,8 +921,8 @@ namespace monogame
                     },
                     Direction.Left => new Rectangle[]
                     {
-                new Rectangle(frameWidth * 4, frameHeight * 3, frameWidth, frameHeight),
-                new Rectangle(frameWidth * 5, frameHeight * 3, frameWidth * 2, frameHeight)
+                new Rectangle(frameWidth * 4, frameHeight * 3, frameWidth * (3/2), frameHeight),
+                new Rectangle(frameWidth * 11/2, frameHeight * 3, frameWidth, frameHeight)
                     },
                     Direction.Right => new Rectangle[]
                     {
@@ -893,6 +972,19 @@ namespace monogame
                     }
                 };
             }
+        }
+
+        private Rectangle[] GetCurrentRectanglePipe()
+        {
+            int frameWidth = 200;
+            int frameHeight = 200;
+
+            return new Rectangle[]
+            {
+        new Rectangle(0, 0, frameWidth, frameHeight),
+        new Rectangle(frameWidth, 0, frameWidth, frameHeight),
+        new Rectangle(frameWidth * 2, 0, frameWidth, frameHeight)
+            };
         }
 
 

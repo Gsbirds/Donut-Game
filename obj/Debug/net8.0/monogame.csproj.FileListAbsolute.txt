@@ -69,3 +69,14 @@
 /home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/empanadasprites6.xnb
 /home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/empanadasprites7.xnb
 /home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/empanadasprites8.xnb
+/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/empanadasprites9.xnb
+/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/empanadasprites10.xnb
+/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/empanadasprites11.xnb
+/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/empanadasprites12.xnb
+/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/empanadasprites13.xnb
+/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/background.xnb
+/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/churro.xnb
+/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/churroTree.xnb
+/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/pipe.xnb
+/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/weed.xnb
+/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/pipe2.xnb
