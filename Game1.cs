@@ -389,10 +389,17 @@ namespace monogame
                 128
             );
 
+
             if (movement != Vector2.Zero)
             {
                 movement.Normalize();
                 ballPosition += movement * updatedBallSpeed;
+
+                float halfScreenHeight = _graphicsDevice.Viewport.Height / 2 - 100;
+                if (ballPosition.Y < halfScreenHeight)
+                {
+                    ballPosition.Y = halfScreenHeight;
+                }
             }
 
             nachoDirectionDelayTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -841,7 +848,7 @@ namespace monogame
                     ? new Rectangle(96, 128, 96, 128)
                     : new Rectangle(96, 256, 96, 128)),
             usePostHitFrame
-                ? new Rectangle(96, 512, 96, 128) 
+                ? new Rectangle(96, 512, 96, 128)
                 : (useOpenMouthFrame
                     ? new Rectangle(96, 128, 96, 128)
                     : new Rectangle(96, 256, 96, 128))
@@ -886,7 +893,7 @@ namespace monogame
                 {
             new Rectangle(0, 384, 96, 128),
             new Rectangle(96, 384, 96, 128),
-            new Rectangle(192, 384, 96, 128) 
+            new Rectangle(192, 384, 96, 128)
                 },
             };
 
@@ -995,8 +1002,8 @@ namespace monogame
                 {
             isSpacebarAnimationActive
                 ? (useSpacebarFrame
-                    ? new Rectangle( 80, 0, doubleWidth, 128)  // Fifth column
-                    : new Rectangle(384, 0, 96, 128))  // Sixth column
+                    ? new Rectangle( 80, 0, doubleWidth, 128)
+                    : new Rectangle(384, 0, 96, 128))
                 : new Rectangle(0, 0, 96, 128),
             new Rectangle(96, 0, 96, 128),
             new Rectangle(192, 0, 96, 128)
@@ -1005,8 +1012,8 @@ namespace monogame
                 {
             isSpacebarAnimationActive
                 ? (useSpacebarFrame
-                    ? new Rectangle(480, 256, doubleWidth, 128) // Fifth column
-                    : new Rectangle(384, 256, 96, 128)) // Sixth column
+                    ? new Rectangle(480, 256, doubleWidth, 128)
+                    : new Rectangle(384, 256, 96, 128))
                 : new Rectangle(0, 256, 96, 128),
             new Rectangle(96, 256, 96, 128),
             new Rectangle(192, 256, 96, 128)
@@ -1015,8 +1022,8 @@ namespace monogame
                 {
             isSpacebarAnimationActive
                 ? (useSpacebarFrame
-                    ? new Rectangle(480, 384, doubleWidth, 128) // Fifth column
-                    : new Rectangle(384, 384, 96, 128)) // Sixth column
+                    ? new Rectangle(480, 384, doubleWidth, 128)
+                    : new Rectangle(384, 384, 96, 128))
                 : new Rectangle(0, 384, 96, 128),
             new Rectangle(96, 384, 96, 128),
             new Rectangle(192, 384, 96, 128)
@@ -1041,7 +1048,7 @@ namespace monogame
 
             if (useBlinkingFrame && !isSpacebarAnimationActive)
             {
-                baseRectangles[2] = new Rectangle(288, baseRectangles[2].Y, 96, 128); // Blinking frame
+                baseRectangles[2] = new Rectangle(288, baseRectangles[2].Y, 96, 128);
             }
 
             return baseRectangles;
