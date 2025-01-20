@@ -142,10 +142,9 @@ namespace monogame
             churroTree = _mainGame.Content.Load<Texture2D>("churroTree");
             pipe = _mainGame.Content.Load<Texture2D>("pipe2");
 
-            // Initialize multiple pipes
             pipes = new Texture2D[3];
             pipes[0] = pipe;
-            pipes[1] = _mainGame.Content.Load<Texture2D>("pipe2"); // Load additional pipe textures if needed
+            pipes[1] = _mainGame.Content.Load<Texture2D>("pipe2");
             pipes[2] = _mainGame.Content.Load<Texture2D>("pipe2");
 
             pipePositions = new Vector2[]
@@ -175,30 +174,30 @@ namespace monogame
 
             downRectangles = new Rectangle[3]
             {
-            new Rectangle(0, 256, 96, 128),  // First frame in the Down row
-            new Rectangle(96, 256, 96, 128), // Second frame
-            new Rectangle(192, 256, 96, 128) // Third frame
+            new Rectangle(0, 256, 96, 128),
+            new Rectangle(96, 256, 96, 128),
+            new Rectangle(192, 256, 96, 128)
             };
 
             upRectangles = new Rectangle[3]
             {
-            new Rectangle(0, 0, 96, 128),    // First frame in the Up row
-            new Rectangle(96, 0, 96, 128),  // Second frame
-            new Rectangle(192, 0, 96, 128)  // Third frame
+            new Rectangle(0, 0, 96, 128),
+            new Rectangle(96, 0, 96, 128),
+            new Rectangle(192, 0, 96, 128)
             };
 
             rightRectangles = new Rectangle[3]
             {
-            new Rectangle(0, 128, 96, 128),  // First frame in the Right row
-            new Rectangle(96, 128, 96, 128), // Second frame
-            new Rectangle(192, 128, 96, 128) // Third frame
+            new Rectangle(0, 128, 96, 128),
+            new Rectangle(96, 128, 96, 128),
+            new Rectangle(192, 128, 96, 128)
             };
 
             leftRectangles = new Rectangle[3]
             {
-            new Rectangle(0, 384, 96, 128),  // First frame in the Left row
-            new Rectangle(96, 384, 96, 128), // Second frame
-            new Rectangle(192, 384, 96, 128) // Third frame
+            new Rectangle(0, 384, 96, 128),
+            new Rectangle(96, 384, 96, 128), 
+            new Rectangle(192, 384, 96, 128) 
             };
 
             currentAnimationIndex = 1;
@@ -376,10 +375,10 @@ namespace monogame
             Vector2 nextPosition = ballPosition + movement * updatedBallSpeed;
 
             Rectangle sombreroRect = new Rectangle(
-                (int)sombreroPosition.X - 150,  // Adjust X based on the actual visible area
-                (int)sombreroPosition.Y - 50,  // Adjust Y based on the visible area
-                300,  // Width of the sombrero
-                100   // Height of the sombrero
+                (int)sombreroPosition.X - 150,
+                (int)sombreroPosition.Y - 50,
+                300,
+                100 
             );
 
 
