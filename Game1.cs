@@ -833,15 +833,15 @@ namespace monogame
             usePostHitFrame
                 ? new Rectangle(96, 512, 96, 128)
                 : (useOpenMouthFrame
-                    ? new Rectangle(96, 128, 96, 128) // Open mouth frame
+                    ? new Rectangle(96, 128, 96, 128)
                     : new Rectangle(96, 256, 96, 128)),
             usePostHitFrame
-                ? new Rectangle(96, 512, 96, 128) // Post-hit frame for "Down"
+                ? new Rectangle(96, 512, 96, 128)
                 : (useOpenMouthFrame
                     ? new Rectangle(96, 128, 96, 128)
                     : new Rectangle(96, 256, 96, 128)),
             usePostHitFrame
-                ? new Rectangle(96, 512, 96, 128) // Post-hit frame for "Down"
+                ? new Rectangle(96, 512, 96, 128) 
                 : (useOpenMouthFrame
                     ? new Rectangle(96, 128, 96, 128)
                     : new Rectangle(96, 256, 96, 128))
@@ -849,17 +849,17 @@ namespace monogame
                 Direction.Left => new Rectangle[]
                 {
             usePostHitFrame
-                ? new Rectangle(0, 512, 96, 128) // Post-hit frame for "Left"
+                ? new Rectangle(0, 512, 96, 128)
                 : (useOpenMouthFrame
                     ? new Rectangle(192, 128, 96, 128)
                     : new Rectangle(192, 256, 96, 128)),
             usePostHitFrame
-                ? new Rectangle(0, 512, 96, 128) // Post-hit frame for "Left"
+                ? new Rectangle(0, 512, 96, 128)
                 : (useOpenMouthFrame
                     ? new Rectangle(192, 128, 96, 128)
                     : new Rectangle(192, 256, 96, 128)),
             usePostHitFrame
-                ? new Rectangle(0, 512, 96, 128) // Post-hit frame for "Left"
+                ? new Rectangle(0, 512, 96, 128)
                 : (useOpenMouthFrame
                     ? new Rectangle(192, 128, 96, 128)
                     : new Rectangle(192, 256, 96, 128))
@@ -867,26 +867,26 @@ namespace monogame
                 Direction.Right => new Rectangle[]
                 {
             usePostHitFrame
-                ? new Rectangle(192, 512, 96, 128) // Post-hit frame for "Right"
+                ? new Rectangle(192, 512, 96, 128)
                 : (useOpenMouthFrame
                     ? new Rectangle(0, 128, 96, 128)
                     : new Rectangle(0, 256, 96, 128)),
             usePostHitFrame
-                ? new Rectangle(192, 512, 96, 128) // Post-hit frame for "Right"
+                ? new Rectangle(192, 512, 96, 128)
                 : (useOpenMouthFrame
                     ? new Rectangle(0, 128, 96, 128)
                     : new Rectangle(0, 256, 96, 128)),
             usePostHitFrame
-                ? new Rectangle(192, 512, 96, 128) // Post-hit frame for "Right"
+                ? new Rectangle(192, 512, 96, 128)
                 : (useOpenMouthFrame
                     ? new Rectangle(0, 128, 96, 128)
                     : new Rectangle(0, 256, 96, 128))
                 },
                 _ => new Rectangle[]
                 {
-            new Rectangle(0, 384, 96, 128),  // Default "Down" row
-            new Rectangle(96, 384, 96, 128), // Default second frame
-            new Rectangle(192, 384, 96, 128) // Default third frame
+            new Rectangle(0, 384, 96, 128),
+            new Rectangle(96, 384, 96, 128),
+            new Rectangle(192, 384, 96, 128) 
                 },
             };
 
