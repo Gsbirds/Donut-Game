@@ -101,6 +101,7 @@ namespace monogame
         private Texture2D background;
         private Texture2D weed;
         private Texture2D pipe;
+        private Texture2D mushroom;
         private Texture2D churroTree;
         private Vector2 sombreroPosition = new Vector2(300, 300);
         private bool donutMovingToSombrero = false;
@@ -113,6 +114,12 @@ namespace monogame
         private Vector2[] pipePositions;
         private int[] currentPipeFrameIndices;
         private float[] pipeAnimationTimers;
+        private Texture2D puprmushSpritesheet;
+        private Rectangle[] puprmushFrames;
+        private int currentPuprmushFrame;
+        private float puprmushFrameTimer;
+        private const float PuprmushFrameDuration = 0.2f;
+
 
 
 
@@ -136,12 +143,11 @@ namespace monogame
             sombreroWallpaper = _mainGame.Content.Load<Texture2D>("sombrerosetting");
             splashCheese = _mainGame.Content.Load<Texture2D>("splashcheese");
             empanada = _mainGame.Content.Load<Texture2D>("empanadasprites11");
-            sombrero = _mainGame.Content.Load<Texture2D>("sombrero");
-            background = _mainGame.Content.Load<Texture2D>("background");
+            sombrero = _mainGame.Content.Load<Texture2D>("Sombrero");
+            background = _mainGame.Content.Load<Texture2D>("pink_purp_background");
             weed = _mainGame.Content.Load<Texture2D>("weed");
             churroTree = _mainGame.Content.Load<Texture2D>("churroTree");
             pipe = _mainGame.Content.Load<Texture2D>("pipe2");
-
             pipes = new Texture2D[3];
             pipes[0] = pipe;
             pipes[1] = _mainGame.Content.Load<Texture2D>("pipe2");
@@ -202,6 +208,19 @@ namespace monogame
 
             currentAnimationIndex = 1;
             currentDirection = Direction.Down;
+
+            puprmushSpritesheet = _mainGame.Content.Load<Texture2D>("Puprmush");
+            int frameWidth = puprmushSpritesheet.Width / 5;
+            int frameHeight = puprmushSpritesheet.Height;
+
+            puprmushFrames = new Rectangle[5];
+            for (int i = 0; i < 5; i++)
+            {
+                puprmushFrames[i] = new Rectangle(i * frameWidth, 0, frameWidth, frameHeight);
+            }
+            currentPuprmushFrame = 0;
+            puprmushFrameTimer = 0f;
+
         }
 
         private Vector2 GetNachoMouthPosition()
@@ -419,6 +438,7 @@ namespace monogame
             if (rotatingRight)
             {
                 nachoRotation += 0.01f;
+
                 if (nachoRotation >= 0.1f)
                 {
                     rotatingRight = false;
@@ -656,6 +676,17 @@ namespace monogame
 
             previousKeyboardState = currentKeyboardState;
 
+            PurpleMushUpdate(gameTime);
+
+        }
+
+        private void PurpleMushUpdate(GameTime gameTime){
+                        puprmushFrameTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+            if (puprmushFrameTimer >= PuprmushFrameDuration)
+            {
+                puprmushFrameTimer -= PuprmushFrameDuration;
+                currentPuprmushFrame = (currentPuprmushFrame + 1) % puprmushFrames.Length;
+            }
         }
 
 
@@ -706,8 +737,25 @@ namespace monogame
                 null,
                 Color.White,
                 0f,
-                new Vector2(300, -20),
+                new Vector2(350, -100),
                 1.0f,
+                SpriteEffects.None,
+                0f
+            );
+
+            Vector2 puprmushPosition = new Vector2(
+            _graphicsDevice.Viewport.Width / 2 + 20,
+            _graphicsDevice.Viewport.Height / 2 -70
+            );
+
+            _spriteBatch.Draw(
+                puprmushSpritesheet,
+                puprmushPosition,
+                puprmushFrames[currentPuprmushFrame],
+                Color.White,
+                0f,
+                new Vector2(puprmushFrames[currentPuprmushFrame].Width / 2, puprmushFrames[currentPuprmushFrame].Height / 2),
+                0.18f,
                 SpriteEffects.None,
                 0f
             );
@@ -821,6 +869,7 @@ namespace monogame
             string donutHealthText = $"Health: {health}";
             Vector2 donutHealthPosition = new Vector2(530, 10);
             _spriteBatch.DrawString(font, donutHealthText, donutHealthPosition, Color.Black);
+
         }
 
 

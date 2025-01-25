@@ -25,6 +25,18 @@
 /processorParam:TextureFormat=Color
 /build:../../../Desktop/mainmenudonut.png;mainmenudonut.png
 
+#begin ../../../Downloads/Puprmush.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../../Downloads/Puprmush.png;Puprmush.png
+
 #begin angrydonut.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -596,6 +608,18 @@
 /processorParam:TextureFormat=Color
 /build:openmountnacho2.png
 
+#begin pink_purp_background.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:pink_purp_background.png
+
 #begin pipe.gif
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -632,6 +656,18 @@
 /processorParam:TextureFormat=Color
 /build:pipe2.png
 
+#begin Puprmush.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Puprmush.png
+
 #begin sombrero.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -643,6 +679,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:sombrero.png
+
+#begin Sombrero.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Sombrero.png
 
 #begin sombrerosetting.png
 /importer:TextureImporter

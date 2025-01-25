@@ -80,3 +80,5 @@
 /home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/pipe.xnb
 /home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/weed.xnb
 /home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/pipe2.xnb
+/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/pink_purp_background.xnb
+/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/Puprmush.xnb
