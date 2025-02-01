@@ -224,6 +224,18 @@
 /processorParam:TextureFormat=Color
 /build:donutsprites18.png
 
+#begin donutsprites20.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:donutsprites20.png
+
 #begin donutsss.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -536,6 +548,18 @@
 /processorParam:TextureFormat=Color
 /build:mainmenudonut4.png
 
+#begin mochitree.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:mochitree.png
+
 #begin nachofrontstant1.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -619,6 +643,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:pink_purp_background.png
+
+#begin pinkmush.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:pinkmush.png
 
 #begin pipe.gif
 /importer:TextureImporter
@@ -715,6 +751,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:splashcheese.png
+
+#begin sushilevelsetting.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:sushilevelsetting.png
 
 #begin sushisprites.png
 /importer:TextureImporter

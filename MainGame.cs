@@ -75,8 +75,8 @@ namespace monogame
                         currentGameState = new Game1(this, _spriteBatch);
                         break;
                     case GameStateType.Game2:
-                        _graphics.PreferredBackBufferWidth = 800;
-                        _graphics.PreferredBackBufferHeight = 600;
+                        _graphics.PreferredBackBufferWidth = 850;
+                        _graphics.PreferredBackBufferHeight = 850;
                         _graphics.ApplyChanges();
                         currentGameState = new Game2(this, _spriteBatch);
                         break;

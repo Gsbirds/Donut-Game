@@ -82,3 +82,7 @@
 /home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/pipe2.xnb
 /home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/pink_purp_background.xnb
 /home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/Puprmush.xnb
+/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/sushilevelsetting.xnb
+/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/mochitree.xnb
+/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/pinkmush.xnb
+/home/gux/monogame-game/monogame/bin/Debug/net8.0/Content/donutsprites20.xnb

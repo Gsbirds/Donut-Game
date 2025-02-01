@@ -119,6 +119,12 @@ namespace monogame
         private int currentPuprmushFrame;
         private float puprmushFrameTimer;
         private const float PuprmushFrameDuration = 0.2f;
+        bool isJumping = false;
+        float jumpTimer = 0f;
+        float jumpDuration = 1.0f;
+        float jumpHeight = 50f;
+        float jumpStartY = 0f;
+
 
 
 
@@ -135,7 +141,7 @@ namespace monogame
 
         public void LoadContent()
         {
-            charaset = _mainGame.Content.Load<Texture2D>("donutsprites17");
+            charaset = _mainGame.Content.Load<Texture2D>("donutsprites20");
             nacho = _mainGame.Content.Load<Texture2D>("nachosprites4");
             font = _mainGame.Content.Load<SpriteFont>("DefaultFont1");
             cheeseLaunch = _mainGame.Content.Load<Texture2D>("cheeselaunch");
@@ -393,13 +399,6 @@ namespace monogame
 
             Vector2 nextPosition = ballPosition + movement * updatedBallSpeed;
 
-            Rectangle sombreroRect = new Rectangle(
-                (int)sombreroPosition.X - 150,
-                (int)sombreroPosition.Y - 50,
-                300,
-                100
-            );
-
 
             Rectangle donutRect = new Rectangle(
                 (int)nextPosition.X,
@@ -563,32 +562,6 @@ namespace monogame
         }
 
 
-        private void SombreroUpdate(float elapsedTime, KeyboardState currentKeyboardState)
-        {
-            if (currentKeyboardState.IsKeyDown(Keys.Space) && !previousKeyboardState.IsKeyDown(Keys.Space))
-            {
-                donutMovingToSombrero = true;
-            }
-
-            if (donutMovingToSombrero)
-            {
-                Vector2 directionToSombrero = sombreroPosition - ballPosition;
-
-                if (directionToSombrero.Length() > 50f)
-                {
-                    directionToSombrero.Normalize();
-                    ballPosition += directionToSombrero * donutJumpSpeed * elapsedTime;
-                }
-                else
-                {
-                    ballPosition = sombreroPosition;
-                    donutMovingToSombrero = false;
-                    hasJumped = false;
-                }
-            }
-        }
-
-
         public void Update(GameTime gameTime)
         {
 
@@ -626,8 +599,6 @@ namespace monogame
 
 
             LeftClickAttack(gameTime, currentMouseState);
-
-            SombreroUpdate(elapsedTime, currentKeyboardState);
 
             if (usePostHitFrame)
             {
@@ -674,14 +645,36 @@ namespace monogame
             animationBlinker(isMoving, gameTime);
             cheeseLauncher(updatedNachoSpeed, gameTime);
 
-            previousKeyboardState = currentKeyboardState;
-
             PurpleMushUpdate(gameTime);
+            
+            if (currentKeyboardState.IsKeyDown(Keys.Space) && !previousKeyboardState.IsKeyDown(Keys.Space) && !isJumping)
+            {
+                isJumping = true;
+                jumpTimer = 0f;
+                jumpStartY = ballPosition.Y;
+            }
+
+            if (isJumping)
+            {
+                jumpTimer += elapsedTime;
+                float progress = jumpTimer / jumpDuration;
+                float offset = jumpHeight * (float)Math.Sin(Math.PI * progress);
+                ballPosition.Y = jumpStartY - offset;
+
+                if (jumpTimer >= jumpDuration)
+                {
+                    ballPosition.Y = jumpStartY;
+                    isJumping = false;
+                    jumpTimer = 0f;
+                }
+            }
+            previousKeyboardState = currentKeyboardState;
 
         }
 
-        private void PurpleMushUpdate(GameTime gameTime){
-                        puprmushFrameTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+        private void PurpleMushUpdate(GameTime gameTime)
+        {
+            puprmushFrameTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
             if (puprmushFrameTimer >= PuprmushFrameDuration)
             {
                 puprmushFrameTimer -= PuprmushFrameDuration;
@@ -745,7 +738,7 @@ namespace monogame
 
             Vector2 puprmushPosition = new Vector2(
             _graphicsDevice.Viewport.Width / 2 + 20,
-            _graphicsDevice.Viewport.Height / 2 -70
+            _graphicsDevice.Viewport.Height / 2 - 70
             );
 
             _spriteBatch.Draw(
@@ -1045,14 +1038,32 @@ namespace monogame
 
         private Rectangle[] GetCurrentRectangles()
         {
+            if (isJumping)
+            {
+                Rectangle jumpFrame;
+                switch (currentDirection)
+                {
+                    case Direction.Up:
+                        jumpFrame = new Rectangle(288, 0, 96, 128); break;
+                    case Direction.Down:
+                        jumpFrame = new Rectangle(288, 256, 96, 128); break;
+                    case Direction.Left:
+                        jumpFrame = new Rectangle(288, 384, 96, 128); break;
+                    case Direction.Right:
+                        jumpFrame = new Rectangle(288, 128, 96, 128); break;
+                    default:
+                        jumpFrame = new Rectangle(288, 128, 96, 128); break;
+                }
+                return new Rectangle[] { jumpFrame, jumpFrame, jumpFrame };
+            }
+
             Rectangle[] baseRectangles = currentDirection switch
             {
                 Direction.Up => new Rectangle[]
                 {
             isSpacebarAnimationActive
-                ? (useSpacebarFrame
-                    ? new Rectangle( 80, 0, doubleWidth, 128)
-                    : new Rectangle(384, 0, 96, 128))
+                ? (useSpacebarFrame ? new Rectangle(80, 0, doubleWidth, 128)
+                                    : new Rectangle(384, 0, 96, 128))
                 : new Rectangle(0, 0, 96, 128),
             new Rectangle(96, 0, 96, 128),
             new Rectangle(192, 0, 96, 128)
@@ -1060,9 +1071,8 @@ namespace monogame
                 Direction.Down => new Rectangle[]
                 {
             isSpacebarAnimationActive
-                ? (useSpacebarFrame
-                    ? new Rectangle(480, 256, doubleWidth, 128)
-                    : new Rectangle(384, 256, 96, 128))
+                ? (useSpacebarFrame ? new Rectangle(480, 256, doubleWidth, 128)
+                                    : new Rectangle(384, 256, 96, 128))
                 : new Rectangle(0, 256, 96, 128),
             new Rectangle(96, 256, 96, 128),
             new Rectangle(192, 256, 96, 128)
@@ -1070,9 +1080,8 @@ namespace monogame
                 Direction.Left => new Rectangle[]
                 {
             isSpacebarAnimationActive
-                ? (useSpacebarFrame
-                    ? new Rectangle(480, 384, doubleWidth, 128)
-                    : new Rectangle(384, 384, 96, 128))
+                ? (useSpacebarFrame ? new Rectangle(480, 384, doubleWidth, 128)
+                                    : new Rectangle(384, 384, 96, 128))
                 : new Rectangle(0, 384, 96, 128),
             new Rectangle(96, 384, 96, 128),
             new Rectangle(192, 384, 96, 128)
@@ -1080,12 +1089,11 @@ namespace monogame
                 Direction.Right => new Rectangle[]
                 {
             isSpacebarAnimationActive
-                ? (useSpacebarFrame
-                    ? new Rectangle(480, 128, doubleWidth, 128)
-                    : new Rectangle(384, 128, 96, 128))
+                ? (useSpacebarFrame ? new Rectangle(480, 128, doubleWidth, 128)
+                                    : new Rectangle(384, 128, 96, 128))
                 : new Rectangle(0, 128, 96, 128),
-                new Rectangle(96, 128, 96, 128),
-                new Rectangle(192, 128, 96, 128)
+            new Rectangle(96, 128, 96, 128),
+            new Rectangle(192, 128, 96, 128)
                 },
                 _ => new Rectangle[]
                 {
@@ -1102,6 +1110,7 @@ namespace monogame
 
             return baseRectangles;
         }
+
 
         public static class Texture2DHelper
         {

@@ -22,6 +22,7 @@ namespace monogame
         float health;
         float timer;
         int threshold;
+        private Texture2D puprmushSpritesheet;
         private SpriteFont font;
 
         Rectangle[] downRectangles;
@@ -56,6 +57,7 @@ namespace monogame
 
         Texture2D splashCheese;
         private Texture2D ginger;
+        private Texture2D mochiTree;
         bool showSplashCheese = false;
         float splashCheeseTimer = 0f;
         const float splashCheeseDuration = 1f;
@@ -86,6 +88,10 @@ namespace monogame
         private bool sushiStopped;
         private float donutTimer = 0f;
         private float sushiTimer = 0f;
+        private Rectangle[] puprmushFrames;
+        private int currentPuprmushFrame;
+        private float puprmushFrameTimer;
+        private const float PuprmushFrameDuration = 0.2f;
 
         public Game2(MainGame mainGame, SpriteBatch spriteBatch)
         {
@@ -135,15 +141,27 @@ namespace monogame
         public void LoadContent()
         {
 
-            charaset = _mainGame.Content.Load<Texture2D>("donutsprites17");
+            charaset = _mainGame.Content.Load<Texture2D>("donutsprites20");
             sushi = _mainGame.Content.Load<Texture2D>("sushisprites10");
             font = _mainGame.Content.Load<SpriteFont>("DefaultFont1");
             cheeseLaunch = _mainGame.Content.Load<Texture2D>("cheeselaunch");
-            sushiWallpaper = _mainGame.Content.Load<Texture2D>("japaneselevel4");
+            sushiWallpaper = _mainGame.Content.Load<Texture2D>("sushilevelsetting");
             splashCheese = _mainGame.Content.Load<Texture2D>("splashcheese");
             ginger = _mainGame.Content.Load<Texture2D>("gingersprites5");
+            mochiTree = _mainGame.Content.Load<Texture2D>("mochitree");
             threshold = 150;
 
+            puprmushSpritesheet = _mainGame.Content.Load<Texture2D>("pinkmush");
+            int frameWidth = puprmushSpritesheet.Width / 5;
+            int frameHeight = puprmushSpritesheet.Height;
+
+            puprmushFrames = new Rectangle[5];
+            for (int i = 0; i < 5; i++)
+            {
+                puprmushFrames[i] = new Rectangle(i * frameWidth, 0, frameWidth, frameHeight);
+            }
+            currentPuprmushFrame = 0;
+            puprmushFrameTimer = 0f;
         }
 
         private Vector2 GetNachoMouthPosition()
@@ -153,7 +171,7 @@ namespace monogame
         }
 
 
-        private void spacebarAttack(GameTime gameTime, KeyboardState currentKeyboardState)
+        private void LeftClickAttack(GameTime gameTime, MouseState currentMouseState)
         {
             Rectangle donutRect = new Rectangle(
                 (int)ballPosition.X - 48,
@@ -169,7 +187,7 @@ namespace monogame
                 128
             );
 
-            if (currentKeyboardState.IsKeyDown(Keys.Space) && !previousKeyboardState.IsKeyDown(Keys.Space))
+            if (currentMouseState.LeftButton == ButtonState.Pressed)
             {
                 if (!isSpacebarAnimationActive)
                 {
@@ -207,6 +225,7 @@ namespace monogame
                 postHitAnimationTimer = 0f;
             }
         }
+
 
         private bool keyboardTracker(float elapsedTime, GameTime gameTime)
         {
@@ -425,6 +444,16 @@ namespace monogame
         }
 
 
+        private void PurpleMushUpdate(GameTime gameTime){
+                        puprmushFrameTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+            if (puprmushFrameTimer >= PuprmushFrameDuration)
+            {
+                puprmushFrameTimer -= PuprmushFrameDuration;
+                currentPuprmushFrame = (currentPuprmushFrame + 1) % puprmushFrames.Length;
+            }
+        }
+
+
         public void Update(GameTime gameTime)
         {
 
@@ -437,8 +466,9 @@ namespace monogame
             float elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
             float updatedNachoSpeed = nachoSpeed * elapsedTime;
             KeyboardState currentKeyboardState = Keyboard.GetState();
+            MouseState currentMouseState = Mouse.GetState();
 
-            spacebarAttack(gameTime, currentKeyboardState);
+            LeftClickAttack(gameTime, currentMouseState);
 
             if (usePostHitFrame)
             {
@@ -493,6 +523,7 @@ namespace monogame
             }
 
             gingerUpdate(elapsedTime);
+            PurpleMushUpdate(gameTime);
 
             MaintainMinimumDistance(ref sushiPosition, gingerPosition, updatedSushiSpeed, elapsedTime);
             MaintainMinimumDistance(ref gingerPosition, sushiPosition, nachoSpeed, elapsedTime);
@@ -571,34 +602,64 @@ namespace monogame
             }
             _graphicsDevice.Clear(Color.Black);
 
-            _spriteBatch.Draw(sushiWallpaper, new Rectangle(0, 0, 800, 600), Color.White);
+            _spriteBatch.Draw(sushiWallpaper, new Rectangle(0, 0, 850, 850), Color.White);
 
             if (showSplashCheese)
             {
                 _spriteBatch.Draw(splashCheese, splashPosition, null, Color.White);
             }
 
+            int newWidth = 800;
+            int newHeight = 800;
+            int centerX = 700;
+            int centerY = 400;
+            int newX = centerX - newWidth / 2;
+            int newY = centerY - newHeight / 2;
+
             _spriteBatch.Draw(
-            ginger,
-            gingerPosition,
-            GetGingerRectangle(currentDirectionGinger, gingerAnimationIndex),
-            Color.White
+                mochiTree,
+                new Rectangle(newX, newY, newWidth, newHeight),
+                Color.White
             );
 
+            Vector2 puprmushPosition = new Vector2(
+            _graphicsDevice.Viewport.Width / 2 - 240,
+            _graphicsDevice.Viewport.Height / 2 + 80
+            );
+
+            _spriteBatch.Draw(
+                puprmushSpritesheet,
+                puprmushPosition,
+                puprmushFrames[currentPuprmushFrame],
+                Color.White,
+                0f,
+                new Vector2(puprmushFrames[currentPuprmushFrame].Width / 2, puprmushFrames[currentPuprmushFrame].Height / 2),
+                0.18f,
+                SpriteEffects.None,
+                0f
+            );
+
+            _spriteBatch.Draw(
+                ginger,
+                gingerPosition,
+                GetGingerRectangle(currentDirectionGinger, gingerAnimationIndex),
+                Color.White
+            );
 
             _spriteBatch.Draw(charaset, ballPosition, GetCurrentRectangles()[currentAnimationIndex], Color.White);
 
             _spriteBatch.Draw(
-           sushi,
-           sushiPosition,
-           GetCurrentRectangleSushi()[currentAnimationIndexSushi],
-           Color.White,
-           0f,
-           new Vector2(70, 66),
-           1.0f,
-           SpriteEffects.None,
-           0f
-       );
+                sushi,
+                sushiPosition,
+                GetCurrentRectangleSushi()[currentAnimationIndexSushi],
+                Color.White,
+                0f,
+                new Vector2(70, 66),
+                1.0f,
+                SpriteEffects.None,
+                0f
+            );
+
             float maxNachoHealth = 4f;
             int nachoHealthBarWidth = 200;
             int nachoHealthBarHeight = 20;

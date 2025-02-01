@@ -22,6 +22,7 @@
     <File>/home/gux/monogame-game/monogame/Content/donutsprites16.png</File>
     <File>/home/gux/monogame-game/monogame/Content/donutsprites17.png</File>
     <File>/home/gux/monogame-game/monogame/Content/donutsprites18.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/donutsprites20.png</File>
     <File>/home/gux/monogame-game/monogame/Content/donutsss.png</File>
     <File>/home/gux/monogame-game/monogame/Content/empanadasprites1.png</File>
     <File>/home/gux/monogame-game/monogame/Content/empanadasprites10.png</File>
@@ -48,6 +49,7 @@
     <File>/home/gux/monogame-game/monogame/Content/mainmenudonut2.png</File>
     <File>/home/gux/monogame-game/monogame/Content/mainmenudonut3.png</File>
     <File>/home/gux/monogame-game/monogame/Content/mainmenudonut4.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/mochitree.png</File>
     <File>/home/gux/monogame-game/monogame/Content/nachofrontstant1.png</File>
     <File>/home/gux/monogame-game/monogame/Content/nachofrontstant2.png</File>
     <File>/home/gux/monogame-game/monogame/Content/nachosprites.png</File>
@@ -55,6 +57,7 @@
     <File>/home/gux/monogame-game/monogame/Content/nachosprites4.png</File>
     <File>/home/gux/monogame-game/monogame/Content/openmountnacho2.png</File>
     <File>/home/gux/monogame-game/monogame/Content/pink_purp_background.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/pinkmush.png</File>
     <File>/home/gux/monogame-game/monogame/Content/pipe.gif</File>
     <File>/home/gux/monogame-game/monogame/Content/pipe.png</File>
     <File>/home/gux/monogame-game/monogame/Content/pipe2.png</File>
@@ -62,6 +65,7 @@
     <File>/home/gux/monogame-game/monogame/Content/Sombrero.png</File>
     <File>/home/gux/monogame-game/monogame/Content/sombrerosetting.png</File>
     <File>/home/gux/monogame-game/monogame/Content/splashcheese.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/sushilevelsetting.png</File>
     <File>/home/gux/monogame-game/monogame/Content/sushisprites.png</File>
     <File>/home/gux/monogame-game/monogame/Content/sushisprites10.png</File>
     <File>/home/gux/monogame-game/monogame/Content/weed.png</File>
@@ -69,6 +73,10 @@
   <DestFiles>
     <File>mainmenudonut.png</File>
     <File>Puprmush.png</File>
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />
