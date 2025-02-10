@@ -124,9 +124,8 @@ namespace monogame
         float jumpDuration = 1.0f;
         float jumpHeight = 50f;
         float jumpStartY = 0f;
-
-
-
+        private Direction nachoFacingDirection = Direction.Down;
+        private Direction empanadaFacingDirection = Direction.Down;
 
 
         public Game1(MainGame mainGame, SpriteBatch spriteBatch)
@@ -614,15 +613,19 @@ namespace monogame
             // ballPosition.X = MathHelper.Clamp(ballPosition.X, currentRect.Width / 2, _graphics.PreferredBackBufferWidth - currentRect.Width / 2);
             // ballPosition.Y = MathHelper.Clamp(ballPosition.Y, currentRect.Height / 2, _graphics.PreferredBackBufferHeight - currentRect.Height / 2);
 
-            float donutOffsetY = 60f;
+            Vector2 adjustedDonutPosition = new Vector2(ballPosition.X, ballPosition.Y + 60f);
 
-            Vector2 adjustedDonutPosition = new Vector2(ballPosition.X, ballPosition.Y + donutOffsetY);
-
+            // --- Update Nacho ---
             Vector2 directionToDonut = adjustedDonutPosition - nachoPosition;
             if (directionToDonut != Vector2.Zero)
             {
                 directionToDonut.Normalize();
                 nachoPosition += directionToDonut * updatedNachoSpeed;
+
+                if (Math.Abs(directionToDonut.X) > Math.Abs(directionToDonut.Y))
+                    nachoFacingDirection = directionToDonut.X > 0 ? Direction.Right : Direction.Left;
+                else
+                    nachoFacingDirection = directionToDonut.Y > 0 ? Direction.Down : Direction.Up;
             }
 
             Vector2 directionToDonutFromEmpanada = adjustedDonutPosition - empanadaPosition;
@@ -631,7 +634,18 @@ namespace monogame
                 empanadaMoving = true;
                 directionToDonutFromEmpanada.Normalize();
                 empanadaPosition += directionToDonutFromEmpanada * empanadaSpeed * elapsedTime;
+
+                if (Math.Abs(directionToDonutFromEmpanada.X) > Math.Abs(directionToDonutFromEmpanada.Y))
+                    empanadaFacingDirection = directionToDonutFromEmpanada.X > 0 ? Direction.Right : Direction.Left;
+                else
+                    empanadaFacingDirection = directionToDonutFromEmpanada.Y > 0 ? Direction.Down : Direction.Up;
             }
+            else
+            {
+                empanadaMoving = false;
+
+            }
+
 
 
             MaintainMinimumDistance(ref nachoPosition, empanadaPosition, nachoSpeed, elapsedTime);
@@ -646,7 +660,7 @@ namespace monogame
             cheeseLauncher(updatedNachoSpeed, gameTime);
 
             PurpleMushUpdate(gameTime);
-            
+
             if (currentKeyboardState.IsKeyDown(Keys.Space) && !previousKeyboardState.IsKeyDown(Keys.Space) && !isJumping)
             {
                 isJumping = true;
@@ -869,7 +883,7 @@ namespace monogame
 
         private Rectangle[] GetCurrentRectanglesNacho()
         {
-            Rectangle[] baseRectangles = currentDirectionNacho2 switch
+            Rectangle[] baseRectangles = nachoFacingDirection switch
             {
                 Direction.Up => new Rectangle[]
                 {
@@ -879,57 +893,39 @@ namespace monogame
                 },
                 Direction.Down => new Rectangle[]
                 {
-            usePostHitFrame
-                ? new Rectangle(96, 512, 96, 128)
-                : (useOpenMouthFrame
-                    ? new Rectangle(96, 128, 96, 128)
-                    : new Rectangle(96, 256, 96, 128)),
-            usePostHitFrame
-                ? new Rectangle(96, 512, 96, 128)
-                : (useOpenMouthFrame
-                    ? new Rectangle(96, 128, 96, 128)
-                    : new Rectangle(96, 256, 96, 128)),
-            usePostHitFrame
-                ? new Rectangle(96, 512, 96, 128)
-                : (useOpenMouthFrame
-                    ? new Rectangle(96, 128, 96, 128)
-                    : new Rectangle(96, 256, 96, 128))
+            usePostHitFrame ? new Rectangle(96, 512, 96, 128)
+                            : (useOpenMouthFrame ? new Rectangle(96, 128, 96, 128)
+                                                 : new Rectangle(96, 256, 96, 128)),
+            usePostHitFrame ? new Rectangle(96, 512, 96, 128)
+                            : (useOpenMouthFrame ? new Rectangle(96, 128, 96, 128)
+                                                 : new Rectangle(96, 256, 96, 128)),
+            usePostHitFrame ? new Rectangle(96, 512, 96, 128)
+                            : (useOpenMouthFrame ? new Rectangle(96, 128, 96, 128)
+                                                 : new Rectangle(96, 256, 96, 128))
                 },
                 Direction.Left => new Rectangle[]
                 {
-            usePostHitFrame
-                ? new Rectangle(0, 512, 96, 128)
-                : (useOpenMouthFrame
-                    ? new Rectangle(192, 128, 96, 128)
-                    : new Rectangle(192, 256, 96, 128)),
-            usePostHitFrame
-                ? new Rectangle(0, 512, 96, 128)
-                : (useOpenMouthFrame
-                    ? new Rectangle(192, 128, 96, 128)
-                    : new Rectangle(192, 256, 96, 128)),
-            usePostHitFrame
-                ? new Rectangle(0, 512, 96, 128)
-                : (useOpenMouthFrame
-                    ? new Rectangle(192, 128, 96, 128)
-                    : new Rectangle(192, 256, 96, 128))
+            usePostHitFrame ? new Rectangle(0, 512, 96, 128)
+                            : (useOpenMouthFrame ? new Rectangle(192, 128, 96, 128)
+                                                 : new Rectangle(192, 256, 96, 128)),
+            usePostHitFrame ? new Rectangle(0, 512, 96, 128)
+                            : (useOpenMouthFrame ? new Rectangle(192, 128, 96, 128)
+                                                 : new Rectangle(192, 256, 96, 128)),
+            usePostHitFrame ? new Rectangle(0, 512, 96, 128)
+                            : (useOpenMouthFrame ? new Rectangle(192, 128, 96, 128)
+                                                 : new Rectangle(192, 256, 96, 128))
                 },
                 Direction.Right => new Rectangle[]
                 {
-            usePostHitFrame
-                ? new Rectangle(192, 512, 96, 128)
-                : (useOpenMouthFrame
-                    ? new Rectangle(0, 128, 96, 128)
-                    : new Rectangle(0, 256, 96, 128)),
-            usePostHitFrame
-                ? new Rectangle(192, 512, 96, 128)
-                : (useOpenMouthFrame
-                    ? new Rectangle(0, 128, 96, 128)
-                    : new Rectangle(0, 256, 96, 128)),
-            usePostHitFrame
-                ? new Rectangle(192, 512, 96, 128)
-                : (useOpenMouthFrame
-                    ? new Rectangle(0, 128, 96, 128)
-                    : new Rectangle(0, 256, 96, 128))
+            usePostHitFrame ? new Rectangle(192, 512, 96, 128)
+                            : (useOpenMouthFrame ? new Rectangle(0, 128, 96, 128)
+                                                 : new Rectangle(0, 256, 96, 128)),
+            usePostHitFrame ? new Rectangle(192, 512, 96, 128)
+                            : (useOpenMouthFrame ? new Rectangle(0, 128, 96, 128)
+                                                 : new Rectangle(0, 256, 96, 128)),
+            usePostHitFrame ? new Rectangle(192, 512, 96, 128)
+                            : (useOpenMouthFrame ? new Rectangle(0, 128, 96, 128)
+                                                 : new Rectangle(0, 256, 96, 128))
                 },
                 _ => new Rectangle[]
                 {
@@ -939,13 +935,15 @@ namespace monogame
                 },
             };
 
-            if (useBlinkingFrame && !usePostHitFrame && currentDirectionNacho2 != Direction.Up)
+            // (Optional) Adjust for blinking if needed.
+            if (useBlinkingFrame && !usePostHitFrame && nachoFacingDirection != Direction.Up)
             {
                 baseRectangles[2] = new Rectangle(baseRectangles[2].X, 384, 96, 128);
             }
 
             return baseRectangles;
         }
+
 
 
         private Rectangle[] GetCurrentRectangleEmpanada()
@@ -955,7 +953,7 @@ namespace monogame
 
             if (isEmpanadaAttacking)
             {
-                return currentDirectionNacho2 switch
+                return empanadaFacingDirection switch
                 {
                     Direction.Up => new Rectangle[]
                     {
@@ -986,7 +984,7 @@ namespace monogame
             }
             else
             {
-                return currentDirectionNacho2 switch
+                return empanadaFacingDirection switch
                 {
                     Direction.Up => new Rectangle[]
                     {
@@ -1021,6 +1019,7 @@ namespace monogame
                 };
             }
         }
+
 
         private Rectangle[] GetCurrentRectanglePipe()
         {
