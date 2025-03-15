@@ -141,7 +141,7 @@ namespace monogame
         public void LoadContent()
         {
 
-            charaset = _mainGame.Content.Load<Texture2D>("donutsprites20");
+            charaset = _mainGame.Content.Load<Texture2D>("donutsprites17");
             sushi = _mainGame.Content.Load<Texture2D>("sushisprites10");
             font = _mainGame.Content.Load<SpriteFont>("DefaultFont1");
             cheeseLaunch = _mainGame.Content.Load<Texture2D>("cheeselaunch");

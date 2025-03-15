@@ -4,9 +4,13 @@
   <Platform>DesktopGL</Platform>
   <Config />
   <SourceFiles>
+    <File>/home/gux/monogame-game/monogame/Content/../../../Downloads/Puprmush.png</File>
     <File>/home/gux/monogame-game/monogame/Content/angrydonut.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/background.png</File>
     <File>/home/gux/monogame-game/monogame/Content/ball.png</File>
     <File>/home/gux/monogame-game/monogame/Content/cheeselaunch.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/churro.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/churroTree.png</File>
     <File>/home/gux/monogame-game/monogame/Content/DefaultFont1.spritefont</File>
     <File>/home/gux/monogame-game/monogame/Content/donutsmol.png</File>
     <File>/home/gux/monogame-game/monogame/Content/donutsprite.png</File>
@@ -17,17 +21,97 @@
     <File>/home/gux/monogame-game/monogame/Content/donutsprites16.png</File>
     <File>/home/gux/monogame-game/monogame/Content/donutsprites17.png</File>
     <File>/home/gux/monogame-game/monogame/Content/donutsprites18.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/donutsprites20.png</File>
     <File>/home/gux/monogame-game/monogame/Content/donutsss.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/empanadasprites1.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/empanadasprites10.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/empanadasprites11.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/empanadasprites12.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/empanadasprites13.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/empanadasprites2.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/empanadasprites3.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/empanadasprites5.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/empanadasprites6.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/empanadasprites7.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/empanadasprites8.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/empanadasprites9.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/gingersprites.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/gingersprites2.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/gingersprites3.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/gingersprites4.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/gingersprites5.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/japaneselevel.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/japaneselevel2.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/japaneselevel3.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/japaneselevel4.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/mainmenudonut.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/mainmenudonut2.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/mainmenudonut3.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/mainmenudonut4.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/mochitree.png</File>
     <File>/home/gux/monogame-game/monogame/Content/nachofrontstant1.png</File>
     <File>/home/gux/monogame-game/monogame/Content/nachofrontstant2.png</File>
     <File>/home/gux/monogame-game/monogame/Content/nachosprites.png</File>
     <File>/home/gux/monogame-game/monogame/Content/nachosprites2.png</File>
     <File>/home/gux/monogame-game/monogame/Content/nachosprites4.png</File>
     <File>/home/gux/monogame-game/monogame/Content/openmountnacho2.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/pink_purp_background.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/pinkmush.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/pipe.gif</File>
+    <File>/home/gux/monogame-game/monogame/Content/pipe.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/pipe2.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/Puprmush.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/Sombrero.png</File>
     <File>/home/gux/monogame-game/monogame/Content/sombrerosetting.png</File>
     <File>/home/gux/monogame-game/monogame/Content/splashcheese.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/sushilevelsetting.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/sushisprites.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/sushisprites10.png</File>
+    <File>/home/gux/monogame-game/monogame/Content/weed.png</File>
   </SourceFiles>
   <DestFiles>
+    <File>Puprmush.png</File>
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />
