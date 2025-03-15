@@ -160,7 +160,7 @@ namespace monogame
             };
 
             donut = new Donut(charaset, new Vector2(_graphicsDevice.Viewport.Width - 96, _graphicsDevice.Viewport.Height - 128), 100f);
-            nachoSprite = new Nacho(nacho, nachoOpenMouthTexture, new Vector2(100, 100), 80f);
+            nachoSprite = new Nacho(nacho, nachoOpenMouthTexture, new Vector2(100, 100), 40f);
             empanadaSprite = new Empanada(empanada, new Vector2(200, 200), 60f);
 
             pipes = new Texture2D[3];
@@ -239,6 +239,13 @@ namespace monogame
             empanadaSprite.SetTargetPosition(donut.Position);
             nachoSprite.Update(gameTime);
             empanadaSprite.Update(gameTime);
+
+
+            // float distanceToDonutNacho = Vector2.Distance(empanadaSprite.Position, donutPos);
+
+            // if (distanceToDonutNacho<200f){
+            //     nachoSprite.SetOpenMouthFrame(empanadaSprite.IsAttacking);
+            // }
 
             if (cheeseVisible)
             {
