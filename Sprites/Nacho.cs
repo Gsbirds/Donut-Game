@@ -20,16 +20,6 @@ namespace monogame.Sprites
         private byte currentAnimationIndex;
         private Vector2 targetPosition;
         private new float rotation;
-        private const float MinDistanceFromEmpanada = 170f;
-        private float animationTimer;
-        private const float AnimationThreshold = 150f;
-        private int animationCycleCount;
-        private bool cheeseVisible;
-        private Vector2 cheesePosition;
-        private float cheeseRotation;
-        private bool hasCheeseDealtDamage;
-        private float cheeseVisibilityTimer;
-
         public float Health => health;
         public bool IsDefeated => isDefeated;
         public Direction FacingDirection => facingDirection;

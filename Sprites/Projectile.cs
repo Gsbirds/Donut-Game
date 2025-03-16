@@ -12,6 +12,8 @@ namespace monogame.Sprites
 
         public bool IsActive => isActive;
         public bool HasDealtDamage => hasDealtDamage;
+        public new Vector2 Position => position;
+        public float Rotation => rotation;
 
         public Projectile(Texture2D texture, Vector2 position, float speed) 
             : base(texture, position, speed)
@@ -44,8 +46,14 @@ namespace monogame.Sprites
             position += direction * speed * deltaTime;
 
             rotation += rotationSpeed * deltaTime;
-            
             rotation %= MathHelper.TwoPi;
+
+            // Reset if off screen
+            if (position.X < -50 || position.Y < -50 || 
+                position.X > 1920 || position.Y > 1080) // Assuming standard 1080p resolution
+            {
+                Reset();
+            }
         }
 
         public void SetDealtDamage()

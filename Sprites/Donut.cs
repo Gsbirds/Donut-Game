@@ -24,7 +24,7 @@ namespace monogame.Sprites
         private byte currentAnimationIndex;
         private int animationCycleCount;
         private bool useBlinkingFrame;
-        private const float AnimationThreshold = 100f;
+        private const float AnimationThreshold = 150f;
         private KeyboardState previousKeyboardState;
         private MouseState previousMouseState;
         private const float MinY = 325f;
@@ -145,7 +145,9 @@ namespace monogame.Sprites
             }
             else
             {
+                // When not moving, use the middle frame for a more natural standing pose
                 currentAnimationIndex = 1;
+                animationTimer = 0f;
             }
 
             previousKeyboardState = keyboardState;

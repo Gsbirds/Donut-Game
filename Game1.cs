@@ -28,10 +28,9 @@ namespace monogame
         private Rectangle[] rightRectangles;
         private int doubleWidth = 192;
 
-        private bool cheeseVisible = true;
-        private bool hasCheeseDealtDamage = false;
-        private float cheeseRotation = 0f;
-        private float cheeseVisibilityTimer = 0f;
+        private Projectile cheeseProjectile;
+        private float projectileCooldownTimer = 0f;
+        private const float ProjectileCooldown = 5f;
 
         private bool showSplashCheese = false;
         private float splashCheeseTimer = 0f;
@@ -54,36 +53,20 @@ namespace monogame
         private Vector2[] pipePositions;
         private int[] currentPipeFrameIndices;
         private float[] pipeAnimationTimers;
-        private float pipeAnimationTimer = 0f;
         private float pipeFrameDuration = 0.2f;
-        private int currentPipeFrameIndex = 0;
-
         private Texture2D puprmushSpritesheet;
         private Rectangle[] puprmushFrames;
         private int currentPuprmushFrame;
         private float puprmushFrameTimer;
-        private const float PuprmushFrameDuration = 0.2f;
-
-        private KeyboardState previousKeyboardState;
+        private const float PuprmushFrameDuration = 0.4f;
         private Vector2 sombreroPosition = new Vector2(300, 300);
 
         #endregion
 
-        private const float EMPANADA_ATTACK_COOLDOWN = 1.5f;
-        private const float EMPANADA_ATTACK_RANGE = 100f;
-        private const float EMPANADA_ATTACK_DAMAGE = 0.5f;
-
         private bool showSplashEffect;
         private float splashTimer;
-        private Vector2 nachoPosition;
-        private Vector2 nachoSpeed;
-        private Vector2 empanadaPosition;
-        private Vector2 empanadaSpeed;
-        private Direction empanadaFacingDirection;
-        private Vector2 cheesePosition;
+    
         private Texture2D nacho;
-        private Direction nachoFacingDirection;
-        private float nachoRotation;
         private Texture2D empanada;
         private const float SPLASH_DURATION = 1f;
 
@@ -117,51 +100,10 @@ namespace monogame
             WhitePixel.SetData(new[] { Color.White });
 
 
-            empanadaFrames = new Rectangle[3]
-            {
-                new Rectangle(0, 0, 96, 128),
-                new Rectangle(96, 0, 96, 128),
-                new Rectangle(192, 0, 96, 128)
-            };
-
-            downRectangles = new Rectangle[3]
-            {
-                new Rectangle(0, 256, 96, 128),
-                new Rectangle(96, 256, 96, 128),
-                new Rectangle(192, 256, 96, 128)
-            };
-
-            upRectangles = new Rectangle[3]
-            {
-                new Rectangle(0, 0, 96, 128),
-                new Rectangle(96, 0, 96, 128),
-                new Rectangle(192, 0, 96, 128)
-            };
-
-            rightRectangles = new Rectangle[3]
-            {
-                new Rectangle(0, 128, 96, 128),
-                new Rectangle(96, 128, 96, 128),
-                new Rectangle(192, 128, 96, 128)
-            };
-
-            leftRectangles = new Rectangle[3]
-            {
-                new Rectangle(0, 384, 96, 128),
-                new Rectangle(96, 384, 96, 128),
-                new Rectangle(192, 384, 96, 128)
-            };
-
-            Rectangle[][] donutAnimationFrames = new Rectangle[][] {
-                downRectangles,
-                upRectangles,
-                leftRectangles,
-                rightRectangles
-            };
-
             donut = new Donut(charaset, new Vector2(_graphicsDevice.Viewport.Width - 96, _graphicsDevice.Viewport.Height - 128), 100f);
             nachoSprite = new Nacho(nacho, nachoOpenMouthTexture, new Vector2(100, 100), 40f);
             empanadaSprite = new Empanada(empanada, new Vector2(200, 200), 60f);
+            cheeseProjectile = new Projectile(cheeseLaunch, Vector2.Zero, 300f);
 
             pipes = new Texture2D[3];
             pipes[0] = pipe;
@@ -240,25 +182,39 @@ namespace monogame
             nachoSprite.Update(gameTime);
             empanadaSprite.Update(gameTime);
 
+            float distanceToDonutNacho = Vector2.Distance(nachoSprite.Position, donut.Position);
 
-            // float distanceToDonutNacho = Vector2.Distance(empanadaSprite.Position, donutPos);
-
-            // if (distanceToDonutNacho<200f){
-            //     nachoSprite.SetOpenMouthFrame(empanadaSprite.IsAttacking);
-            // }
-
-            if (cheeseVisible)
+            // Update cooldown timer
+            if (projectileCooldownTimer > 0)
             {
-                Vector2 directionToCheeseTarget = donut.Position - cheesePosition;
-                if (directionToCheeseTarget != Vector2.Zero)
+                projectileCooldownTimer -= deltaTime;
+            }
+
+            if (distanceToDonutNacho < 200f)
+            {
+                nachoSprite.SetOpenMouthFrame(true);
+                
+                if (projectileCooldownTimer <= 0 && !cheeseProjectile.IsActive)
                 {
-                    directionToCheeseTarget.Normalize();
-                    cheesePosition += directionToCheeseTarget * nachoSpeed * 2.5f * deltaTime;
+                    Vector2 launchPosition = nachoSprite.Position + new Vector2(0, -40);
+                    Vector2 directionToDonut = donut.Position - launchPosition;
+                    cheeseProjectile.Launch(launchPosition, directionToDonut);
+                    
+                    projectileCooldownTimer = ProjectileCooldown;
                 }
+            }
+            else
+            {
+                nachoSprite.SetOpenMouthFrame(false);
+            }
+
+            if (cheeseProjectile.IsActive)
+            {
+                cheeseProjectile.Update(gameTime);
 
                 Rectangle cheeseRect = new Rectangle(
-                    (int)cheesePosition.X - 32,
-                    (int)cheesePosition.Y - 32,
+                    (int)cheeseProjectile.Position.X - 32,
+                    (int)cheeseProjectile.Position.Y - 32,
                     64,
                     64
                 );
@@ -270,21 +226,15 @@ namespace monogame
                     128
                 );
 
-                if (cheeseRect.Intersects(donutRect) && !hasCheeseDealtDamage)
+                if (cheeseRect.Intersects(donutRect) && !cheeseProjectile.HasDealtDamage)
                 {
                     showSplashEffect = true;
-                    cheeseVisible = false;
+                    cheeseProjectile.Reset();
                     splashPosition = donut.Position;
                     splashTimer = 0f;
-                    hasCheeseDealtDamage = true;
+                    cheeseProjectile.SetDealtDamage();
                 }
             }
-            else
-            {
-                cheeseVisible = false;
-                hasCheeseDealtDamage = false;
-            }
-
             if (showSplashEffect)
             {
                 splashTimer += deltaTime;
@@ -350,25 +300,9 @@ namespace monogame
             nachoSprite.Draw(_spriteBatch);
             empanadaSprite.Draw(_spriteBatch);
 
-            if (showSplashEffect)
+            if (cheeseProjectile.IsActive)
             {
-                _spriteBatch.Draw(
-                    splashCheese,
-                    new Vector2(splashPosition.X - 32, splashPosition.Y - 32),
-                    null,
-                    Color.White
-                );
-            }
-
-
-            if (cheeseVisible)
-            {
-                _spriteBatch.Draw(
-                    cheeseLaunch,
-                    new Vector2(cheesePosition.X - 32, cheesePosition.Y - 32),
-                    null,
-                    Color.White
-                );
+                cheeseProjectile.Draw(_spriteBatch);
             }
 
             if (showSplashEffect)
@@ -381,7 +315,6 @@ namespace monogame
                 );
             }
 
-            float maxNachoHealth = 4f;
             int nachoHealthBarWidth = 200;
             int nachoHealthBarHeight = 20;
             Vector2 nachoHealthBarPosition = new Vector2(10, 10);

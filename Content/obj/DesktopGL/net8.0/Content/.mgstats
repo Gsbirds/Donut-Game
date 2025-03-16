@@ -1,5 +1,5 @@
 Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Size,Build Seconds
-"/home/gux/monogame-game/monogame/Content/../../../Downloads/Puprmush.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/Puprmush.xnb","TextureProcessor","Texture2DContent",839310,64800085,0.8473991
+"/home/gux/monogame-game/monogame/Content/../../../Downloads/Puprmush.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/Puprmush.xnb","TextureProcessor","Texture2DContent",839310,64800085,0.8510657
 "/home/gux/monogame-game/monogame/Content/angrydonut.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/angrydonut.xnb","TextureProcessor","Texture2DContent",1634334,36000085,0.6857494
 "/home/gux/monogame-game/monogame/Content/background.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/background.xnb","TextureProcessor","Texture2DContent",1034583,2890085,0.0911533
 "/home/gux/monogame-game/monogame/Content/ball.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/ball.xnb","TextureProcessor","Texture2DContent",8368,16469,0.0885307
@@ -52,10 +52,10 @@ Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Siz
 "/home/gux/monogame-game/monogame/Content/openmountnacho2.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/openmountnacho2.xnb","TextureProcessor","Texture2DContent",11558,160085,0.0053216
 "/home/gux/monogame-game/monogame/Content/pink_purp_background.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/pink_purp_background.xnb","TextureProcessor","Texture2DContent",1109710,2890085,0.0798117
 "/home/gux/monogame-game/monogame/Content/pinkmush.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/pinkmush.xnb","TextureProcessor","Texture2DContent",1280009,64800085,0.7584028
-"/home/gux/monogame-game/monogame/Content/pipe.gif","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/pipe.xnb","TextureProcessor","Texture2DContent",11258,160085,0.0053105
-"/home/gux/monogame-game/monogame/Content/pipe.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/pipe.xnb","TextureProcessor","Texture2DContent",12850,480085,0.012023
+"/home/gux/monogame-game/monogame/Content/pipe.gif","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/pipe.xnb","TextureProcessor","Texture2DContent",11258,160085,0.0056349
+"/home/gux/monogame-game/monogame/Content/pipe.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/pipe.xnb","TextureProcessor","Texture2DContent",12850,480085,0.0123899
 "/home/gux/monogame-game/monogame/Content/pipe2.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/pipe2.xnb","TextureProcessor","Texture2DContent",12472,480085,0.0131604
-"/home/gux/monogame-game/monogame/Content/Puprmush.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/Puprmush.xnb","TextureProcessor","Texture2DContent",839310,64800085,0.7156097
+"/home/gux/monogame-game/monogame/Content/Puprmush.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/Puprmush.xnb","TextureProcessor","Texture2DContent",839310,64800085,0.7352627
 "/home/gux/monogame-game/monogame/Content/Sombrero.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/Sombrero.xnb","TextureProcessor","Texture2DContent",147300,1440085,0.0354004
 "/home/gux/monogame-game/monogame/Content/sombrerosetting.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/sombrerosetting.xnb","TextureProcessor","Texture2DContent",308849,1690085,0.0409224
 "/home/gux/monogame-game/monogame/Content/splashcheese.png","/home/gux/monogame-game/monogame/Content/bin/DesktopGL/Content/splashcheese.xnb","TextureProcessor","Texture2DContent",4952,160085,0.1066234
