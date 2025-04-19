@@ -1,621 +1,174 @@
 using System;
-using System.Transactions;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using monogame.Sprites;
 using monogame.Screens;
+using monogame.Animation;
 
 namespace monogame
 {
 
     public class Game2 : IGameState
     {
-        Texture2D charaset;
-        Texture2D sushi;
-        Vector2 ballPosition = new Vector2(300, 300);
-        Texture2D cheeseLaunch;
-        Vector2 nachoPosition;
-        Vector2 cheesePosition;
-        Texture2D sushiWallpaper;
-        float ballSpeed;
-        float nachoSpeed = 30f;
-        private SpriteBatch _spriteBatch;
-        float health;
-        float timer;
-        int threshold;
+        private Donut donut;
+        private Sushi sushiSprite;
+        private Ginger gingerSprite;
+        private CheeseProjectile cheeseProjectile;
+        
+        private Texture2D donutTexture;
+        private Texture2D sushiTexture;
+        private Texture2D gingerTexture;
+        private Texture2D sushiWallpaper;
+        private Texture2D mochiTree;
         private Texture2D puprmushSpritesheet;
         private SpriteFont font;
+        
+        private float projectileCooldownTimer = 0f;
+        private const float ProjectileCooldown = 2.0f;
+        private float minDistanceBetweenSushiAndGinger = 100f;
+        
+        private bool showSplashEffect = false;
+        private Vector2 splashPosition;
+        private float splashTimer = 0f;
+        private const float SPLASH_DURATION = 0.5f;
+        private MouseState previousMouseState;
 
-        Rectangle[] downRectangles;
-        Rectangle[] upRectangles;
-        Rectangle[] leftRectangles;
-        Rectangle[] rightRectangles;
-
-        bool cheeseVisible = true;
-
-        byte currentAnimationIndex;
-
-
-        enum Direction { Down, Up, Left, Right }
-        Direction currentDirection;
-
-        bool hasCheeseDealtDamage = false;
-        int animationCycleCount = 0;
-        bool useBlinkingFrame = false;
-
-        bool useSpacebarFrame = false;
-
-        private bool isSpacebarAnimationActive = false;
-        private float spacebarAnimationTimer = 0f;
-        private float spacebarFirstFrameDuration = 0.5f;
-        private float spacebarSecondFrameDuration = 0.8f;
-        private int doubleWidth = 192;
-        float nachoHealth;
-        private bool nachoDamagedThisCycle = false;
+        private Direction currentDirection = Direction.Down;
         private KeyboardState previousKeyboardState;
-
-        float cheeseVisibilityTimer = 0f;
-
-        Texture2D splashCheese;
-        private Texture2D ginger;
-        private Texture2D mochiTree;
-        bool showSplashCheese = false;
-        float splashCheeseTimer = 0f;
-        const float splashCheeseDuration = 1f;
-        Vector2 splashPosition;
-        Vector2 sushiPosition;
-        private float nachoDirectionDelayTimer = 0f;
-        private const float NachoDirectionDelayDuration = 2f;
-
-        private bool usePostHitFrame = false;
-        private float postHitAnimationTimer = 0f;
-        private const float postHitAnimationDuration = 0.5f;
-        private bool nachoDefeated = false;
-        private Direction currentDirectionSushi = Direction.Down;
-        private float sushiDirectionDelayTimer = 0f;
-        private const float SushiDirectionDelayDuration = 1f;
+        private SpriteBatch _spriteBatch;
         private GraphicsDevice _graphicsDevice;
         private MainGame _mainGame;
-        private bool sushiMoving;
-        private Vector2 gingerPosition;
-        private int gingerAnimationIndex;
-        private Direction currentDirectionGinger;
-        private float gingerAnimationTimer;
-        private float sushiAttackCooldown = 1.5f;
-        private float sushiAttackTimer = 0f;
-        private bool isSushiAttacking = false;
-        private bool useSushiAttackFrame = false;
-        private byte currentAnimationIndexSushi;
-        private bool sushiStopped;
-        private float donutTimer = 0f;
-        private float sushiTimer = 0f;
+        
         private Rectangle[] puprmushFrames;
         private int currentPuprmushFrame;
         private float puprmushFrameTimer;
         private const float PuprmushFrameDuration = 0.2f;
         
-        // Game over screen
         private GameOverScreen gameOverScreen;
+        
+        private bool isSpacebarAnimationActive = false;
+        private bool useSpacebarFrame = false;
+        private bool useBlinkingFrame = false;
+        private int doubleWidth = 96 * 2; // Assuming standard width is 96
+        
+        private Direction currentDirectionSushi = Direction.Down;
+        private bool isSushiAttacking = false;
+        private bool useSushiAttackFrame = false;
 
         public Game2(MainGame mainGame, SpriteBatch spriteBatch)
         {
             _mainGame = mainGame;
             _spriteBatch = spriteBatch;
             _graphicsDevice = mainGame.GraphicsDevice;
-
-            ballPosition = new Vector2(300, 300);
-            nachoPosition = new Vector2(150, 150);
-            sushiPosition = new Vector2(200, 200);
-            ballSpeed = 100f;
-            nachoSpeed = 80f;
-            downRectangles = new Rectangle[3]
-          {
-                new Rectangle(0, 256, 96, 128),
-                new Rectangle(96, 256, 96, 128),
-                new Rectangle(192, 256, 96, 128)
-          };
-
-            upRectangles = new Rectangle[3]
-            {
-                new Rectangle(0, 0, 96, 128),
-                new Rectangle(96, 0, 96, 128),
-                new Rectangle(192, 0, 96, 128)
-            };
-
-            rightRectangles = new Rectangle[3]
-            {
-                new Rectangle(0, 128, 96, 128),
-                new Rectangle(96, 128, 96, 128),
-                new Rectangle(192, 128, 96, 128)
-            };
-
-            leftRectangles = new Rectangle[3]
-            {
-                new Rectangle(0, 384, 96, 128),
-                new Rectangle(96, 384, 96, 128),
-                new Rectangle(192, 384, 96, 128)
-            };
-
-            currentAnimationIndex = 1;
+            
+            previousMouseState = Mouse.GetState();
             currentDirection = Direction.Down;
-            nachoHealth = 4;
         }
-
 
         public void LoadContent()
         {
-            charaset = _mainGame.Content.Load<Texture2D>("donutsprites20");
-            sushi = _mainGame.Content.Load<Texture2D>("sushisprites10");
-            cheeseLaunch = _mainGame.Content.Load<Texture2D>("cheeselaunch");
-            font = _mainGame.Content.Load<SpriteFont>("DefaultFont1");
-            sushiWallpaper = _mainGame.Content.Load<Texture2D>("sushilevelsetting");
-            splashCheese = _mainGame.Content.Load<Texture2D>("splashcheese");
-            ginger = _mainGame.Content.Load<Texture2D>("gingersprites5");
-            mochiTree = _mainGame.Content.Load<Texture2D>("mochitree");
-            threshold = 150;
- 
+            donutTexture = _mainGame.Content.Load<Texture2D>("donutsprites20");
+            sushiTexture = _mainGame.Content.Load<Texture2D>("sushisprites10");  // Use proper sushi sprites
+            gingerTexture = _mainGame.Content.Load<Texture2D>("gingersprites4");  // Use proper ginger sprites
+            sushiWallpaper = _mainGame.Content.Load<Texture2D>("sushilevelsetting");  // Background
+            mochiTree = _mainGame.Content.Load<Texture2D>("mochitree");  // Tree
             puprmushSpritesheet = _mainGame.Content.Load<Texture2D>("pinkmush");
+            
+            font = _mainGame.Content.Load<SpriteFont>("DefaultFont1");
+            
+            donut = new Donut(donutTexture, new Vector2(_graphicsDevice.Viewport.Width - 96, _graphicsDevice.Viewport.Height - 128), 100f);
+            sushiSprite = new Sushi(sushiTexture, new Vector2(200, 200), 60f);
+            gingerSprite = new Ginger(gingerTexture, new Vector2(100, 100), 40f);
+            
+            Texture2D cheeseTexture = _mainGame.Content.Load<Texture2D>("cheeselaunch");
+            Texture2D cheeseSplashTexture = _mainGame.Content.Load<Texture2D>("splashcheese");
+            cheeseProjectile = new CheeseProjectile(cheeseTexture, cheeseSplashTexture);
+            
+            sushiSprite.OnDamageDealt += (damage) => {
+                donut.TakeDamage(10f);  // Reduced damage to make game less difficult
+            };
+            
             int frameWidth = puprmushSpritesheet.Width / 5;
             int frameHeight = puprmushSpritesheet.Height;
-
             puprmushFrames = new Rectangle[5];
             for (int i = 0; i < 5; i++)
             {
                 puprmushFrames[i] = new Rectangle(i * frameWidth, 0, frameWidth, frameHeight);
             }
-
             currentPuprmushFrame = 0;
             puprmushFrameTimer = 0f;
-
-            health = 1000f;
-            timer = 1000f;
-            // threshold = 51;
             
-            // Initialize the game over screen
             gameOverScreen = new GameOverScreen(_mainGame, _graphicsDevice, font);
         }
 
-        private Vector2 GetNachoMouthPosition()
-        {
-            Rectangle currentRect = downRectangles[currentAnimationIndex];
-            return nachoPosition + new Vector2(currentRect.Width / 2, -70);
-        }
-
-
-        private void LeftClickAttack(GameTime gameTime, MouseState currentMouseState)
-        {
-            Rectangle donutRect = new Rectangle(
-                (int)ballPosition.X - 48,
-                (int)ballPosition.Y - 64,
-                96,
-                128
-            );
-
-            Rectangle nachoRect = new Rectangle(
-                (int)nachoPosition.X - 48,
-                (int)nachoPosition.Y - 64,
-                96,
-                128
-            );
-
-            if (currentMouseState.LeftButton == ButtonState.Pressed)
-            {
-                if (!isSpacebarAnimationActive)
-                {
-                    isSpacebarAnimationActive = true;
-                    spacebarAnimationTimer = 0f;
-                    nachoDamagedThisCycle = false;
-                }
-            }
-
-            if (isSpacebarAnimationActive)
-            {
-                spacebarAnimationTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-                if (spacebarAnimationTimer <= spacebarFirstFrameDuration)
-                {
-                    useSpacebarFrame = true;
-                }
-                else if (spacebarAnimationTimer <= spacebarFirstFrameDuration + spacebarSecondFrameDuration)
-                {
-                    useSpacebarFrame = false;
-                }
-                else
-                {
-                    spacebarAnimationTimer = 0f;
-                    isSpacebarAnimationActive = false;
-                }
-            }
-
-            if (useSpacebarFrame && donutRect.Intersects(nachoRect) && !nachoDamagedThisCycle)
-            {
-                nachoHealth = Math.Max(0, nachoHealth - 1);
-                nachoDamagedThisCycle = true;
-
-                usePostHitFrame = true;
-                postHitAnimationTimer = 0f;
-            }
-        }
-
-
-        private bool keyboardTracker(float elapsedTime, GameTime gameTime)
-        {
-
-            bool isMoving = false;
-            float updatedBallSpeed = ballSpeed * elapsedTime;
-
-            var kstate = Keyboard.GetState();
-
-            Vector2 movement = Vector2.Zero;
-
-            if (kstate.IsKeyDown(Keys.Up))
-            {
-                movement.Y -= 1;
-                currentDirection = Direction.Up;
-                isMoving = true;
-            }
-            if (kstate.IsKeyDown(Keys.Down))
-            {
-                movement.Y += 1;
-                currentDirection = Direction.Down;
-                isMoving = true;
-            }
-            if (kstate.IsKeyDown(Keys.Left))
-            {
-                movement.X -= 1;
-                currentDirection = Direction.Left;
-                isMoving = true;
-            }
-            if (kstate.IsKeyDown(Keys.Right))
-            {
-                movement.X += 1;
-                currentDirection = Direction.Right;
-                isMoving = true;
-            }
-
-            if (movement != Vector2.Zero)
-            {
-                movement.Normalize();
-                ballPosition += movement * updatedBallSpeed;
-            }
-
-            if ((currentDirection == Direction.Right && ballPosition.X > sushiPosition.X) ||
-            (currentDirection == Direction.Left && ballPosition.X < sushiPosition.X) ||
-            (currentDirection == Direction.Down && ballPosition.Y > sushiPosition.Y) ||
-            (currentDirection == Direction.Up && ballPosition.Y < sushiPosition.Y))
-            {
-                nachoDirectionDelayTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-                if (nachoDirectionDelayTimer >= NachoDirectionDelayDuration)
-                {
-                    nachoDirectionDelayTimer = 0f;
-                }
-            }
-
-            return isMoving;
-        }
-
-        private void animationBlinker(bool isDonutMoving, GameTime gameTime)
-        {
-            if (isDonutMoving || isSpacebarAnimationActive)
-            {
-                if (donutTimer > threshold)
-                {
-                    currentAnimationIndex = (byte)((currentAnimationIndex + 1) % 3);
-
-                    if (currentAnimationIndex == 0)
-                    {
-                        animationCycleCount++;
-
-                        useBlinkingFrame = (animationCycleCount % 3 == 0);
-                    }
-
-                    donutTimer = 0f;
-                }
-                else
-                {
-                    donutTimer += (float)gameTime.ElapsedGameTime.TotalMilliseconds;
-                }
-            }
-            else
-            {
-                currentAnimationIndex = 1;
-            }
-
-            if (sushiMoving)
-            {
-                if (sushiTimer > threshold)
-                {
-                    currentAnimationIndexSushi = (byte)((currentAnimationIndexSushi + 1) % 3);
-
-                    if (currentAnimationIndexSushi == 0)
-                    {
-                        animationCycleCount++;
-                        useBlinkingFrame = animationCycleCount % 3 == 0;
-                    }
-
-                    sushiTimer = 0f;
-                }
-                else
-                {
-                    sushiTimer += (float)gameTime.ElapsedGameTime.TotalMilliseconds;
-                }
-            }
-            else
-            {
-                currentAnimationIndexSushi = 1;
-            }
-        }
-
-
-        private void cheeseLauncher(float updatedNachoSpeed, GameTime gameTime)
-        {
-            int cheeseWidth = 20;
-            int cheeseHeight = 20;
-
-            float distanceToDonut = Vector2.Distance(nachoPosition, ballPosition);
-
-            cheeseVisibilityTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-            if (showSplashCheese)
-            {
-                splashCheeseTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
-                if (splashCheeseTimer >= splashCheeseDuration)
-                {
-                    showSplashCheese = false;
-                    splashCheeseTimer = 0f;
-                }
-            }
-
-            if (cheeseVisible && !showSplashCheese)
-            {
-                cheeseVisibilityTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-                if (cheeseVisibilityTimer >= 4f)
-                {
-                    cheeseVisible = false;
-                    cheeseVisibilityTimer = 0f;
-                    cheesePosition = GetNachoMouthPosition();
-                    hasCheeseDealtDamage = false;
-
-                    if (cheeseVisible)
-                    {
-                        cheesePosition = GetNachoMouthPosition();
-                        hasCheeseDealtDamage = false;
-                    }
-                    else
-                    {
-                        splashPosition = cheesePosition;
-                    }
-                    return;
-                }
-            }
-
-            if (distanceToDonut <= 150)
-            {
-                if (!cheeseVisible && !showSplashCheese)
-                {
-                    cheesePosition = GetNachoMouthPosition();
-                    cheeseVisible = true;
-                }
-
-                Vector2 directionToDonut = ballPosition - cheesePosition;
-                if (directionToDonut != Vector2.Zero && directionToDonut.LengthSquared() > 1f)
-                {
-                    directionToDonut.Normalize();
-                    cheesePosition += directionToDonut * updatedNachoSpeed * 2.5f;
-                }
-
-
-                Rectangle cheeseRect = new Rectangle(
-                    (int)cheesePosition.X - cheeseWidth / 2,
-                    (int)cheesePosition.Y - cheeseHeight / 2,
-                    cheeseWidth,
-                    cheeseHeight
-                );
-
-                Rectangle donutRect = new Rectangle(
-                    (int)ballPosition.X - 48,
-                    (int)ballPosition.Y - 64,
-                    96,
-                    128
-                );
-
-                if (cheeseRect.Intersects(donutRect) && !hasCheeseDealtDamage)
-                {
-                    showSplashCheese = true;
-                    cheeseVisible = false;
-                    splashPosition = ballPosition;
-                    splashCheeseTimer = 0f;
-                    health -= 0.5f;
-                    hasCheeseDealtDamage = true;
-                }
-            }
-            else
-            {
-                cheeseVisible = false;
-                hasCheeseDealtDamage = false;
-            }
-        }
-
-        const float MinDistanceBetweenGingerAndSushi = 210f;
-
-        private void MaintainMinimumDistance(ref Vector2 movingPosition, Vector2 otherPosition, float adjustmentSpeed, float elapsedTime)
-        {
-            float distance = Vector2.Distance(movingPosition, otherPosition);
-            if (distance < MinDistanceBetweenGingerAndSushi)
-            {
-                Vector2 directionAway = movingPosition - otherPosition;
-                if (directionAway != Vector2.Zero)
-                {
-                    directionAway.Normalize();
-                    movingPosition += directionAway * adjustmentSpeed * elapsedTime;
-                }
-            }
-        }
-
-
-        private void PurpleMushUpdate(GameTime gameTime){
-                        puprmushFrameTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
-            if (puprmushFrameTimer >= PuprmushFrameDuration)
-            {
-                puprmushFrameTimer -= PuprmushFrameDuration;
-                currentPuprmushFrame = (currentPuprmushFrame + 1) % puprmushFrames.Length;
-            }
-        }
-
-
         public void Update(GameTime gameTime)
         {
-            // Calculate elapsed time for the update
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
             
-            // Handle game over screen if active
             if (gameOverScreen.IsActive)
             {
                 gameOverScreen.Update(deltaTime);
                 return;
             }
             
-            // Check for game over condition
-            if (ballPosition.Y < -100 || ballPosition.Y > _graphicsDevice.Viewport.Height + 100 ||
-                ballPosition.X < -100 || ballPosition.X > _graphicsDevice.Viewport.Width + 100)
+            donut.Update(gameTime);
+            if (donut.Health <= 0)
             {
                 gameOverScreen.Activate();
                 return;
             }
+            
+            sushiSprite.SetTargetPosition(donut.Position);
+            sushiSprite.Update(gameTime);
+            
+            gingerSprite.SetTargetPosition(donut.Position);
+            gingerSprite.Update(gameTime);
 
-            if (nachoHealth <= 0)
+            if (sushiSprite.Health <= 0 && gingerSprite.Health <= 0)
             {
-                nachoDefeated = true;
+                _mainGame.SwitchGameState(MainGame.GameStateType.Game1);
                 return;
             }
 
-            float elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
-            float updatedNachoSpeed = nachoSpeed * elapsedTime;
-            KeyboardState currentKeyboardState = Keyboard.GetState();
-            MouseState currentMouseState = Mouse.GetState();
-
-            LeftClickAttack(gameTime, currentMouseState);
-
-            if (usePostHitFrame)
+            donut.Update(gameTime);
+            
+            Vector2 donutPos = donut.Position;
+            
+            sushiSprite.SetTargetPosition(donutPos);
+            gingerSprite.SetTargetPosition(donutPos);
+            sushiSprite.Update(gameTime);
+            gingerSprite.Update(gameTime);
+            
+            Vector2 sushiToGinger = gingerSprite.Position - sushiSprite.Position;
+            if (sushiToGinger.Length() < minDistanceBetweenSushiAndGinger)
             {
-                postHitAnimationTimer += elapsedTime;
-                if (postHitAnimationTimer >= postHitAnimationDuration)
-                {
-                    usePostHitFrame = false;
-                    postHitAnimationTimer = 0f;
-                }
+                Vector2 separation = Vector2.Normalize(sushiToGinger) * minDistanceBetweenSushiAndGinger;
+                gingerSprite.Position = sushiSprite.Position + separation;
             }
-
-            bool isMoving = keyboardTracker(elapsedTime, gameTime);
-
-            cheeseLauncher(updatedNachoSpeed, gameTime);
-            previousKeyboardState = currentKeyboardState;
-
-            float sushiOffsetY = 60f;
-            Vector2 adjustedSushiTarget = new Vector2(ballPosition.X, ballPosition.Y + sushiOffsetY);
-
-            float updatedSushiSpeed = nachoSpeed * elapsedTime;
-            Vector2 directionToDonutFromSushi = adjustedSushiTarget - sushiPosition;
-
-            if (directionToDonutFromSushi != Vector2.Zero)
+            
+            puprmushFrameTimer += deltaTime;
+            if (puprmushFrameTimer >= PuprmushFrameDuration)
             {
-                sushiMoving = true;
-                directionToDonutFromSushi.Normalize();
-                sushiPosition += directionToDonutFromSushi * updatedSushiSpeed;
+                puprmushFrameTimer = 0f;
+                currentPuprmushFrame = (currentPuprmushFrame + 1) % puprmushFrames.Length;
             }
-            else
-            {
-                sushiMoving = false;
-            }
-
-            animationBlinker(isMoving, gameTime);
-
-            CheckSushiAttack(elapsedTime);
-
-            sushiDirectionDelayTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-            if ((currentDirection == Direction.Right && ballPosition.X > sushiPosition.X) ||
-                (currentDirection == Direction.Left && ballPosition.X < sushiPosition.X) ||
-                (currentDirection == Direction.Down && ballPosition.Y > sushiPosition.Y) ||
-                (currentDirection == Direction.Up && ballPosition.Y < sushiPosition.Y))
-            {
-                nachoDirectionDelayTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-                if (sushiDirectionDelayTimer >= SushiDirectionDelayDuration)
-                {
-                    currentDirectionSushi = currentDirection;
-                    sushiDirectionDelayTimer = 0f;
-                }
-            }
-
-            gingerUpdate(elapsedTime);
-            PurpleMushUpdate(gameTime);
-
-            MaintainMinimumDistance(ref sushiPosition, gingerPosition, updatedSushiSpeed, elapsedTime);
-            MaintainMinimumDistance(ref gingerPosition, sushiPosition, nachoSpeed, elapsedTime);
+            
+            donut.Position = new Vector2(
+                Math.Clamp(donut.Position.X, 48, _graphicsDevice.Viewport.Width - 48),
+                Math.Clamp(donut.Position.Y, 64, _graphicsDevice.Viewport.Height - 64)
+            );
+            
+            UpdateProjectile(gameTime, deltaTime);
+            
+            HandleMouseAttacks();
+            
+            previousMouseState = Mouse.GetState();
         }
-
-
-        private void CheckSushiAttack(float elapsedTime)
-        {
-            float attackRange = 50f;
-            float distanceToDonut = Vector2.Distance(sushiPosition, ballPosition);
-
-            if (isSushiAttacking)
-            {
-                sushiAttackTimer += elapsedTime;
-                if (sushiAttackTimer >= sushiAttackCooldown)
-                {
-                    isSushiAttacking = false;
-                    sushiAttackTimer = 0f;
-                }
-            }
-
-            if (distanceToDonut <= attackRange && !isSushiAttacking)
-            {
-                isSushiAttacking = true;
-                useSushiAttackFrame = true;
-                sushiAttackTimer = 0f;
-                health -= 0.5f;
-            }
-        }
-
-
-        public void gingerUpdate(float elapsedTime)
-        {
-            const float GingerFrameDuration = 0.2f;
-            gingerAnimationTimer += elapsedTime;
-            if (gingerAnimationTimer >= GingerFrameDuration)
-            {
-                gingerAnimationIndex = (gingerAnimationIndex + 1) % 2;
-                gingerAnimationTimer = 0f;
-            }
-
-            Vector2 directionToDonutFromGinger = ballPosition - gingerPosition;
-            if (directionToDonutFromGinger.LengthSquared() > 1f)
-            {
-                directionToDonutFromGinger.Normalize();
-                float updatedGingerSpeed = nachoSpeed * elapsedTime;
-                gingerPosition += directionToDonutFromGinger * updatedGingerSpeed;
-
-                if (Math.Abs(directionToDonutFromGinger.X) > Math.Abs(directionToDonutFromGinger.Y))
-                {
-                    currentDirectionGinger = directionToDonutFromGinger.X > 0 ? Direction.Right : Direction.Left;
-                }
-                else
-                {
-                    currentDirectionGinger = directionToDonutFromGinger.Y > 0 ? Direction.Down : Direction.Up;
-                }
-            }
-        }
-
-
 
         public void Draw(GameTime gameTime)
         {
-            // Draw game over screen if active
             if (gameOverScreen.IsActive)
             {
                 gameOverScreen.Draw(_spriteBatch);
@@ -625,30 +178,13 @@ namespace monogame
             _graphicsDevice.Clear(Color.Black);
 
             _spriteBatch.Draw(sushiWallpaper, new Rectangle(0, 0, 850, 850), Color.White);
-
-            if (showSplashCheese)
-            {
-                _spriteBatch.Draw(splashCheese, splashPosition, null, Color.White);
-            }
-
-            int newWidth = 800;
-            int newHeight = 800;
-            int centerX = 700;
-            int centerY = 400;
-            int newX = centerX - newWidth / 2;
-            int newY = centerY - newHeight / 2;
-
-            _spriteBatch.Draw(
-                mochiTree,
-                new Rectangle(newX, newY, newWidth, newHeight),
-                Color.White
-            );
-
+            _spriteBatch.Draw(mochiTree, new Rectangle(450, 350, 390, 390), Color.White);
+            
             Vector2 puprmushPosition = new Vector2(
-            _graphicsDevice.Viewport.Width / 2 - 240,
-            _graphicsDevice.Viewport.Height / 2 + 80
+                _graphicsDevice.Viewport.Width / 2 + 20,
+                _graphicsDevice.Viewport.Height / 2 - 70
             );
-
+            
             _spriteBatch.Draw(
                 puprmushSpritesheet,
                 puprmushPosition,
@@ -661,56 +197,150 @@ namespace monogame
                 0f
             );
 
-            _spriteBatch.Draw(
-                ginger,
-                gingerPosition,
-                GetGingerRectangle(currentDirectionGinger, gingerAnimationIndex),
-                Color.White
-            );
+            donut.Draw(_spriteBatch);
 
-            _spriteBatch.Draw(charaset, ballPosition, GetCurrentRectangles()[currentAnimationIndex], Color.White);
+            sushiSprite.Draw(_spriteBatch);
+            gingerSprite.Draw(_spriteBatch);
 
-            _spriteBatch.Draw(
-                sushi,
-                sushiPosition,
-                GetCurrentRectangleSushi()[currentAnimationIndexSushi],
-                Color.White,
-                0f,
-                new Vector2(70, 66),
-                1.0f,
-                SpriteEffects.None,
-                0f
-            );
-
-            float maxNachoHealth = 4f;
-            int nachoHealthBarWidth = 200;
-            int nachoHealthBarHeight = 20;
-            Vector2 nachoHealthBarPosition = new Vector2(10, 10);
-
-            if (nachoHealthBarWidth != 0)
+            if (cheeseProjectile.IsActive)
             {
                 _spriteBatch.Draw(
-                    Texture2DHelper.CreateRectangle(_graphicsDevice, nachoHealthBarWidth, nachoHealthBarHeight, Color.Gray),
-                    new Rectangle((int)nachoHealthBarPosition.X, (int)nachoHealthBarPosition.Y, nachoHealthBarWidth, nachoHealthBarHeight),
-                    Color.Gray
+                    cheeseProjectile.Texture,
+                    cheeseProjectile.Position,
+                    null,
+                    Color.White,
+                    cheeseProjectile.Rotation,
+                    new Vector2(cheeseProjectile.Texture.Width / 2, cheeseProjectile.Texture.Height / 2),
+                    0.5f,
+                    SpriteEffects.None,
+                    0
                 );
             }
 
-            int nachoHealthCurrentWidth = (int)((nachoHealth / maxNachoHealth) * nachoHealthBarWidth);
-            if (nachoHealthCurrentWidth != 0)
+            if (showSplashEffect)
             {
+                float scale = 1.0f - (splashTimer / SPLASH_DURATION);
                 _spriteBatch.Draw(
-                    Texture2DHelper.CreateRectangle(_graphicsDevice, nachoHealthCurrentWidth, nachoHealthBarHeight, Color.WhiteSmoke),
-                    new Rectangle((int)nachoHealthBarPosition.X, (int)nachoHealthBarPosition.Y, nachoHealthCurrentWidth, nachoHealthBarHeight),
-                    Color.WhiteSmoke
+                    cheeseProjectile.SplashTexture,
+                    splashPosition,
+                    null,
+                    Color.White * (1.0f - (splashTimer / SPLASH_DURATION)),
+                    0f,
+                    new Vector2(cheeseProjectile.SplashTexture.Width / 2, cheeseProjectile.SplashTexture.Height / 2),
+                    scale,
+                    SpriteEffects.None,
+                    0
                 );
             }
 
-            string donutHealthText = $"Health: {health}";
-            Vector2 donutHealthPosition = new Vector2(650, 10);
-            _spriteBatch.DrawString(font, donutHealthText, donutHealthPosition, Color.White);
+            DrawUI();
         }
+        
+        private void DrawUI()
+        {
+            string donutHealthText = $"Donut Health: {donut.Health:0}";
+            Vector2 donutTextSize = font.MeasureString(donutHealthText);
+            Vector2 donutPosition = new Vector2(10, 10);
 
+            _spriteBatch.DrawString(font, donutHealthText, donutPosition + new Vector2(1, 1), Color.Black);
+            _spriteBatch.DrawString(font, donutHealthText, donutPosition, Color.White);
+
+            string enemyText = $"Sushi: {sushiSprite.Health:0} | Ginger: {gingerSprite.Health:0}";
+            Vector2 enemyTextSize = font.MeasureString(enemyText);
+            Vector2 enemyPosition = new Vector2(_graphicsDevice.Viewport.Width - enemyTextSize.X - 10, 10);
+
+            _spriteBatch.DrawString(font, enemyText, enemyPosition + new Vector2(1, 1), Color.Black);
+            _spriteBatch.DrawString(font, enemyText, enemyPosition, Color.White);
+        }
+        
+        private void UpdateProjectile(GameTime gameTime, float deltaTime)
+        {
+            if (projectileCooldownTimer > 0)
+            {
+                projectileCooldownTimer -= deltaTime;
+            }
+            
+            float distanceToDonut = Vector2.Distance(gingerSprite.Position, donut.Position);
+            if (distanceToDonut < 200f && projectileCooldownTimer <= 0 && !cheeseProjectile.IsActive)
+            {
+                Vector2 launchPosition = gingerSprite.Position + new Vector2(0, -40);
+                Vector2 directionToDonut = donut.Position - launchPosition;
+                cheeseProjectile.Launch(launchPosition, directionToDonut);
+                
+                projectileCooldownTimer = ProjectileCooldown;
+            }
+            
+            if (cheeseProjectile.IsActive)
+            {
+                cheeseProjectile.Update(gameTime);
+                
+                Vector2 projectilePos = cheeseProjectile.Position;
+                if (projectilePos.X < -100 || projectilePos.Y < -100 || 
+                    projectilePos.X > _graphicsDevice.Viewport.Width + 100 || 
+                    projectilePos.Y > _graphicsDevice.Viewport.Height + 100)
+                {
+                    cheeseProjectile.Reset();
+                }
+                else
+                {
+                    Rectangle cheeseRect = new Rectangle(
+                        (int)cheeseProjectile.Position.X - 32,
+                        (int)cheeseProjectile.Position.Y - 32,
+                        64,
+                        64
+                    );
+
+                    Rectangle donutRect = new Rectangle(
+                        (int)donut.Position.X - 48,
+                        (int)donut.Position.Y - 64,
+                        96,
+                        128
+                    );
+
+                    if (cheeseRect.Intersects(donutRect) && !cheeseProjectile.HasDealtDamage)
+                    {
+                        showSplashEffect = true;
+                        splashPosition = donut.Position;
+                        splashTimer = 0f;
+                        
+                        cheeseProjectile.DealDamageTo(donut);
+                        
+                        cheeseProjectile.Reset();
+                    }
+                }
+            }
+            
+            if (showSplashEffect)
+            {
+                splashTimer += deltaTime;
+                if (splashTimer >= SPLASH_DURATION)
+                {
+                    showSplashEffect = false;
+                }
+            }
+        }
+        
+        private void HandleMouseAttacks()
+        {
+            var mouseState = Mouse.GetState();
+            
+            if (mouseState.LeftButton == ButtonState.Pressed && previousMouseState.LeftButton != ButtonState.Pressed)
+            {
+                Vector2 mousePosition = new Vector2(mouseState.X, mouseState.Y);
+                
+                float distanceToSushi = Vector2.Distance(mousePosition, sushiSprite.Position);
+                if (distanceToSushi < 70)
+                {
+                    sushiSprite.TakeDamage(20f);
+                }
+                
+                float distanceToGinger = Vector2.Distance(mousePosition, gingerSprite.Position);
+                if (distanceToGinger < 70)
+                {
+                    gingerSprite.TakeDamage(20f);
+                }
+            }
+        }
 
         public static class Texture2DHelper
         {

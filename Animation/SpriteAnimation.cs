@@ -19,6 +19,10 @@ namespace monogame.Animation
             Reset();
         }
 
+        public SpriteAnimation()
+        {
+        }
+
         public void Update(GameTime gameTime)
         {
             frameTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
