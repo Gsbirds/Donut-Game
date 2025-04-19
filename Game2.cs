@@ -152,12 +152,16 @@ namespace monogame
             splashCheese = _mainGame.Content.Load<Texture2D>("splashcheese");
             ginger = _mainGame.Content.Load<Texture2D>("gingersprites5");
             mochiTree = _mainGame.Content.Load<Texture2D>("mochitree");
+            threshold = 150;
+ 
             puprmushSpritesheet = _mainGame.Content.Load<Texture2D>("pinkmush");
+            int frameWidth = puprmushSpritesheet.Width / 5;
+            int frameHeight = puprmushSpritesheet.Height;
 
             puprmushFrames = new Rectangle[5];
             for (int i = 0; i < 5; i++)
             {
-                puprmushFrames[i] = new Rectangle(i * 800, 0, 800, 600);
+                puprmushFrames[i] = new Rectangle(i * frameWidth, 0, frameWidth, frameHeight);
             }
 
             currentPuprmushFrame = 0;
@@ -165,7 +169,7 @@ namespace monogame
 
             health = 1000f;
             timer = 1000f;
-            threshold = 51;
+            // threshold = 51;
             
             // Initialize the game over screen
             gameOverScreen = new GameOverScreen(_mainGame, _graphicsDevice, font);
