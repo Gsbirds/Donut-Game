@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -109,7 +109,8 @@ namespace monogame
             cheeseProjectile.Reset();
             
             empanadaSprite.OnDamageDealt += (damage) => {
-                donut.TakeDamage(15f);
+                // Higher damage value for more noticeable health reduction
+                donut.TakeDamage(25f);
             };
 
             pipes = new Texture2D[3];

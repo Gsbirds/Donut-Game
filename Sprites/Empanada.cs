@@ -13,15 +13,16 @@ namespace monogame.Sprites
         private const float empanadaAttackCooldown = 1.0f;
         private bool empanadaMoving;
         private byte currentAnimationIndexEmpanada;
+        private byte currentAttackFrame;
+        private float attackAnimationTimer;
         private const int frameWidth = 110;
+        private const int attackFrameWidth = 160;
         private const int frameHeight = 133;
         private float animationTimer;
         private const float AnimationThreshold = 300f;
-        private int animationCycleCount;
-        private bool useBlinkingFrame;
         private const float MinDistanceFromNacho = 170f;
-        private const float AttackRange = 20f; // Reduced to make empanada only attack when very close
-        private const float AttackDamage = 0.5f;
+        private const float AttackRange = 20f; 
+        private const float AttackDamage = 10.0f; // Significantly increased damage 
         private Vector2 targetPosition;
         private Vector2 nachoPosition;
         private float halfScreenHeight;
@@ -47,12 +48,12 @@ namespace monogame.Sprites
             
             empanadaFacingDirection = Direction.Down;
             currentAnimationIndexEmpanada = 0;
+            currentAttackFrame = 0;
             animationTimer = 0f;
+            attackAnimationTimer = 0f;
             empanadaAttackTimer = 0f;
             empanadaMoving = false;
             isEmpanadaAttacking = false;
-            useBlinkingFrame = false;
-            animationCycleCount = 0;
             halfScreenHeight = 325f;
             periodicAttackTimer = 0f;
             canPeriodicAttack = true;
@@ -67,6 +68,7 @@ namespace monogame.Sprites
             Vector2 directionToDonut = targetPosition - Position;
             float distanceToDonut = directionToDonut.Length();
             empanadaMoving = true;
+            
             
             if (directionToDonut != Vector2.Zero)
             {
@@ -110,12 +112,20 @@ namespace monogame.Sprites
                     if (distanceToTarget <= AttackRange * 2.0f)
                     {
                         canPeriodicAttack = true;
+                        
+                        if (distanceToTarget <= AttackRange * 1.5f)
+                        {
+                            isEmpanadaAttacking = true;
+                            empanadaAttackTimer = 0f;
+                            
+                            OnDamageDealt?.Invoke(AttackDamage);
+                        }
                     }
                 }
             }
             
             periodicAttackTimer += deltaTime;
-            if (periodicAttackTimer >= PeriodicAttackInterval)
+            if (periodicAttackTimer >= PeriodicAttackInterval * 0.5f) // Half the normal interval for more frequent attacks
             {
                 canPeriodicAttack = true;
                 periodicAttackTimer = 0f;
@@ -137,7 +147,7 @@ namespace monogame.Sprites
                     empanadaFacingDirection = normalizedDirection.Y > 0 ? Direction.Down : Direction.Up;
                 }
                 
-                OnDamageDealt?.Invoke(AttackDamage);
+                OnDamageDealt?.Invoke(AttackDamage * 5.0f);
             }
             else if (isEmpanadaAttacking && distanceToTarget > AttackRange)
             {
@@ -145,6 +155,7 @@ namespace monogame.Sprites
                 empanadaAttackTimer = 0f;
             }
 
+            // For animation logic - walking animation
             if (empanadaMoving)
             {
                 animationTimer += deltaTime * 1000; 
@@ -157,6 +168,22 @@ namespace monogame.Sprites
             else if (animationTimer > 0)
             {
                 animationTimer = 0f;
+            }
+            
+            if (isEmpanadaAttacking || distanceToTarget <= AttackRange * 2.0f) 
+            {
+                attackAnimationTimer += deltaTime * 1000;
+                
+                if (attackAnimationTimer > 200) 
+                {
+                    currentAttackFrame = (byte)((currentAttackFrame + 1) % 2);
+                    attackAnimationTimer = 0f;
+                    
+                    if (distanceToTarget <= AttackRange * 1.5f && isEmpanadaAttacking)
+                    {
+                        OnDamageDealt?.Invoke(AttackDamage * 5.0f);
+                    }
+                }
             }
         }
 
@@ -174,32 +201,32 @@ namespace monogame.Sprites
                 {
                     Direction.Up => new Rectangle[]
                     {
-                        new Rectangle(frameWidth * 4, 0, frameWidth, frameHeight),
-                        new Rectangle(frameWidth * 5, 0, frameWidth, frameHeight)
+                        new Rectangle(frameWidth * 4, 0, attackFrameWidth, frameHeight),
+                        new Rectangle(frameWidth * 4 + attackFrameWidth, 0, attackFrameWidth, frameHeight)
                     },
                     Direction.Down => new Rectangle[]
                     {
-                        new Rectangle(frameWidth * 4, frameHeight * 2, frameWidth, frameHeight),
-                        new Rectangle(frameWidth * 5, frameHeight * 2, frameWidth, frameHeight)
+                        new Rectangle(frameWidth * 4, frameHeight * 2, attackFrameWidth, frameHeight),
+                        new Rectangle(frameWidth * 4 + attackFrameWidth, frameHeight * 2, attackFrameWidth, frameHeight)
                     },
                     Direction.Left => new Rectangle[]
                     {
-                        new Rectangle(frameWidth * 4, frameHeight * 3, frameWidth, frameHeight),
-                        new Rectangle(frameWidth * 5, frameHeight * 3, frameWidth, frameHeight)
+                        new Rectangle(frameWidth * 4, frameHeight * 3, attackFrameWidth, frameHeight),
+                        new Rectangle(frameWidth * 4 + attackFrameWidth, frameHeight * 3, attackFrameWidth, frameHeight)
                     },
                     Direction.Right => new Rectangle[]
                     {
-                        new Rectangle(frameWidth * 4, frameHeight, frameWidth, frameHeight),
-                        new Rectangle(frameWidth * 5, frameHeight, frameWidth, frameHeight)
+                        new Rectangle(frameWidth * 4, frameHeight, attackFrameWidth, frameHeight),
+                        new Rectangle(frameWidth * 4 + attackFrameWidth, frameHeight, attackFrameWidth, frameHeight)
                     },
                     _ => new Rectangle[]
                     {
-                        new Rectangle(frameWidth * 4, frameHeight, frameWidth, frameHeight),
-                        new Rectangle(frameWidth * 5, frameHeight, frameWidth, frameHeight)
+                        new Rectangle(frameWidth * 4, frameHeight, attackFrameWidth, frameHeight),
+                        new Rectangle(frameWidth * 4 + attackFrameWidth, frameHeight, attackFrameWidth, frameHeight)
                     }
                 };
                 
-                frameIndex = (int)(empanadaAttackTimer / (empanadaAttackCooldown / 2)) % 2;
+                frameIndex = currentAttackFrame;
             }
             else
             {
@@ -244,13 +271,17 @@ namespace monogame.Sprites
 
             Color spriteColor = isInvulnerable && (int)(invulnerabilityTimer * 10) % 2 == 0 ? Color.Red : Color.White;
 
+            Vector2 origin = useAttackFrames ? 
+                new Vector2(attackFrameWidth / 2.5f, frameHeight / 2) :  
+                new Vector2(frameWidth / 2, frameHeight / 2);
+                
             spriteBatch.Draw(
                 texture,
                 position,
                 currentFrame,
                 spriteColor,
                 0f,
-                new Vector2(70, 66),
+                origin,
                 1.0f,
                 SpriteEffects.None,
                 0f

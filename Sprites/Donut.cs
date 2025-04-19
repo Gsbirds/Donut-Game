@@ -301,7 +301,19 @@ namespace monogame.Sprites
 
         public override bool TakeDamage(float damage)
         {
+            // For donut, bypass invulnerability check for continuous damage
+            if (isInvulnerable)
+            {
+                // Still allow damage but at a reduced rate while invulnerable
+                currentHealth = MathHelper.Max(0, currentHealth - damage * 0.5f);
+                return true;
+            }
+            
+            // Normal damage handling
             bool damageDealt = base.TakeDamage(damage);
+            
+            // Make donut invulnerable for a much shorter time than other sprites
+            invulnerabilityTimer = InvulnerabilityDuration * 0.25f; // 75% reduction in invulnerability time
             
             if (damageDealt && currentHealth <= 0)
             {
