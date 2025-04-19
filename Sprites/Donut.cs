@@ -309,7 +309,6 @@ namespace monogame.Sprites
             
             bool damageDealt = base.TakeDamage(damage);
             
-            // Make donut invulnerable for a much shorter time than other sprites
             invulnerabilityTimer = InvulnerabilityDuration * 0.25f;
             
             if (damageDealt && currentHealth <= 0)

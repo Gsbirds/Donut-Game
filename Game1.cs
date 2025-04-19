@@ -248,7 +248,6 @@ namespace monogame
                 nachoSprite.SetPostHitFrame(true);
                 nachoSprite.TakeDamage(20f);
                 
-                // Check immediately if both enemies are defeated
                 if (nachoSprite.Health <= 0 && empanadaSprite.Health <= 0)
                 {
                     _mainGame.SwitchGameState(MainGame.GameStateType.Game2);
@@ -264,7 +263,6 @@ namespace monogame
             {
                 empanadaSprite.TakeDamage(20f);
                 
-                // Check immediately if both enemies are defeated
                 if (nachoSprite.Health <= 0 && empanadaSprite.Health <= 0)
                 {
                     _mainGame.SwitchGameState(MainGame.GameStateType.Game2);
@@ -335,7 +333,7 @@ namespace monogame
             if (gameOverScreen.IsActive)
             {
                 gameOverScreen.Draw(_spriteBatch);
-                return; // Skip drawing the rest of the game
+                return;
             }
             
             _spriteBatch.Draw(
