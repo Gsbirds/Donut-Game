@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -20,7 +20,7 @@ namespace monogame
         private Nacho nachoSprite;
         private Empanada empanadaSprite;
         private const float MinDistanceBetweenNachoAndEmpanada = 170f;
-        private const float AttackRange = 50f; // Reduced to make empanada only attack when very close
+        private const float AttackRange = 50f;
         private Rectangle[] empanadaFrames;
         private Rectangle[] downRectangles;
         private Rectangle[] upRectangles;
@@ -47,7 +47,7 @@ namespace monogame
         private Texture2D pipe;
         private Texture2D mushroom;
         private Texture2D churroTree;
-        public static Texture2D WhitePixel; // Used for health bars
+        public static Texture2D WhitePixel;
 
         private Texture2D[] pipes;
         private Vector2[] pipePositions;
@@ -81,7 +81,6 @@ namespace monogame
 
         public void LoadContent()
         {
-            // Initialize mouse state
             previousMouseState = Mouse.GetState();
 
             charaset = _mainGame.Content.Load<Texture2D>("donutsprites20");
@@ -106,13 +105,10 @@ namespace monogame
             donut = new Donut(charaset, new Vector2(_graphicsDevice.Viewport.Width - 96, _graphicsDevice.Viewport.Height - 128), 100f);
             nachoSprite = new Nacho(nacho, nachoOpenMouthTexture, new Vector2(100, 100), 40f);
             empanadaSprite = new Empanada(empanada, new Vector2(200, 200), 60f);
-            // Initialize cheese projectile in inactive state
             cheeseProjectile = new Projectile(cheeseLaunch, new Vector2(0, 0), 400f);
-            cheeseProjectile.Reset(); // Ensure it starts inactive
+            cheeseProjectile.Reset();
             
-            // Subscribe to empanada attack event to damage donut
             empanadaSprite.OnDamageDealt += (damage) => {
-                // Apply significant damage to make health changes clearly visible
                 donut.TakeDamage(15f);
             };
 
@@ -152,10 +148,8 @@ namespace monogame
             Vector2 donutPos = donut.Position;
             float distanceToDonut = Vector2.Distance(empanadaSprite.Position, donutPos);
 
-            // Always try to attack when within a larger range
             if (distanceToDonut <= AttackRange * 3.0f)
             {
-                // Force empanada to always attack when near donut
                 empanadaSprite.StartAttack();
             }
             empanadaSprite.Update(deltaTime, donutPos, nachoSprite.Position);
@@ -196,14 +190,12 @@ namespace monogame
 
             float distanceToDonutNacho = Vector2.Distance(nachoSprite.Position, donut.Position);
 
-            // Update cooldown timer
             if (projectileCooldownTimer > 0)
             {
                 projectileCooldownTimer -= deltaTime;
             }
 
             var mouse = Mouse.GetState();
-            // Only launch projectiles when nacho is close enough to donut
             if (distanceToDonutNacho < 200f)
             {
                 nachoSprite.SetOpenMouthFrame(true);
@@ -221,21 +213,17 @@ namespace monogame
             {
                 nachoSprite.SetOpenMouthFrame(false);
                 
-                // Reset projectile if nacho is too far away and cheese is active
                 if (cheeseProjectile.IsActive && Vector2.Distance(cheeseProjectile.Position, donut.Position) > 500f)
                 {
                     cheeseProjectile.Reset();
                 }
             }
 
-            // Get current mouse state for attacking
             var mouseState = Mouse.GetState();
             
-            // Donut attacking enemies when close
             float donutNachoDistance = Vector2.Distance(donut.Position, nachoSprite.Position);
             float donutEmpanadaDistance = Vector2.Distance(donut.Position, empanadaSprite.Position);
 
-            // Check for donut attack against nacho
             if (donutNachoDistance < 70 && mouseState.LeftButton == ButtonState.Pressed && previousMouseState.LeftButton != ButtonState.Pressed)
             {
                 nachoSprite.SetPostHitFrame(true);
@@ -246,20 +234,16 @@ namespace monogame
                 nachoSprite.SetPostHitFrame(false);
             }
             
-            // Check for donut attack against empanada
             if (donutEmpanadaDistance < 70 && mouseState.LeftButton == ButtonState.Pressed && previousMouseState.LeftButton != ButtonState.Pressed)
             {
                 empanadaSprite.TakeDamage(20f);
             }
             
-            // Update previous state for next frame
             previousMouseState = mouseState;
 
             if (cheeseProjectile.IsActive)
             {
                 cheeseProjectile.Update(gameTime);
-
-                // Reset projectile if it goes off screen
                 Vector2 projectilePos = cheeseProjectile.Position;
                 if (projectilePos.X < -100 || projectilePos.Y < -100 || 
                     projectilePos.X > _graphicsDevice.Viewport.Width + 100 || 
@@ -269,7 +253,6 @@ namespace monogame
                 }
                 else
                 {
-                    // Check collision with donut
                     Rectangle cheeseRect = new Rectangle(
                         (int)cheeseProjectile.Position.X - 32,
                         (int)cheeseProjectile.Position.Y - 32,
@@ -290,10 +273,8 @@ namespace monogame
                         splashPosition = donut.Position;
                         splashTimer = 0f;
                         
-                        // Deal damage to donut
                         cheeseProjectile.DealDamageTo(donut);
                         
-                        // Always reset projectile on hit
                         cheeseProjectile.Reset();
                     }
                 }
@@ -378,7 +359,6 @@ namespace monogame
                 );
             }
 
-            // Health UI elements are now drawn directly by each sprite
         }
 
         public static class Texture2DHelper
