@@ -43,7 +43,6 @@ namespace monogame.Sprites
         protected Nacho(Texture2D texture, Vector2 position, float speed)
             : base(texture, position, speed)
         {
-            // Set nacho-specific health
             maxHealth = 120f;
             currentHealth = maxHealth;
             rotationSpeed = MathHelper.Pi / 2;

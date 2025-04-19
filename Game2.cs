@@ -3,6 +3,7 @@ using System.Transactions;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using monogame.Screens;
 
 namespace monogame
 {
@@ -92,6 +93,9 @@ namespace monogame
         private int currentPuprmushFrame;
         private float puprmushFrameTimer;
         private const float PuprmushFrameDuration = 0.2f;
+        
+        // Game over screen
+        private GameOverScreen gameOverScreen;
 
         public Game2(MainGame mainGame, SpriteBatch spriteBatch)
         {
@@ -140,28 +144,31 @@ namespace monogame
 
         public void LoadContent()
         {
-
-            charaset = _mainGame.Content.Load<Texture2D>("donutsprites17");
+            charaset = _mainGame.Content.Load<Texture2D>("donutsprites20");
             sushi = _mainGame.Content.Load<Texture2D>("sushisprites10");
-            font = _mainGame.Content.Load<SpriteFont>("DefaultFont1");
             cheeseLaunch = _mainGame.Content.Load<Texture2D>("cheeselaunch");
+            font = _mainGame.Content.Load<SpriteFont>("DefaultFont1");
             sushiWallpaper = _mainGame.Content.Load<Texture2D>("sushilevelsetting");
             splashCheese = _mainGame.Content.Load<Texture2D>("splashcheese");
             ginger = _mainGame.Content.Load<Texture2D>("gingersprites5");
             mochiTree = _mainGame.Content.Load<Texture2D>("mochitree");
-            threshold = 150;
-
             puprmushSpritesheet = _mainGame.Content.Load<Texture2D>("pinkmush");
-            int frameWidth = puprmushSpritesheet.Width / 5;
-            int frameHeight = puprmushSpritesheet.Height;
 
             puprmushFrames = new Rectangle[5];
             for (int i = 0; i < 5; i++)
             {
-                puprmushFrames[i] = new Rectangle(i * frameWidth, 0, frameWidth, frameHeight);
+                puprmushFrames[i] = new Rectangle(i * 800, 0, 800, 600);
             }
+
             currentPuprmushFrame = 0;
             puprmushFrameTimer = 0f;
+
+            health = 1000f;
+            timer = 1000f;
+            threshold = 51;
+            
+            // Initialize the game over screen
+            gameOverScreen = new GameOverScreen(_mainGame, _graphicsDevice, font);
         }
 
         private Vector2 GetNachoMouthPosition()
@@ -456,6 +463,23 @@ namespace monogame
 
         public void Update(GameTime gameTime)
         {
+            // Calculate elapsed time for the update
+            float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            
+            // Handle game over screen if active
+            if (gameOverScreen.IsActive)
+            {
+                gameOverScreen.Update(deltaTime);
+                return;
+            }
+            
+            // Check for game over condition
+            if (ballPosition.Y < -100 || ballPosition.Y > _graphicsDevice.Viewport.Height + 100 ||
+                ballPosition.X < -100 || ballPosition.X > _graphicsDevice.Viewport.Width + 100)
+            {
+                gameOverScreen.Activate();
+                return;
+            }
 
             if (nachoHealth <= 0)
             {
@@ -587,19 +611,13 @@ namespace monogame
 
         public void Draw(GameTime gameTime)
         {
-
-            if (nachoDefeated)
+            // Draw game over screen if active
+            if (gameOverScreen.IsActive)
             {
-                _graphicsDevice.Clear(Color.Black);
-                string defeatMessage = "Sushi Defeated";
-                Vector2 textSize = font.MeasureString(defeatMessage);
-                Vector2 textPosition = new Vector2(
-                    300,
-                    300
-                );
-                _spriteBatch.DrawString(font, defeatMessage, textPosition, Color.White);
+                gameOverScreen.Draw(_spriteBatch);
                 return;
             }
+            
             _graphicsDevice.Clear(Color.Black);
 
             _spriteBatch.Draw(sushiWallpaper, new Rectangle(0, 0, 850, 850), Color.White);

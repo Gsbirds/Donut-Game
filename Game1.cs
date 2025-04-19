@@ -1,9 +1,10 @@
-using System;
+﻿using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using monogame.Sprites;
 using monogame.Animation;
+using monogame.Screens;
 
 namespace monogame
 {
@@ -71,6 +72,8 @@ namespace monogame
         private Texture2D empanada;
         private const float SPLASH_DURATION = 1f;
 
+        // Game state transition management
+        private GameOverScreen gameOverScreen;
 
         public Game1(MainGame mainGame, SpriteBatch spriteBatch)
         {
@@ -109,22 +112,17 @@ namespace monogame
             cheeseProjectile.Reset();
             
             empanadaSprite.OnDamageDealt += (damage) => {
-                // Higher damage value for more noticeable health reduction
-                donut.TakeDamage(25f);
+                donut.TakeDamage(10f);
             };
 
             pipes = new Texture2D[3];
             pipes[0] = pipe;
-            pipes[1] = _mainGame.Content.Load<Texture2D>("pipe2");
-            pipes[2] = _mainGame.Content.Load<Texture2D>("pipe2");
-
-            pipePositions = new Vector2[]
-            {
-                new Vector2(670, 570),
-                new Vector2(250, 300),
-                new Vector2(465, 300),
-            };
-
+            pipes[1] = pipe;
+            pipes[2] = pipe;
+            pipePositions = new Vector2[3];
+            pipePositions[0] = new Vector2(50, 125);
+            pipePositions[1] = new Vector2(700, 350);
+            pipePositions[2] = new Vector2(150, 600);
             currentPipeFrameIndices = new int[3];
             pipeAnimationTimers = new float[3];
 
@@ -137,12 +135,32 @@ namespace monogame
             }
             currentPuprmushFrame = 0;
             puprmushFrameTimer = 0f;
+
+            gameOverScreen = new GameOverScreen(_mainGame, _graphicsDevice, font);
         }
 
         public void Update(GameTime gameTime)
         {
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            
+            // Handle game over screen update
+            if (gameOverScreen.IsActive)
+            {
+                gameOverScreen.Update(deltaTime);
+                return;
+            }
+            else if (donut.Health <= 0)
+            {
+                gameOverScreen.Activate();
+                return;
+            }
 
+            else if (nachoSprite.Health <= 0 && empanadaSprite.Health <= 0)
+            {
+                _mainGame.SwitchGameState(MainGame.GameStateType.Game2);
+                return;
+            }
+            
             donut.Update(gameTime);
             nachoSprite.Update(gameTime);
             
@@ -229,6 +247,13 @@ namespace monogame
             {
                 nachoSprite.SetPostHitFrame(true);
                 nachoSprite.TakeDamage(20f);
+                
+                // Check immediately if both enemies are defeated
+                if (nachoSprite.Health <= 0 && empanadaSprite.Health <= 0)
+                {
+                    _mainGame.SwitchGameState(MainGame.GameStateType.Game2);
+                    return;
+                }
             }
             else
             {
@@ -238,6 +263,13 @@ namespace monogame
             if (donutEmpanadaDistance < 70 && mouseState.LeftButton == ButtonState.Pressed && previousMouseState.LeftButton != ButtonState.Pressed)
             {
                 empanadaSprite.TakeDamage(20f);
+                
+                // Check immediately if both enemies are defeated
+                if (nachoSprite.Health <= 0 && empanadaSprite.Health <= 0)
+                {
+                    _mainGame.SwitchGameState(MainGame.GameStateType.Game2);
+                    return;
+                }
             }
             
             previousMouseState = mouseState;
@@ -299,7 +331,13 @@ namespace monogame
 
         public void Draw(GameTime gameTime)
         {
-
+            // Draw game over screen if active
+            if (gameOverScreen.IsActive)
+            {
+                gameOverScreen.Draw(_spriteBatch);
+                return; // Skip drawing the rest of the game
+            }
+            
             _spriteBatch.Draw(
                 background,
                 new Rectangle(0, 0, 850, 850), 

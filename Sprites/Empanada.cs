@@ -118,14 +118,14 @@ namespace monogame.Sprites
                             isEmpanadaAttacking = true;
                             empanadaAttackTimer = 0f;
                             
-                            OnDamageDealt?.Invoke(AttackDamage);
+                            OnDamageDealt?.Invoke(AttackDamage * 0.8f);
                         }
                     }
                 }
             }
             
             periodicAttackTimer += deltaTime;
-            if (periodicAttackTimer >= PeriodicAttackInterval * 0.5f) // Half the normal interval for more frequent attacks
+            if (periodicAttackTimer >= PeriodicAttackInterval * 0.5f)
             {
                 canPeriodicAttack = true;
                 periodicAttackTimer = 0f;
@@ -147,7 +147,7 @@ namespace monogame.Sprites
                     empanadaFacingDirection = normalizedDirection.Y > 0 ? Direction.Down : Direction.Up;
                 }
                 
-                OnDamageDealt?.Invoke(AttackDamage * 5.0f);
+                OnDamageDealt?.Invoke(AttackDamage * 2.0f);
             }
             else if (isEmpanadaAttacking && distanceToTarget > AttackRange)
             {
@@ -155,7 +155,6 @@ namespace monogame.Sprites
                 empanadaAttackTimer = 0f;
             }
 
-            // For animation logic - walking animation
             if (empanadaMoving)
             {
                 animationTimer += deltaTime * 1000; 
@@ -181,7 +180,7 @@ namespace monogame.Sprites
                     
                     if (distanceToTarget <= AttackRange * 1.5f && isEmpanadaAttacking)
                     {
-                        OnDamageDealt?.Invoke(AttackDamage * 5.0f);
+                        OnDamageDealt?.Invoke(AttackDamage * 2.0f);
                     }
                 }
             }
