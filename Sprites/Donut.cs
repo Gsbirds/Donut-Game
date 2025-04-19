@@ -14,7 +14,6 @@ namespace monogame.Sprites
         private float jumpDuration;
         private float jumpHeight;
         private float jumpStartY;
-        private float health;
         private bool isMoving;
         private bool isAttacking;
         private float attackTimer;
@@ -29,14 +28,17 @@ namespace monogame.Sprites
         private MouseState previousMouseState;
         private const float MinY = 325f;
 
-        public float Health => health;
-
         public enum Direction { Down, Up, Left, Right }
+
+        public Direction CurrentDirection => currentDirection;
+        
+        public new float Health => currentHealth;
 
         public Donut(Texture2D texture, Vector2 position, float speed) 
             : base(texture, position, speed)
         {
-            health = 4f;
+            maxHealth = 100f;
+            currentHealth = maxHealth;
             jumpDuration = 1.0f;
             jumpHeight = 50f;
             currentDirection = Direction.Down;
@@ -145,7 +147,6 @@ namespace monogame.Sprites
             }
             else
             {
-                // When not moving, use the middle frame for a more natural standing pose
                 currentAnimationIndex = 1;
                 animationTimer = 0f;
             }
@@ -156,13 +157,50 @@ namespace monogame.Sprites
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            Rectangle currentFrame = GetCurrentFrame();
             spriteBatch.Draw(
                 texture,
                 Position,
-                currentFrame,
-                Color.White
+                GetCurrentFrame(),
+                Color.White,
+                0f,
+                new Vector2(96 / 2, 128 / 2),
+                1.0f,
+                SpriteEffects.None,
+                0f
             );
+            
+            DrawDonutHealthBar(spriteBatch);
+        }
+        
+        private void DrawDonutHealthBar(SpriteBatch spriteBatch)
+        {
+            int healthBarWidth = 200;
+            int healthBarHeight = 20;
+            Vector2 healthBarPosition = new Vector2(10, 10);
+            
+            Rectangle backgroundRectangle = new Rectangle(
+                (int)healthBarPosition.X,
+                (int)healthBarPosition.Y,
+                healthBarWidth,
+                healthBarHeight
+            );
+            spriteBatch.Draw(Game1.WhitePixel, backgroundRectangle, Color.DarkGray);
+            
+            int currentHealthWidth = (int)(healthBarWidth * (currentHealth / maxHealth));
+            Rectangle currentHealthRectangle = new Rectangle(
+                (int)healthBarPosition.X,
+                (int)healthBarPosition.Y,
+                currentHealthWidth,
+                healthBarHeight
+            );
+            
+            Color healthColor = Color.Green;
+            if (currentHealth < maxHealth * 0.6f)
+                healthColor = Color.Yellow;
+            if (currentHealth < maxHealth * 0.3f)
+                healthColor = Color.Red;
+                
+            spriteBatch.Draw(Game1.WhitePixel, currentHealthRectangle, healthColor);
         }
 
         private Rectangle GetCurrentFrame()
@@ -261,10 +299,16 @@ namespace monogame.Sprites
             }
         }
 
-        public void TakeDamage(float damage)
+        public override bool TakeDamage(float damage)
         {
-            // Health system temporarily disabled
-            // health = MathHelper.Max(0, health - damage);
+            bool damageDealt = base.TakeDamage(damage);
+            
+            if (damageDealt && currentHealth <= 0)
+            {
+                // Handle donut death if needed
+            }
+            
+            return damageDealt;
         }
 
 

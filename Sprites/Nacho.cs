@@ -9,7 +9,6 @@ namespace monogame.Sprites
     {
         private Direction facingDirection;
         private SpriteAnimation[] animations;
-        private float health;
         private bool isDefeated;
         private float rotationSpeed;
         private bool rotatingRight;
@@ -20,22 +19,21 @@ namespace monogame.Sprites
         private byte currentAnimationIndex;
         private Vector2 targetPosition;
         private new float rotation;
-        public float Health => health;
-        public bool IsDefeated => isDefeated;
+        public bool IsDefeated => isDefeated || currentHealth <= 0;
         public Direction FacingDirection => facingDirection;
 
         public Nacho(Texture2D texture, Texture2D openMouthTexture, Vector2 position, float speed) 
             : base(texture, position, speed)
         {
             this.openMouthTexture = openMouthTexture;
-            health = 4f;
-            rotationSpeed = MathHelper.Pi / 2; // 90 degrees per second
+            maxHealth = 120f;
+            currentHealth = maxHealth;
+            rotationSpeed = MathHelper.Pi / 2;
             rotatingRight = true;
             facingDirection = Direction.Down;
             currentAnimationIndex = 1;
 
-            // Initialize animations for each direction
-            animations = new SpriteAnimation[4]; // Up, Right, Down, Left
+            animations = new SpriteAnimation[4];
             for (int i = 0; i < 4; i++)
             {
                 animations[i] = new SpriteAnimation(AnimationFrames.GetCurrentRectanglesNacho((Direction)i, false, false, false), 0.1f);
@@ -45,7 +43,9 @@ namespace monogame.Sprites
         protected Nacho(Texture2D texture, Vector2 position, float speed)
             : base(texture, position, speed)
         {
-            health = 4f;
+            // Set nacho-specific health
+            maxHealth = 120f;
+            currentHealth = maxHealth;
             rotationSpeed = MathHelper.Pi / 2;
             rotatingRight = true;
             facingDirection = Direction.Down;
@@ -59,8 +59,15 @@ namespace monogame.Sprites
 
         public override void Update(GameTime gameTime)
         {
+            base.Update(gameTime);
+            
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
             Update(deltaTime, targetPosition);
+            
+            if (currentHealth <= 0)
+            {
+                isDefeated = true;
+            }
         }
 
         private void Update(float deltaTime, Vector2 targetPosition)
@@ -125,13 +132,16 @@ namespace monogame.Sprites
             useBlinkingFrame = value;
         }
 
-        public void TakeDamage(float damage)
+        public override bool TakeDamage(float damage)
         {
-            health = MathHelper.Max(0, health - damage);
-            if (health <= 0)
+            bool damageDealt = base.TakeDamage(damage);
+            
+            if (damageDealt && currentHealth <= 0)
             {
                 isDefeated = true;
             }
+            
+            return damageDealt;
         }
 
         public void SetOpenMouth(bool open)
@@ -156,9 +166,13 @@ namespace monogame.Sprites
             var texture = useOpenMouthFrame ? openMouthTexture : this.texture;
             var currentFrame = animations[(int)facingDirection].GetCurrentFrame();
             
-            spriteBatch.Draw(texture, position, currentFrame, Color.White, rotation,
+            Color spriteColor = isInvulnerable && (int)(invulnerabilityTimer * 10) % 2 == 0 ? Color.Red : Color.White;
+            
+            spriteBatch.Draw(texture, position, currentFrame, spriteColor, rotation,
                 new Vector2(currentFrame.Width / 2, currentFrame.Height / 2),
                 Vector2.One, SpriteEffects.None, 0f);
+                
+            DrawHealthBar(spriteBatch);
         }
     }
 }

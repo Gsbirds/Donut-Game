@@ -10,6 +10,14 @@ namespace monogame.Sprites
         protected float speed;
         protected float rotation;
         
+        // Health system
+        protected float maxHealth;
+        protected float currentHealth;
+        protected bool isInvulnerable;
+        protected float invulnerabilityTimer;
+        protected const float InvulnerabilityDuration = 0.5f;
+        protected bool showHealthBar = true;
+        
         public Vector2 Position 
         { 
             get => position;
@@ -24,16 +32,34 @@ namespace monogame.Sprites
 
         public Texture2D Texture => texture;
 
+        public float Health => currentHealth;
+        public float MaxHealth => maxHealth;
+        public bool IsInvulnerable => isInvulnerable;
+        
         public Sprite(Texture2D texture, Vector2 position, float speed)
         {
             this.texture = texture;
             this.position = position;
             this.speed = speed;
             this.rotation = 0f;
+            this.maxHealth = 100f;
+            this.currentHealth = maxHealth;
+            this.isInvulnerable = false;
+            this.invulnerabilityTimer = 0f;
         }
 
         public virtual void Update(GameTime gameTime)
         {
+            float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            if (isInvulnerable)
+            {
+                invulnerabilityTimer += deltaTime;
+                if (invulnerabilityTimer >= InvulnerabilityDuration)
+                {
+                    isInvulnerable = false;
+                    invulnerabilityTimer = 0f;
+                }
+            }
         }
 
         public virtual void Draw(SpriteBatch spriteBatch)
@@ -43,9 +69,60 @@ namespace monogame.Sprites
 
         protected virtual void Draw(SpriteBatch spriteBatch, Rectangle sourceRectangle)
         {
-            spriteBatch.Draw(texture, position, sourceRectangle, Color.White, rotation,
+            Color spriteColor = isInvulnerable && (int)(invulnerabilityTimer * 10) % 2 == 0 ? Color.Red : Color.White;
+            
+            spriteBatch.Draw(texture, position, sourceRectangle, spriteColor, rotation,
                 new Vector2(sourceRectangle.Width / 2, sourceRectangle.Height / 2),
                 Vector2.One, SpriteEffects.None, 0f);
+                
+            DrawHealthBar(spriteBatch);
+        }
+        
+        protected void DrawHealthBar(SpriteBatch spriteBatch)
+        {
+            if (!showHealthBar) return;
+            
+            int healthBarWidth = 60;
+            int healthBarHeight = 5;
+            Vector2 healthBarPosition = new Vector2(
+                position.X - healthBarWidth / 2,
+                position.Y - 64
+            );
+            
+            Rectangle backgroundRectangle = new Rectangle(
+                (int)healthBarPosition.X,
+                (int)healthBarPosition.Y,
+                healthBarWidth,
+                healthBarHeight
+            );
+            spriteBatch.Draw(Game1.WhitePixel, backgroundRectangle, Color.DarkGray);
+            
+            int currentHealthWidth = (int)(healthBarWidth * (currentHealth / maxHealth));
+            Rectangle currentHealthRectangle = new Rectangle(
+                (int)healthBarPosition.X,
+                (int)healthBarPosition.Y,
+                currentHealthWidth,
+                healthBarHeight
+            );
+            
+            Color healthColor = Color.Green;
+            if (currentHealth < maxHealth * 0.6f)
+                healthColor = Color.Yellow;
+            if (currentHealth < maxHealth * 0.3f)
+                healthColor = Color.Red;
+                
+            spriteBatch.Draw(Game1.WhitePixel, currentHealthRectangle, healthColor);
+        }
+        
+        public virtual bool TakeDamage(float damage)
+        {
+            if (isInvulnerable) return false;
+            
+            currentHealth = MathHelper.Max(0, currentHealth - damage);
+            isInvulnerable = true;
+            invulnerabilityTimer = 0f;
+            
+            return true;
         }
     }
 }

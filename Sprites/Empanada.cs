@@ -7,47 +7,10 @@ namespace monogame.Sprites
 {
     public class Empanada : Sprite
     {
-        private Rectangle[] GetCurrentRectangleEmpanada()
-        {
-
-            return empanadaFacingDirection switch
-            {
-                Direction.Up => new Rectangle[]
-                {
-                    new Rectangle(0, 0, frameWidth, frameHeight),
-                    new Rectangle(frameWidth, 0, frameWidth, frameHeight),
-                    new Rectangle(frameWidth * 2, 0, frameWidth, frameHeight)
-                },
-                Direction.Down => new Rectangle[]
-                {
-                    new Rectangle(0, frameHeight * 2, frameWidth, frameHeight),
-                    new Rectangle(frameWidth, frameHeight * 2, frameWidth, frameHeight),
-                    new Rectangle(frameWidth * 2, frameHeight * 2, frameWidth, frameHeight)
-                },
-                Direction.Left => new Rectangle[]
-                {
-                    new Rectangle(0, frameHeight * 3, frameWidth, frameHeight),
-                    new Rectangle(frameWidth, frameHeight * 3, frameWidth, frameHeight),
-                    new Rectangle(frameWidth * 2, frameHeight * 3, frameWidth, frameHeight)
-                },
-                Direction.Right => new Rectangle[]
-                {
-                    new Rectangle(0, frameHeight, frameWidth, frameHeight),
-                    new Rectangle(frameWidth, frameHeight, frameWidth, frameHeight),
-                    new Rectangle(frameWidth * 2, frameHeight, frameWidth, frameHeight)
-                },
-                _ => new Rectangle[]
-                {
-                    new Rectangle(0, frameHeight, frameWidth, frameHeight),
-                    new Rectangle(frameWidth, frameHeight, frameWidth, frameHeight),
-                    new Rectangle(frameWidth * 2, frameHeight, frameWidth, frameHeight)
-                }
-            };
-        }
         private Direction empanadaFacingDirection;
         private bool isEmpanadaAttacking;
         private float empanadaAttackTimer;
-        private const float empanadaAttackCooldown = 1.5f;
+        private const float empanadaAttackCooldown = 1.0f;
         private bool empanadaMoving;
         private byte currentAnimationIndexEmpanada;
         private const int frameWidth = 110;
@@ -57,12 +20,16 @@ namespace monogame.Sprites
         private int animationCycleCount;
         private bool useBlinkingFrame;
         private const float MinDistanceFromNacho = 170f;
-        private const float AttackRange = 50f;
+        private const float AttackRange = 20f; // Reduced to make empanada only attack when very close
         private const float AttackDamage = 0.5f;
         private Vector2 targetPosition;
         private Vector2 nachoPosition;
         private float halfScreenHeight;
         public event Action<float> OnDamageDealt;
+
+        private float periodicAttackTimer;
+        private const float PeriodicAttackInterval = 1.5f;
+        private bool canPeriodicAttack;
 
         public Direction FacingDirection => empanadaFacingDirection;
         public bool IsAttacking => isEmpanadaAttacking;
@@ -75,6 +42,9 @@ namespace monogame.Sprites
         public Empanada(Texture2D texture, Vector2 position, float speed) 
             : base(texture, position, speed)
         {
+            maxHealth = 80f;
+            currentHealth = maxHealth;
+            
             empanadaFacingDirection = Direction.Down;
             currentAnimationIndexEmpanada = 0;
             animationTimer = 0f;
@@ -84,6 +54,9 @@ namespace monogame.Sprites
             useBlinkingFrame = false;
             animationCycleCount = 0;
             halfScreenHeight = 325f;
+            periodicAttackTimer = 0f;
+            canPeriodicAttack = true;
+            targetPosition = new Vector2(1000, 1000);
         }
 
         public void Update(float deltaTime, Vector2 targetPos, Vector2 nachoPos)
@@ -92,17 +65,28 @@ namespace monogame.Sprites
             nachoPosition = nachoPos;
 
             Vector2 directionToDonut = targetPosition - Position;
+            float distanceToDonut = directionToDonut.Length();
             empanadaMoving = true;
             
             if (directionToDonut != Vector2.Zero)
             {
                 directionToDonut.Normalize();
-                Position += directionToDonut * Speed * deltaTime;
-
-                if (Math.Abs(directionToDonut.X) > Math.Abs(directionToDonut.Y))
-                    empanadaFacingDirection = directionToDonut.X > 0 ? Direction.Right : Direction.Left;
-                else
-                    empanadaFacingDirection = directionToDonut.Y > 0 ? Direction.Down : Direction.Up;
+                
+                if (distanceToDonut > 20.0f)
+                {
+                    Position += directionToDonut * Speed * deltaTime;
+                }
+                else if (distanceToDonut < 10.0f)
+                {
+                    Position -= directionToDonut * Speed * 0.5f * deltaTime;
+                }
+                if (!isEmpanadaAttacking)
+                {
+                    if (Math.Abs(directionToDonut.X) > Math.Abs(directionToDonut.Y))
+                        empanadaFacingDirection = directionToDonut.X > 0 ? Direction.Right : Direction.Left;
+                    else
+                        empanadaFacingDirection = directionToDonut.Y > 0 ? Direction.Down : Direction.Up;
+                }
             }
 
             Vector2 directionFromNacho = Position - nachoPosition;
@@ -114,6 +98,7 @@ namespace monogame.Sprites
             }
 
             float distanceToTarget = Vector2.Distance(Position, targetPosition);
+            
             if (isEmpanadaAttacking)
             {
                 empanadaAttackTimer += deltaTime;
@@ -121,16 +106,44 @@ namespace monogame.Sprites
                 {
                     isEmpanadaAttacking = false;
                     empanadaAttackTimer = 0f;
+                    
+                    if (distanceToTarget <= AttackRange * 2.0f)
+                    {
+                        canPeriodicAttack = true;
+                    }
                 }
             }
-
-            if (distanceToTarget <= AttackRange && !isEmpanadaAttacking)
+            
+            periodicAttackTimer += deltaTime;
+            if (periodicAttackTimer >= PeriodicAttackInterval)
+            {
+                canPeriodicAttack = true;
+                periodicAttackTimer = 0f;
+            }
+            
+            if (distanceToTarget <= AttackRange * 2.0f && !isEmpanadaAttacking && canPeriodicAttack)
             {
                 isEmpanadaAttacking = true;
                 empanadaAttackTimer = 0f;
+                canPeriodicAttack = false;
+                
+                Vector2 normalizedDirection = Vector2.Normalize(directionToDonut);
+                if (Math.Abs(normalizedDirection.X) > Math.Abs(normalizedDirection.Y))
+                {
+                    empanadaFacingDirection = normalizedDirection.X > 0 ? Direction.Right : Direction.Left;
+                }
+                else
+                {
+                    empanadaFacingDirection = normalizedDirection.Y > 0 ? Direction.Down : Direction.Up;
+                }
+                
                 OnDamageDealt?.Invoke(AttackDamage);
             }
-
+            else if (isEmpanadaAttacking && distanceToTarget > AttackRange)
+            {
+                isEmpanadaAttacking = false;
+                empanadaAttackTimer = 0f;
+            }
 
             if (empanadaMoving)
             {
@@ -149,25 +162,111 @@ namespace monogame.Sprites
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            Rectangle[] frames = GetCurrentRectangleEmpanada();
-            Rectangle currentFrame = frames[currentAnimationIndexEmpanada];
+            Rectangle[] frames;
+            int frameIndex;
+          
+            float distanceToDonut = Vector2.Distance(Position, targetPosition);
+            bool useAttackFrames = distanceToDonut <= AttackRange * 2.0f;
+            
+            if (useAttackFrames)
+            {
+                frames = empanadaFacingDirection switch
+                {
+                    Direction.Up => new Rectangle[]
+                    {
+                        new Rectangle(frameWidth * 4, 0, frameWidth, frameHeight),
+                        new Rectangle(frameWidth * 5, 0, frameWidth, frameHeight)
+                    },
+                    Direction.Down => new Rectangle[]
+                    {
+                        new Rectangle(frameWidth * 4, frameHeight * 2, frameWidth, frameHeight),
+                        new Rectangle(frameWidth * 5, frameHeight * 2, frameWidth, frameHeight)
+                    },
+                    Direction.Left => new Rectangle[]
+                    {
+                        new Rectangle(frameWidth * 4, frameHeight * 3, frameWidth, frameHeight),
+                        new Rectangle(frameWidth * 5, frameHeight * 3, frameWidth, frameHeight)
+                    },
+                    Direction.Right => new Rectangle[]
+                    {
+                        new Rectangle(frameWidth * 4, frameHeight, frameWidth, frameHeight),
+                        new Rectangle(frameWidth * 5, frameHeight, frameWidth, frameHeight)
+                    },
+                    _ => new Rectangle[]
+                    {
+                        new Rectangle(frameWidth * 4, frameHeight, frameWidth, frameHeight),
+                        new Rectangle(frameWidth * 5, frameHeight, frameWidth, frameHeight)
+                    }
+                };
+                
+                frameIndex = (int)(empanadaAttackTimer / (empanadaAttackCooldown / 2)) % 2;
+            }
+            else
+            {
+                frames = empanadaFacingDirection switch
+                {
+                    Direction.Up => new Rectangle[]
+                    {
+                        new Rectangle(0, 0, frameWidth, frameHeight),
+                        new Rectangle(frameWidth, 0, frameWidth, frameHeight),
+                        new Rectangle(frameWidth * 2, 0, frameWidth, frameHeight)
+                    },
+                    Direction.Down => new Rectangle[]
+                    {
+                        new Rectangle(0, frameHeight * 2, frameWidth, frameHeight),
+                        new Rectangle(frameWidth, frameHeight * 2, frameWidth, frameHeight),
+                        new Rectangle(frameWidth * 2, frameHeight * 2, frameWidth, frameHeight)
+                    },
+                    Direction.Left => new Rectangle[]
+                    {
+                        new Rectangle(0, frameHeight * 3, frameWidth, frameHeight),
+                        new Rectangle(frameWidth, frameHeight * 3, frameWidth, frameHeight),
+                        new Rectangle(frameWidth * 2, frameHeight * 3, frameWidth, frameHeight)
+                    },
+                    Direction.Right => new Rectangle[]
+                    {
+                        new Rectangle(0, frameHeight, frameWidth, frameHeight),
+                        new Rectangle(frameWidth, frameHeight, frameWidth, frameHeight),
+                        new Rectangle(frameWidth * 2, frameHeight, frameWidth, frameHeight)
+                    },
+                    _ => new Rectangle[]
+                    {
+                        new Rectangle(0, frameHeight, frameWidth, frameHeight),
+                        new Rectangle(frameWidth, frameHeight, frameWidth, frameHeight),
+                        new Rectangle(frameWidth * 2, frameHeight, frameWidth, frameHeight)
+                    }
+                };
+                
+                frameIndex = currentAnimationIndexEmpanada;
+            }
+            
+            Rectangle currentFrame = frames[frameIndex];
+
+            Color spriteColor = isInvulnerable && (int)(invulnerabilityTimer * 10) % 2 == 0 ? Color.Red : Color.White;
 
             spriteBatch.Draw(
                 texture,
                 position,
                 currentFrame,
-                Color.White,
+                spriteColor,
                 0f,
                 new Vector2(70, 66),
                 1.0f,
                 SpriteEffects.None,
                 0f
             );
+            
+            DrawHealthBar(spriteBatch);
         }
 
         public override void Update(GameTime gameTime)
         {
-            Update((float)gameTime.ElapsedGameTime.TotalSeconds, position, position);
+            base.Update(gameTime);
+
+            if (currentHealth <= 0)
+            {
+                // Handle death logic if needed
+            }
         }
 
         public void SetFacingDirection(Direction direction)
@@ -182,11 +281,35 @@ namespace monogame.Sprites
 
         public void StartAttack()
         {
-            if (!isEmpanadaAttacking)
+            float distanceToDonut = Vector2.Distance(Position, targetPosition);
+            if (!isEmpanadaAttacking && canPeriodicAttack)
             {
                 isEmpanadaAttacking = true;
                 empanadaAttackTimer = 0f;
+                canPeriodicAttack = false;
+                periodicAttackTimer = 0f;
+                
+                Vector2 directionToDonut = Vector2.Normalize(targetPosition - Position);
+                if (Math.Abs(directionToDonut.X) > Math.Abs(directionToDonut.Y))
+                {
+                    empanadaFacingDirection = directionToDonut.X > 0 ? Direction.Right : Direction.Left;
+                }
+                else
+                {
+                    empanadaFacingDirection = directionToDonut.Y > 0 ? Direction.Down : Direction.Up;
+                }
+                
+                OnDamageDealt?.Invoke(AttackDamage);
             }
+        }
+        
+        public override bool TakeDamage(float damage)
+        {
+            bool damageDealt = base.TakeDamage(damage);
+            
+            // Optional: Add empanada-specific damage reactions here
+            
+            return damageDealt;
         }
     }
 }

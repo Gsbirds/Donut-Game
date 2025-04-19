@@ -9,17 +9,20 @@ namespace monogame.Sprites
         private bool isActive;
         private float rotationSpeed;
         private bool hasDealtDamage;
+        private float damageAmount;
 
         public bool IsActive => isActive;
         public bool HasDealtDamage => hasDealtDamage;
         public new Vector2 Position => position;
         public float Rotation => rotation;
 
-        public Projectile(Texture2D texture, Vector2 position, float speed) 
+        public Projectile(Texture2D texture, Vector2 position, float speed, float damage = 10f) 
             : base(texture, position, speed)
         {
             rotationSpeed = MathHelper.TwoPi;
+            damageAmount = damage;
             Reset();
+            showHealthBar = false;
         }
 
         public void Launch(Vector2 startPosition, Vector2 direction)
@@ -48,9 +51,8 @@ namespace monogame.Sprites
             rotation += rotationSpeed * deltaTime;
             rotation %= MathHelper.TwoPi;
 
-            // Reset if off screen
             if (position.X < -50 || position.Y < -50 || 
-                position.X > 1920 || position.Y > 1080) // Assuming standard 1080p resolution
+                position.X > 1920 || position.Y > 1080)
             {
                 Reset();
             }
@@ -59,6 +61,24 @@ namespace monogame.Sprites
         public void SetDealtDamage()
         {
             hasDealtDamage = true;
+        }
+        
+        public float GetDamageAmount()
+        {
+            return damageAmount;
+        }
+        
+        public bool DealDamageTo(Sprite target)
+        {
+            if (!isActive || hasDealtDamage) return false;
+            
+            bool damageDealt = target.TakeDamage(damageAmount);
+            if (damageDealt)
+            {
+                hasDealtDamage = true;
+            }
+            
+            return damageDealt;
         }
 
         public Rectangle GetBounds()
@@ -74,7 +94,10 @@ namespace monogame.Sprites
         protected override void Draw(SpriteBatch spriteBatch, Rectangle sourceRectangle)
         {
             if (!isActive) return;
-            base.Draw(spriteBatch, sourceRectangle);
+            
+            spriteBatch.Draw(texture, position, sourceRectangle, Color.White, rotation,
+                new Vector2(sourceRectangle.Width / 2, sourceRectangle.Height / 2),
+                Vector2.One, SpriteEffects.None, 0f);
         }
     }
 }
