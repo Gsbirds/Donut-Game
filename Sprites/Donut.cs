@@ -157,13 +157,26 @@ namespace monogame.Sprites
 
         public override void Draw(SpriteBatch spriteBatch)
         {
+            Rectangle currentFrame = GetCurrentFrame();
+            
+            Vector2 origin;
+            
+            if (isAttacking && attackTimer <= AttackDuration && currentDirection != Direction.Up)
+            {
+                origin = new Vector2(192 / 2, 128 / 2);
+            }
+            else
+            {
+                origin = new Vector2(96 / 2, 128 / 2);
+            }
+            
             spriteBatch.Draw(
                 texture,
                 Position,
-                GetCurrentFrame(),
+                currentFrame,
                 Color.White,
                 0f,
-                new Vector2(96 / 2, 128 / 2),
+                origin,
                 1.0f,
                 SpriteEffects.None,
                 0f
@@ -251,7 +264,7 @@ namespace monogame.Sprites
                 {
                     return currentDirection switch
                     {
-                        Direction.Up => new Rectangle(80, 0, doubleWidth, frameHeight),
+                        Direction.Up => new Rectangle(80, 0, frameWidth, frameHeight),
                         Direction.Down => new Rectangle(480, 256, doubleWidth, frameHeight),
                         Direction.Left => new Rectangle(480, 384, doubleWidth, frameHeight),
                         Direction.Right => new Rectangle(480, 128, doubleWidth, frameHeight),

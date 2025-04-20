@@ -62,6 +62,13 @@ namespace monogame.Sprites
 
         public void Update(float deltaTime, Vector2 targetPos, Vector2 nachoPos)
         {
+            if (currentHealth <= 0)
+            {
+                empanadaMoving = false;
+                isEmpanadaAttacking = false;
+                return;
+            }
+            
             targetPosition = targetPos;
             nachoPosition = nachoPos;
 
@@ -268,7 +275,16 @@ namespace monogame.Sprites
             
             Rectangle currentFrame = frames[frameIndex];
 
-            Color spriteColor = isInvulnerable && (int)(invulnerabilityTimer * 10) % 2 == 0 ? Color.Red : Color.White;
+            // Use a darker/grayed out color when defeated
+            Color spriteColor;
+            if (currentHealth <= 0)
+            {
+                spriteColor = Color.Gray; // Gray tint for defeated state
+            }
+            else
+            {
+                spriteColor = isInvulnerable && (int)(invulnerabilityTimer * 10) % 2 == 0 ? Color.Red : Color.White;
+            }
 
             Vector2 origin = useAttackFrames ? 
                 new Vector2(attackFrameWidth / 2.5f, frameHeight / 2) :  
