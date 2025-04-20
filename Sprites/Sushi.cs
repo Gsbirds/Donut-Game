@@ -14,6 +14,7 @@ namespace monogame.Sprites
         private float attackCooldown;
         private bool useAttackFrame = false;
         private byte currentAnimationIndex = 0;
+        private bool hasDealtDamageThisAttack = false; 
         private SpriteAnimation[] animations;
         private Vector2 targetPosition;
         private const float AttackRange = 150f;
@@ -31,7 +32,7 @@ namespace monogame.Sprites
         {
             maxHealth = 100f;
             currentHealth = maxHealth;
-            attackCooldown = 1.5f;
+            attackCooldown = 3.0f; 
             facingDirection = Direction.Down;
             moveSpeed = speed;
             animations = new SpriteAnimation[4];
@@ -70,12 +71,13 @@ namespace monogame.Sprites
             {
                 attackTimer += deltaTime;
                 
-                if (attackTimer < 0.2f)
+                if (attackTimer >= 0.5f && attackTimer <= 0.7f && !hasDealtDamageThisAttack)
                 {
                     float distanceToTarget = Vector2.Distance(Position, targetPosition);
                     if (distanceToTarget <= AttackRange)
                     {
                         OnDamageDealt?.Invoke(AttackDamage);
+                        hasDealtDamageThisAttack = true;
                     }
                 }
                 
@@ -84,6 +86,7 @@ namespace monogame.Sprites
                     isAttacking = false;
                     attackTimer = 0f;
                     useAttackFrame = false;
+                    hasDealtDamageThisAttack = false; 
                 }
             }
             
@@ -105,6 +108,11 @@ namespace monogame.Sprites
             Vector2 direction = targetPosition - Position;
             float distance = direction.Length();
             
+            if (distance <= AttackRange && !isAttacking)
+            {
+                StartAttack();
+            }
+            
             if (distance > 20f)
             {
                 if (distance > 0)
@@ -118,15 +126,12 @@ namespace monogame.Sprites
         
         private void UpdateFacingDirection(Vector2 direction)
         {
-            // Fix to match Empanada behavior - invert both X and Y axis
             if (Math.Abs(direction.X) > Math.Abs(direction.Y))
             {
-                // When moving right, face left and vice versa
                 facingDirection = direction.X > 0 ? Direction.Left : Direction.Right;
             }
             else
             {
-                // When moving down, face up and vice versa
                 facingDirection = direction.Y > 0 ? Direction.Up : Direction.Down;
             }
         }
@@ -165,11 +170,29 @@ namespace monogame.Sprites
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            Rectangle currentFrame = animations[(int)facingDirection].GetCurrentFrame();
+            Rectangle currentFrame;
+            
+            if (isAttacking)
+            {
+                int frameWidth = 110;
+                int frameHeight = 133;
+                
+                int attackFrame = attackTimer < 0.5f ? 3 : 4; 
+                
+                currentFrame = new Rectangle(
+                    attackFrame * frameWidth,
+                    (int)facingDirection * frameHeight,
+                    frameWidth,
+                    frameHeight
+                );
+            }
+            else
+            {
+                currentFrame = animations[(int)facingDirection].GetCurrentFrame();
+            }
             
             Color spriteColor = isInvulnerable && (int)(invulnerabilityTimer * 10) % 2 == 0 ? Color.Red : Color.White;
             
-            // Set proper origin point to match Empanada animation frames
             Vector2 origin = new Vector2(currentFrame.Width / 2, currentFrame.Height / 2);
             
             spriteBatch.Draw(

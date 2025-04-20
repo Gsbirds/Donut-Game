@@ -87,7 +87,7 @@ namespace monogame
             cheeseProjectile = new CheeseProjectile(cheeseTexture, cheeseSplashTexture);
             
             sushiSprite.OnDamageDealt += (damage) => {
-                donut.TakeDamage(10f);  // Reduced damage to make game less difficult
+                donut.TakeDamage(3f);  
             };
             
             int frameWidth = puprmushSpritesheet.Width / 5;
@@ -306,18 +306,28 @@ namespace monogame
             
             if (mouseState.LeftButton == ButtonState.Pressed && previousMouseState.LeftButton != ButtonState.Pressed)
             {
-                Vector2 mousePosition = new Vector2(mouseState.X, mouseState.Y);
-                
-                float distanceToSushi = Vector2.Distance(mousePosition, sushiSprite.Position);
-                if (distanceToSushi < 70)
+                float donutSushiDistance = Vector2.Distance(donut.Position, sushiSprite.Position);
+                if (donutSushiDistance < 70) 
                 {
                     sushiSprite.TakeDamage(20f);
+                    
+                    if (sushiSprite.Health <= 0 && gingerSprite.Health <= 0)
+                    {
+                        _mainGame.SwitchGameState(MainGame.GameStateType.Game1);
+                        return;
+                    }
                 }
                 
-                float distanceToGinger = Vector2.Distance(mousePosition, gingerSprite.Position);
-                if (distanceToGinger < 70)
+                float donutGingerDistance = Vector2.Distance(donut.Position, gingerSprite.Position);
+                if (donutGingerDistance < 70)
                 {
                     gingerSprite.TakeDamage(20f);
+                    
+                    if (sushiSprite.Health <= 0 && gingerSprite.Health <= 0)
+                    {
+                        _mainGame.SwitchGameState(MainGame.GameStateType.Game1);
+                        return;
+                    }
                 }
             }
         }
