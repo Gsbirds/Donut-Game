@@ -86,7 +86,7 @@ namespace monogame.Sprites
             int healthBarHeight = 5;
             Vector2 healthBarPosition = new Vector2(
                 position.X - healthBarWidth / 2,
-                position.Y - 64
+                position.Y - 80
             );
             
             Rectangle backgroundRectangle = new Rectangle(

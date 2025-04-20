@@ -168,7 +168,6 @@ namespace monogame.Sprites
                 SpriteEffects.None,
                 0f
             );
-            
             DrawDonutHealthBar(spriteBatch);
         }
         
@@ -176,7 +175,23 @@ namespace monogame.Sprites
         {
             int healthBarWidth = 200;
             int healthBarHeight = 20;
-            Vector2 healthBarPosition = new Vector2(10, 10);
+            int borderSize = 2;
+            
+            GraphicsDevice graphicsDevice = spriteBatch.GraphicsDevice;
+            int screenWidth = graphicsDevice.Viewport.Width;
+            
+            Vector2 healthBarPosition = new Vector2(
+                screenWidth - healthBarWidth - 10,
+                10
+            );
+            
+            Rectangle borderRectangle = new Rectangle(
+                (int)healthBarPosition.X - borderSize,
+                (int)healthBarPosition.Y - borderSize,
+                healthBarWidth + 2*borderSize,
+                healthBarHeight + 2*borderSize
+            );
+            spriteBatch.Draw(Game1.WhitePixel, borderRectangle, Color.Black);
             
             Rectangle backgroundRectangle = new Rectangle(
                 (int)healthBarPosition.X,
@@ -194,12 +209,21 @@ namespace monogame.Sprites
                 healthBarHeight
             );
             
-            Color healthColor = Color.Green;
-            if (currentHealth < maxHealth * 0.6f)
-                healthColor = Color.Yellow;
-            if (currentHealth < maxHealth * 0.3f)
-                healthColor = Color.Red;
-                
+            Color healthColor;
+            
+            if (currentHealth >= maxHealth * 0.66f)
+            {
+                healthColor = new Color(0, 255, 255);
+            }
+            else if (currentHealth >= maxHealth * 0.33f)
+            {
+                healthColor = new Color(0, 200, 220);
+            }
+            else
+            {
+                healthColor = new Color(0, 120, 180);
+            }
+            
             spriteBatch.Draw(Game1.WhitePixel, currentHealthRectangle, healthColor);
         }
 

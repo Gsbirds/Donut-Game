@@ -118,13 +118,16 @@ namespace monogame.Sprites
         
         private void UpdateFacingDirection(Vector2 direction)
         {
+            // Fix to match Empanada behavior - invert both X and Y axis
             if (Math.Abs(direction.X) > Math.Abs(direction.Y))
             {
-                facingDirection = direction.X > 0 ? Direction.Right : Direction.Left;
+                // When moving right, face left and vice versa
+                facingDirection = direction.X > 0 ? Direction.Left : Direction.Right;
             }
             else
             {
-                facingDirection = direction.Y > 0 ? Direction.Down : Direction.Up;
+                // When moving down, face up and vice versa
+                facingDirection = direction.Y > 0 ? Direction.Up : Direction.Down;
             }
         }
 
@@ -166,13 +169,16 @@ namespace monogame.Sprites
             
             Color spriteColor = isInvulnerable && (int)(invulnerabilityTimer * 10) % 2 == 0 ? Color.Red : Color.White;
             
+            // Set proper origin point to match Empanada animation frames
+            Vector2 origin = new Vector2(currentFrame.Width / 2, currentFrame.Height / 2);
+            
             spriteBatch.Draw(
                 texture,
                 position,
                 currentFrame,
                 spriteColor,
                 rotation,
-                new Vector2(currentFrame.Width / 2, currentFrame.Height / 2),
+                origin,
                 Vector2.One,
                 SpriteEffects.None,
                 0f

@@ -51,7 +51,7 @@ namespace monogame
         private bool isSpacebarAnimationActive = false;
         private bool useSpacebarFrame = false;
         private bool useBlinkingFrame = false;
-        private int doubleWidth = 96 * 2; // Assuming standard width is 96
+        private int doubleWidth = 96 * 2;
         
         private Direction currentDirectionSushi = Direction.Down;
         private bool isSushiAttacking = false;
@@ -70,10 +70,10 @@ namespace monogame
         public void LoadContent()
         {
             donutTexture = _mainGame.Content.Load<Texture2D>("donutsprites20");
-            sushiTexture = _mainGame.Content.Load<Texture2D>("sushisprites10");  // Use proper sushi sprites
-            gingerTexture = _mainGame.Content.Load<Texture2D>("gingersprites4");  // Use proper ginger sprites
-            sushiWallpaper = _mainGame.Content.Load<Texture2D>("sushilevelsetting");  // Background
-            mochiTree = _mainGame.Content.Load<Texture2D>("mochitree");  // Tree
+            sushiTexture = _mainGame.Content.Load<Texture2D>("sushisprites10");
+            gingerTexture = _mainGame.Content.Load<Texture2D>("gingersprites4");
+            sushiWallpaper = _mainGame.Content.Load<Texture2D>("sushilevelsetting");
+            mochiTree = _mainGame.Content.Load<Texture2D>("mochitree");
             puprmushSpritesheet = _mainGame.Content.Load<Texture2D>("pinkmush");
             
             font = _mainGame.Content.Load<SpriteFont>("DefaultFont1");
@@ -178,13 +178,10 @@ namespace monogame
             _graphicsDevice.Clear(Color.Black);
 
             _spriteBatch.Draw(sushiWallpaper, new Rectangle(0, 0, 850, 850), Color.White);
-            _spriteBatch.Draw(mochiTree, new Rectangle(450, 350, 390, 390), Color.White);
             
-            Vector2 puprmushPosition = new Vector2(
-                _graphicsDevice.Viewport.Width / 2 + 20,
-                _graphicsDevice.Viewport.Height / 2 - 70
-            );
+            _spriteBatch.Draw(mochiTree, new Rectangle(250, 50, 878, 878), Color.White);
             
+            Vector2 puprmushPosition = new Vector2(120, 50 + 550);
             _spriteBatch.Draw(
                 puprmushSpritesheet,
                 puprmushPosition,
@@ -233,25 +230,8 @@ namespace monogame
                 );
             }
 
-            DrawUI();
         }
-        
-        private void DrawUI()
-        {
-            string donutHealthText = $"Donut Health: {donut.Health:0}";
-            Vector2 donutTextSize = font.MeasureString(donutHealthText);
-            Vector2 donutPosition = new Vector2(10, 10);
 
-            _spriteBatch.DrawString(font, donutHealthText, donutPosition + new Vector2(1, 1), Color.Black);
-            _spriteBatch.DrawString(font, donutHealthText, donutPosition, Color.White);
-
-            string enemyText = $"Sushi: {sushiSprite.Health:0} | Ginger: {gingerSprite.Health:0}";
-            Vector2 enemyTextSize = font.MeasureString(enemyText);
-            Vector2 enemyPosition = new Vector2(_graphicsDevice.Viewport.Width - enemyTextSize.X - 10, 10);
-
-            _spriteBatch.DrawString(font, enemyText, enemyPosition + new Vector2(1, 1), Color.Black);
-            _spriteBatch.DrawString(font, enemyText, enemyPosition, Color.White);
-        }
         
         private void UpdateProjectile(GameTime gameTime, float deltaTime)
         {
@@ -418,89 +398,5 @@ namespace monogame
             return baseRectangles;
         }
 
-
-        private Rectangle GetGingerRectangle(Direction direction, int animationIndex)
-        {
-            int frameWidth = 98;
-            int frameHeight = 85;
-
-            int row = direction switch
-            {
-                Direction.Up => 0,
-                Direction.Right => 1,
-                Direction.Down => 2,
-                Direction.Left => 3,
-                _ => 2
-            };
-
-            int column = animationIndex % 2;
-
-            return new Rectangle(column * frameWidth, row * frameHeight, frameWidth, frameHeight);
-        }
-
-
-        private Rectangle[] GetCurrentRectangleSushi()
-        {
-            int frameWidth = 110;
-            int frameHeight = 133;
-            int doubleWidth = frameWidth * 2;
-
-            Rectangle[] baseRectangles = currentDirectionSushi switch
-            {
-                Direction.Up => new Rectangle[]
-                {
-            isSushiAttacking
-                ? (useSushiAttackFrame
-                    ? new Rectangle(frameWidth * 4, 0, frameWidth, frameHeight)
-                    : new Rectangle(frameWidth * 5, 0, doubleWidth, frameHeight))
-                : new Rectangle(0, 0, frameWidth, frameHeight),
-            new Rectangle(frameWidth, 0, frameWidth, frameHeight),
-            new Rectangle(frameWidth * 2, 0, frameWidth, frameHeight)
-                },
-                Direction.Down => new Rectangle[]
-                {
-            isSushiAttacking
-                ? (useSushiAttackFrame
-                    ? new Rectangle(frameWidth * 4, frameHeight * 2, frameWidth, frameHeight)
-                    : new Rectangle(frameWidth * 5, frameHeight * 2, doubleWidth, frameHeight))
-                : new Rectangle(0, frameHeight * 2, frameWidth, frameHeight),
-            new Rectangle(frameWidth, frameHeight * 2, frameWidth, frameHeight),
-            new Rectangle(frameWidth * 2, frameHeight * 2, frameWidth, frameHeight)
-                },
-                Direction.Left => new Rectangle[]
-                {
-            isSushiAttacking
-                ? (useSushiAttackFrame
-                    ? new Rectangle(frameWidth * 4, frameHeight * 3, frameWidth, frameHeight)
-                    : new Rectangle(frameWidth * 5, frameHeight * 3, doubleWidth, frameHeight))
-                : new Rectangle(0, frameHeight * 3, frameWidth, frameHeight),
-            new Rectangle(frameWidth, frameHeight * 3, frameWidth, frameHeight),
-            new Rectangle(frameWidth * 2, frameHeight * 3, frameWidth, frameHeight)
-                },
-                Direction.Right => new Rectangle[]
-                {
-            isSushiAttacking
-                ? (useSushiAttackFrame
-                    ? new Rectangle(frameWidth * 4, frameHeight, frameWidth, frameHeight)
-                    : new Rectangle(frameWidth * 5, frameHeight, doubleWidth, frameHeight))
-                : new Rectangle(0, frameHeight, frameWidth, frameHeight),
-            new Rectangle(frameWidth, frameHeight, frameWidth, frameHeight),
-            new Rectangle(frameWidth * 2, frameHeight, frameWidth, frameHeight)
-                },
-                _ => new Rectangle[]
-                {
-            new Rectangle(0, frameHeight, frameWidth, frameHeight),
-            new Rectangle(frameWidth, frameHeight, frameWidth, frameHeight),
-            new Rectangle(frameWidth * 2, frameHeight, frameWidth, frameHeight)
-                },
-            };
-
-            if (useBlinkingFrame && !isSushiAttacking)
-            {
-                baseRectangles[2] = new Rectangle(frameWidth * 3, baseRectangles[2].Y, frameWidth, frameHeight); // Blinking frame
-            }
-
-            return baseRectangles;
-        }
     }
 }

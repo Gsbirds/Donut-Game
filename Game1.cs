@@ -143,7 +143,6 @@ namespace monogame
         {
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
             
-            // Handle game over screen update
             if (gameOverScreen.IsActive)
             {
                 gameOverScreen.Update(deltaTime);
