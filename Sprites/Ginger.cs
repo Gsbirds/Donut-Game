@@ -97,14 +97,17 @@ namespace monogame.Sprites
             
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
             
-            UpdateAttack(deltaTime);
-            UpdateMovement(deltaTime);
-            UpdateAnimation(deltaTime, gameTime);
-            
+            // Check if Ginger is defeated before processing any movement or animations
             if (currentHealth <= 0)
             {
                 isDefeated = true;
+                isAttacking = false;
+                return; // Skip all other logic
             }
+            
+            UpdateAttack(deltaTime);
+            UpdateMovement(deltaTime);
+            UpdateAnimation(deltaTime, gameTime);
         }
         
         private void UpdateAttack(float deltaTime)

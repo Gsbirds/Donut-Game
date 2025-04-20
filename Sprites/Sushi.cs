@@ -66,6 +66,13 @@ namespace monogame.Sprites
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
             
             base.Update(gameTime);
+            
+            if (currentHealth <= 0)
+            {
+                isDefeated = true;
+                isAttacking = false;
+                return;
+            }
 
             if (isAttacking)
             {
@@ -191,7 +198,19 @@ namespace monogame.Sprites
                 currentFrame = animations[(int)facingDirection].GetCurrentFrame();
             }
             
-            Color spriteColor = isInvulnerable && (int)(invulnerabilityTimer * 10) % 2 == 0 ? Color.Red : Color.White;
+            Color spriteColor;
+            if (isDefeated || currentHealth <= 0)
+            {
+                spriteColor = Color.Gray;
+            }
+            else if (isInvulnerable && (int)(invulnerabilityTimer * 10) % 2 == 0)
+            {
+                spriteColor = Color.Red;
+            }
+            else
+            {
+                spriteColor = Color.White;
+            }
             
             Vector2 origin = new Vector2(currentFrame.Width / 2, currentFrame.Height / 2);
             
