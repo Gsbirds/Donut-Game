@@ -194,11 +194,11 @@ namespace monogame
                 0f
             );
 
-            donut.Draw(_spriteBatch);
-
             sushiSprite.Draw(_spriteBatch);
             gingerSprite.Draw(_spriteBatch);
-
+            
+            donut.Draw(_spriteBatch);
+            
             if (cheeseProjectile.IsActive)
             {
                 _spriteBatch.Draw(

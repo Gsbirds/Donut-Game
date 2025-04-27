@@ -389,9 +389,10 @@ namespace monogame
                 0f
             );
 
-            donut.Draw(_spriteBatch);
             nachoSprite.Draw(_spriteBatch);
             empanadaSprite.Draw(_spriteBatch);
+            
+            donut.Draw(_spriteBatch);
 
             if (cheeseProjectile.IsActive)
             {
