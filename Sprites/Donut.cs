@@ -160,8 +160,8 @@ namespace monogame.Sprites
             Rectangle currentFrame = GetCurrentFrame();
             
             Vector2 origin;
-            
-            if (isAttacking && attackTimer <= AttackDuration && currentDirection != Direction.Up)
+            if (isAttacking && attackTimer <= AttackDuration && 
+                (currentDirection == Direction.Left || currentDirection == Direction.Right))
             {
                 origin = new Vector2(192 / 2, 128 / 2);
             }
@@ -253,7 +253,7 @@ namespace monogame.Sprites
                     Direction.Up => new Rectangle(288, 0, frameWidth, frameHeight),
                     Direction.Down => new Rectangle(288, 256, frameWidth, frameHeight),
                     Direction.Left => new Rectangle(288, 384, frameWidth, frameHeight),
-                    Direction.Right => new Rectangle(288, 128, frameWidth, frameHeight),
+                    Direction.Right => new Rectangle(288, 118, frameWidth, frameHeight),
                     _ => new Rectangle(288, 128, frameWidth, frameHeight)
                 };
             }
@@ -264,22 +264,22 @@ namespace monogame.Sprites
                 {
                     return currentDirection switch
                     {
-                        Direction.Up => new Rectangle(80, 0, frameWidth, frameHeight),
-                        Direction.Down => new Rectangle(480, 256, doubleWidth, frameHeight),
+                        Direction.Up => new Rectangle(100, 0, frameWidth, frameHeight),
+                        Direction.Down => new Rectangle(520, 256, frameWidth, frameHeight),
                         Direction.Left => new Rectangle(480, 384, doubleWidth, frameHeight),
-                        Direction.Right => new Rectangle(480, 128, doubleWidth, frameHeight),
-                        _ => new Rectangle(480, 128, doubleWidth, frameHeight)
+                        Direction.Right => new Rectangle(488, 128, doubleWidth, frameHeight),
+                        _ => new Rectangle(490, 128, doubleWidth, frameHeight)
                     };
                 }
                 else
                 {
                     return currentDirection switch
                     {
-                        Direction.Up => new Rectangle(384, 0, frameWidth, frameHeight),
-                        Direction.Down => new Rectangle(384, 256, frameWidth, frameHeight),
+                        Direction.Up => new Rectangle(404, 0, frameWidth, frameHeight),
+                        Direction.Down => new Rectangle(394, 256, frameWidth, frameHeight),
                         Direction.Left => new Rectangle(384, 384, frameWidth, frameHeight),
-                        Direction.Right => new Rectangle(384, 128, frameWidth, frameHeight),
-                        _ => new Rectangle(384, 128, frameWidth, frameHeight)
+                        Direction.Right => new Rectangle(404, 128, frameWidth, frameHeight),
+                        _ => new Rectangle(404, 128, frameWidth, frameHeight)
                     };
                 }
             }
