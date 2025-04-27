@@ -29,6 +29,10 @@ namespace monogame
         private Rectangle[] rightRectangles;
         private int doubleWidth = 192;
 
+        private float nachoHitFrameTimer = 0f;
+        private const float NachoHitFrameDuration = .65f;
+        private bool isNachoHitActive = false;
+
         private Projectile cheeseProjectile;
         private float projectileCooldownTimer = 0f;
         private const float ProjectileCooldown = 5f;
@@ -242,20 +246,29 @@ namespace monogame
             float donutNachoDistance = Vector2.Distance(donut.Position, nachoSprite.Position);
             float donutEmpanadaDistance = Vector2.Distance(donut.Position, empanadaSprite.Position);
 
+            if (isNachoHitActive)
+            {
+                nachoHitFrameTimer -= deltaTime;
+                if (nachoHitFrameTimer <= 0)
+                {
+                    nachoHitFrameTimer = 0;
+                    isNachoHitActive = false;
+                    nachoSprite.SetPostHitFrame(false);
+                }
+            }
+            
             if (donutNachoDistance < 70 && mouseState.LeftButton == ButtonState.Pressed && previousMouseState.LeftButton != ButtonState.Pressed)
             {
                 nachoSprite.SetPostHitFrame(true);
                 nachoSprite.TakeDamage(20f);
+                isNachoHitActive = true;
+                nachoHitFrameTimer = NachoHitFrameDuration;
                 
                 if (nachoSprite.Health <= 0 && empanadaSprite.Health <= 0)
                 {
                     _mainGame.SwitchGameState(MainGame.GameStateType.Game2);
                     return;
                 }
-            }
-            else
-            {
-                nachoSprite.SetPostHitFrame(false);
             }
             
             if (donutEmpanadaDistance < 70 && mouseState.LeftButton == ButtonState.Pressed && previousMouseState.LeftButton != ButtonState.Pressed)
