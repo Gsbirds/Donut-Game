@@ -207,8 +207,8 @@ namespace monogame.Sprites
                 {
                     Direction.Up => new Rectangle[]
                     {
-                        new Rectangle(frameWidth * 4, 0, attackFrameWidth, frameHeight),
-                        new Rectangle(frameWidth * 4 + attackFrameWidth, 0, attackFrameWidth, frameHeight)
+                        new Rectangle(frameWidth * 4 - 35, 0, attackFrameWidth, frameHeight),
+                        new Rectangle(frameWidth * 4 + attackFrameWidth - 35, 0, attackFrameWidth, frameHeight)
                     },
                     Direction.Down => new Rectangle[]
                     {
@@ -217,13 +217,13 @@ namespace monogame.Sprites
                     },
                     Direction.Left => new Rectangle[]
                     {
-                        new Rectangle(frameWidth * 4, frameHeight * 3, attackFrameWidth, frameHeight),
-                        new Rectangle(frameWidth * 4 + attackFrameWidth, frameHeight * 3, attackFrameWidth, frameHeight)
+                        new Rectangle(frameWidth * 4 + 20, frameHeight * 3, attackFrameWidth, frameHeight),
+                        new Rectangle(frameWidth * 4 + attackFrameWidth + 20, frameHeight * 3, attackFrameWidth, frameHeight)
                     },
                     Direction.Right => new Rectangle[]
                     {
-                        new Rectangle(frameWidth * 4, frameHeight, attackFrameWidth, frameHeight),
-                        new Rectangle(frameWidth * 4 + attackFrameWidth, frameHeight, attackFrameWidth, frameHeight)
+                        new Rectangle(frameWidth * 4 - 20, frameHeight, attackFrameWidth, frameHeight),
+                        new Rectangle(frameWidth * 4 + attackFrameWidth - 20, frameHeight, attackFrameWidth, frameHeight)
                     },
                     _ => new Rectangle[]
                     {
