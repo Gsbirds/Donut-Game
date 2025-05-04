@@ -148,6 +148,17 @@ namespace monogame.Sprites
             useOpenMouthFrame = open;
         }
 
+        public override Rectangle GetBounds()
+        {
+            // Moderate collision boundary for Nacho
+            return new Rectangle(
+                (int)position.X - 15,   // Moderate size for collision
+                (int)position.Y - 18,
+                30,                    // Width that represents the character body
+                36                     // Height that represents the character body
+            );
+        }
+
         public override void Draw(SpriteBatch spriteBatch)
         {
             var currentRectangles = AnimationFrames.GetCurrentRectanglesNacho(

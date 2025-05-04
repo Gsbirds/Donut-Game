@@ -229,13 +229,13 @@ namespace monogame.Sprites
             DrawHealthBar(spriteBatch);
         }
 
-        public Rectangle GetBounds()
+        public override Rectangle GetBounds()
         {
             return new Rectangle(
-                (int)position.X - 48,
-                (int)position.Y - 64,
-                96,
-                128
+                (int)position.X - 15,
+                (int)position.Y - 18,
+                30,
+                36
             );
         }
     }

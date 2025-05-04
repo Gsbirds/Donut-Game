@@ -109,8 +109,8 @@ namespace monogame
             WhitePixel.SetData(new[] { Color.White });
 
 
-            donut = new Donut(charaset, new Vector2(_graphicsDevice.Viewport.Width - 96, _graphicsDevice.Viewport.Height - 128), 100f);
-            nachoSprite = new Nacho(nacho, nachoOpenMouthTexture, new Vector2(100, 100), 40f);
+            donut = new Donut(charaset, new Vector2(_graphicsDevice.Viewport.Width - 96, _graphicsDevice.Viewport.Height - 128), 160f);
+            nachoSprite = new Nacho(nacho, nachoOpenMouthTexture, new Vector2(100, 100), 80f);
             empanadaSprite = new Empanada(empanada, new Vector2(200, 200), 60f);
             cheeseProjectile = new Projectile(cheeseLaunch, new Vector2(0, 0), 400f);
             cheeseProjectile.Reset();
@@ -166,7 +166,12 @@ namespace monogame
             
             donut.Update(gameTime);
             nachoSprite.Update(gameTime);
+            empanadaSprite.Update(deltaTime, donut.Position, nachoSprite.Position);
             
+            Sprite.ResolveCollision(donut, nachoSprite);
+            Sprite.ResolveCollision(donut, empanadaSprite);
+            Sprite.ResolveCollision(nachoSprite, empanadaSprite);
+
             Vector2 donutPos = donut.Position;
             float distanceToDonut = Vector2.Distance(empanadaSprite.Position, donutPos);
 
@@ -174,7 +179,6 @@ namespace monogame
             {
                 empanadaSprite.StartAttack();
             }
-            empanadaSprite.Update(deltaTime, donutPos, nachoSprite.Position);
 
             Vector2 nachoToEmpanada = empanadaSprite.Position - nachoSprite.Position;
             if (nachoToEmpanada.Length() < MinDistanceBetweenNachoAndEmpanada)

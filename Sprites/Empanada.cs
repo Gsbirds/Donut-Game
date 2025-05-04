@@ -22,7 +22,7 @@ namespace monogame.Sprites
         private const float AnimationThreshold = 300f;
         private const float MinDistanceFromNacho = 170f;
         private const float AttackRange = 20f; 
-        private const float AttackDamage = 10.0f; // Significantly increased damage 
+        private const float AttackDamage = 10.0f;
         private Vector2 targetPosition;
         private Vector2 nachoPosition;
         private float halfScreenHeight;
@@ -275,11 +275,10 @@ namespace monogame.Sprites
             
             Rectangle currentFrame = frames[frameIndex];
 
-            // Use a darker/grayed out color when defeated
             Color spriteColor;
             if (currentHealth <= 0)
             {
-                spriteColor = Color.Gray; // Gray tint for defeated state
+                spriteColor = Color.Gray;
             }
             else
             {
@@ -303,6 +302,16 @@ namespace monogame.Sprites
             );
             
             DrawHealthBar(spriteBatch);
+        }
+
+        public override Rectangle GetBounds()
+        {
+            return new Rectangle(
+                (int)position.X - 15, 
+                (int)position.Y - 18,
+                30,                    
+                36                     
+            );
         }
 
         public override void Update(GameTime gameTime)

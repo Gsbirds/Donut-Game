@@ -355,6 +355,17 @@ namespace monogame.Sprites
             
             return damageDealt;
         }
+        
+
+        public override Rectangle GetBounds()
+        {
+            return new Rectangle(
+                (int)position.X - 14,
+                (int)position.Y - 18,
+                28,
+                36              
+            );
+        }
 
 
     }

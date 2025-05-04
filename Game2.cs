@@ -78,9 +78,9 @@ namespace monogame
             
             font = _mainGame.Content.Load<SpriteFont>("DefaultFont1");
             
-            donut = new Donut(donutTexture, new Vector2(_graphicsDevice.Viewport.Width - 96, _graphicsDevice.Viewport.Height - 128), 100f);
-            sushiSprite = new Sushi(sushiTexture, new Vector2(200, 200), 60f);
-            gingerSprite = new Ginger(gingerTexture, new Vector2(100, 100), 40f);
+            donut = new Donut(donutTexture, new Vector2(_graphicsDevice.Viewport.Width - 96, _graphicsDevice.Viewport.Height - 128), 160f);
+            sushiSprite = new Sushi(sushiTexture, new Vector2(200, 200), 120f);
+            gingerSprite = new Ginger(gingerTexture, new Vector2(100, 100), 70f);
             
             Texture2D cheeseTexture = _mainGame.Content.Load<Texture2D>("cheeselaunch");
             Texture2D cheeseSplashTexture = _mainGame.Content.Load<Texture2D>("splashcheese");
@@ -107,26 +107,18 @@ namespace monogame
         {
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
             
-            if (gameOverScreen.IsActive)
+            if (gameOverScreen != null && gameOverScreen.IsActive)
             {
                 gameOverScreen.Update(deltaTime);
                 return;
             }
-            
-            donut.Update(gameTime);
-            if (donut.Health <= 0)
+            else if (donut.Health <= 0)
             {
-                gameOverScreen.Activate();
+                if (gameOverScreen != null)
+                    gameOverScreen.Activate();
                 return;
             }
-            
-            sushiSprite.SetTargetPosition(donut.Position);
-            sushiSprite.Update(gameTime);
-            
-            gingerSprite.SetTargetPosition(donut.Position);
-            gingerSprite.Update(gameTime);
-
-            if (sushiSprite.Health <= 0 && gingerSprite.Health <= 0)
+            else if (sushiSprite.Health <= 0 && gingerSprite.Health <= 0)
             {
                 _mainGame.SwitchGameState(MainGame.GameStateType.Game1);
                 return;
@@ -140,6 +132,13 @@ namespace monogame
             gingerSprite.SetTargetPosition(donutPos);
             sushiSprite.Update(gameTime);
             gingerSprite.Update(gameTime);
+            
+            // Check and resolve collisions between Donut and other sprites
+            if (donut.CollidesWith(sushiSprite))
+                Sprite.ResolveCollision(donut, sushiSprite);
+                
+            if (donut.CollidesWith(gingerSprite))
+                Sprite.ResolveCollision(donut, gingerSprite);
             
             Vector2 sushiToGinger = gingerSprite.Position - sushiSprite.Position;
             if (sushiToGinger.Length() < minDistanceBetweenSushiAndGinger)
