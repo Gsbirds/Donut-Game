@@ -54,11 +54,12 @@ namespace monogame
         private Texture2D churroTree;
         public static Texture2D WhitePixel;
 
-        private Texture2D[] pipes;
+        private Texture2D pipeTexture;
         private Vector2[] pipePositions;
         private int[] currentPipeFrameIndices;
         private float[] pipeAnimationTimers;
-        private float pipeFrameDuration = 0.2f;
+        private float pipeFrameDuration = 0.5f; // Slowed down animation
+        private Rectangle[] pipeSourceRectangles;
         private Texture2D puprmushSpritesheet;
         private Rectangle[] puprmushFrames;
         private int currentPuprmushFrame;
@@ -102,7 +103,7 @@ namespace monogame
             background = _mainGame.Content.Load<Texture2D>("pink_purp_background");
             weed = _mainGame.Content.Load<Texture2D>("weed");
             churroTree = _mainGame.Content.Load<Texture2D>("churroTree");
-            pipe = _mainGame.Content.Load<Texture2D>("pipe2");
+            pipeTexture = _mainGame.Content.Load<Texture2D>("pipe2");
             puprmushSpritesheet = _mainGame.Content.Load<Texture2D>("Puprmush");
 
             WhitePixel = new Texture2D(_graphicsDevice, 1, 1);
@@ -119,16 +120,29 @@ namespace monogame
                 donut.TakeDamage(10f);
             };
 
-            pipes = new Texture2D[3];
-            pipes[0] = pipe;
-            pipes[1] = pipe;
-            pipes[2] = pipe;
-            pipePositions = new Vector2[3];
-            pipePositions[0] = new Vector2(50, 125);
-            pipePositions[1] = new Vector2(700, 350);
-            pipePositions[2] = new Vector2(150, 600);
-            currentPipeFrameIndices = new int[3];
-            pipeAnimationTimers = new float[3];
+            pipeSourceRectangles = new Rectangle[3];
+            int pipeWidth = pipeTexture.Width / 3;
+            int pipeHeight = pipeTexture.Height;
+            for (int i = 0; i < 3; i++)
+            {
+                pipeSourceRectangles[i] = new Rectangle(i * pipeWidth, 0, pipeWidth, pipeHeight);
+            }
+            
+            pipePositions = new Vector2[2];
+            
+            Vector2 centerPosition = new Vector2(
+                _graphicsDevice.Viewport.Width / 2 + 20,
+                _graphicsDevice.Viewport.Height / 2 - 70
+            );
+            
+            int distance = 105;
+            int y = (int)centerPosition.Y + 50;
+            
+            pipePositions[0] = new Vector2(centerPosition.X - distance, y);
+            pipePositions[1] = new Vector2(centerPosition.X + distance, y);
+            
+            currentPipeFrameIndices = new int[2];
+            pipeAnimationTimers = new float[2];
 
             int frameWidth = puprmushSpritesheet.Width / 5;
             int frameHeight = puprmushSpritesheet.Height;
@@ -187,7 +201,7 @@ namespace monogame
                 nachoSprite.Position = empanadaSprite.Position - separation;
             }
 
-            for (int i = 0; i < pipes.Length; i++)
+            for (int i = 0; i < pipePositions.Length; i++)
             {
                 pipeAnimationTimers[i] += deltaTime;
                 if (pipeAnimationTimers[i] >= pipeFrameDuration)
@@ -341,11 +355,21 @@ namespace monogame
                 puprmushFrameTimer = 0f;
                 currentPuprmushFrame = (currentPuprmushFrame + 1) % puprmushFrames.Length;
             }
+
+            // Update pipe animations
+            for (int i = 0; i < pipePositions.Length; i++)
+            {
+                pipeAnimationTimers[i] += deltaTime;
+                if (pipeAnimationTimers[i] >= pipeFrameDuration)
+                {
+                    pipeAnimationTimers[i] = 0f;
+                    currentPipeFrameIndices[i] = (currentPipeFrameIndices[i] + 1) % pipeSourceRectangles.Length;
+                }
+            }
         }
 
         public void Draw(GameTime gameTime)
         {
-            // Draw game over screen if active
             if (gameOverScreen.IsActive)
             {
                 gameOverScreen.Draw(_spriteBatch);
@@ -392,6 +416,21 @@ namespace monogame
                 SpriteEffects.None,
                 0f
             );
+
+            for (int i = 0; i < pipePositions.Length; i++)
+            {
+                _spriteBatch.Draw(
+                    pipeTexture,
+                    pipePositions[i],
+                    pipeSourceRectangles[currentPipeFrameIndices[i]],
+                    Color.White,
+                    0f,
+                    new Vector2(pipeSourceRectangles[0].Width / 2, pipeSourceRectangles[0].Height / 2),
+                    1.0f,
+                    SpriteEffects.None,
+                    0f
+                );
+            }
 
             nachoSprite.Draw(_spriteBatch);
             empanadaSprite.Draw(_spriteBatch);
