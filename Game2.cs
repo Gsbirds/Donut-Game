@@ -41,8 +41,6 @@ namespace monogame
         private float splashTimer = 0f;
         private const float SPLASH_DURATION = 0.5f;
         private MouseState previousMouseState;
-
-        private Direction currentDirection = Direction.Down;
         private SpriteBatch _spriteBatch;
         private GraphicsDevice _graphicsDevice;
         private MainGame _mainGame;
@@ -53,15 +51,6 @@ namespace monogame
         private const float PuprmushFrameDuration = 0.2f;
         
         private GameOverScreen gameOverScreen;
-        
-        private bool isSpacebarAnimationActive = false;
-        private bool useSpacebarFrame = false;
-        private bool useBlinkingFrame = false;
-        private int doubleWidth = 96 * 2;
-        
-        private Direction currentDirectionSushi = Direction.Down;
-        private bool isSushiAttacking = false;
-        private bool useSushiAttackFrame = false;
 
         public Game2(MainGame mainGame, SpriteBatch spriteBatch)
         {
@@ -70,12 +59,11 @@ namespace monogame
             _graphicsDevice = mainGame.GraphicsDevice;
             
             previousMouseState = Mouse.GetState();
-            currentDirection = Direction.Down;
         }
 
         public void LoadContent()
         {
-            donutTexture = _mainGame.Content.Load<Texture2D>("donutsprites20");
+            donutTexture = _mainGame.Content.Load<Texture2D>("donutspritesnew");
             sushiTexture = _mainGame.Content.Load<Texture2D>("sushisprites10");
             gingerTexture = _mainGame.Content.Load<Texture2D>("gingersprites4");
             sushiWallpaper = _mainGame.Content.Load<Texture2D>("sushilevelsetting");
@@ -90,7 +78,6 @@ namespace monogame
             Texture2D cheeseTexture = _mainGame.Content.Load<Texture2D>("cheeselaunch");
             Texture2D cheeseSplashTexture = _mainGame.Content.Load<Texture2D>("splashcheese");
             
-            // Set up animation frames
             int frameWidth = puprmushSpritesheet.Width / 5;
             int frameHeight2 = puprmushSpritesheet.Height; 
             puprmushFrames = new Rectangle[5];
@@ -101,8 +88,12 @@ namespace monogame
             currentPuprmushFrame = 0;
             puprmushFrameTimer = 0f;
             
-            // Create game objects in the correct order
             donut = new Donut(donutTexture, new Vector2(_graphicsDevice.Viewport.Width - 96, _graphicsDevice.Viewport.Height - 128), 160f);
+            donut.SetInGame2(true);
+            if (_mainGame.HasPickedUpAxe)
+            {
+                donut.PickupAxe();
+            }
             sushiSprite = new Sushi(sushiTexture, new Vector2(200, 200), 120f);
             gingerSprite = new Ginger(gingerTexture, new Vector2(100, 100), 70f);
             cheeseProjectile = new CheeseProjectile(cheeseTexture, cheeseSplashTexture);

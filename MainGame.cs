@@ -22,6 +22,8 @@ namespace monogame
         public bool IsColorEffectActive { get; set; } = false;
         public int ColorButtonIndex { get; set; } = 0;
 
+        public bool HasPickedUpAxe { get; set; } = false;
+
         public enum GameStateType
         {
             MainMenu,

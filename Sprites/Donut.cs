@@ -20,6 +20,12 @@ namespace monogame.Sprites
         private bool isAttacking;
         private float attackTimer;
         private const float AttackDuration = 0.5f;
+        
+        public bool HasAxe { get; private set; } = false;
+        public bool InGame2 { get; private set; } = false;
+        
+        public void PickupAxe() { HasAxe = true; }
+        public void SetInGame2(bool inGame2) { InGame2 = inGame2; }
         private const float SecondFrameDuration = 0.8f;
         private float animationTimer;
         private byte currentAnimationIndex;
@@ -168,9 +174,6 @@ namespace monogame.Sprites
             Draw(spriteBatch, Color.White);
         }
 
-        /// <summary>
-        /// Sets the donut color and returns the previous color
-        /// </summary>
         public DonutColor SetColor(DonutColor newColor)
         {
             DonutColor oldColor = currentColor;
@@ -185,7 +188,6 @@ namespace monogame.Sprites
         
         public DonutColor CycleToNextColor()
         {
-            // Get the next color in the sequence
             int colorCount = Enum.GetValues(typeof(DonutColor)).Length;
             int nextColorIndex = ((int)currentColor + 1) % colorCount;
             currentColor = (DonutColor)nextColorIndex;
@@ -327,6 +329,20 @@ namespace monogame.Sprites
             int frameWidth = 96;
             int frameHeight = 128;
             int doubleWidth = 192;
+            
+            if (InGame2 && HasAxe && isAttacking)
+            {
+                int frameX = attackTimer <= AttackDuration / 2 ? 768 : 864;
+                
+                return currentDirection switch
+                {
+                    Direction.Up => new Rectangle(frameX, 0, frameWidth, frameHeight),
+                    Direction.Down => new Rectangle(frameX, 256, frameWidth, frameHeight),
+                    Direction.Left => new Rectangle(frameX, 384, frameWidth, frameHeight),
+                    Direction.Right => new Rectangle(frameX, 128, frameWidth, frameHeight),
+                    _ => new Rectangle(frameX, 128, frameWidth, frameHeight)
+                };
+            }
 
             if (isJumping)
             {

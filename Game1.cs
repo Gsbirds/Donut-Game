@@ -60,7 +60,7 @@ namespace monogame
         private Vector2[] pipePositions;
         private int[] currentPipeFrameIndices;
         private float[] pipeAnimationTimers;
-        private float pipeFrameDuration = 0.5f; // Slowed down animation
+        private float pipeFrameDuration = 0.5f;
         private Rectangle[] pipeSourceRectangles;
         private Texture2D puprmushSpritesheet;
         private Rectangle[] puprmushFrames;
@@ -71,6 +71,10 @@ namespace monogame
         private Button pinkDonutButton;
         private Texture2D buttonTexture;
         
+        private bool enemiesDefeated = false;
+        private bool axePickedUp = false;
+        private Texture2D axeTexture;
+        private Axe axeSprite;
 
         private float puprmushFrameTimer;
         private const float PuprmushFrameDuration = 0.4f;
@@ -97,12 +101,10 @@ namespace monogame
 
         public void LoadContent()
         {
-
-
             previousMouseState = Mouse.GetState();
             
-            // First load all content
-            charaset = _mainGame.Content.Load<Texture2D>("donutsprites20");
+            charaset = _mainGame.Content.Load<Texture2D>("donutspritesnew");
+            axeTexture = _mainGame.Content.Load<Texture2D>("Axe");
             nacho = _mainGame.Content.Load<Texture2D>("nachosprites4");
             font = _mainGame.Content.Load<SpriteFont>("DefaultFont1");
             cheeseLaunch = _mainGame.Content.Load<Texture2D>("cheeselaunch");
@@ -120,13 +122,14 @@ namespace monogame
             WhitePixel = new Texture2D(_graphicsDevice, 1, 1);
             WhitePixel.SetData(new[] { Color.White });
 
-            // Then create button
             buttonTexture = new Texture2D(_graphicsDevice, 1, 1);
             Color[] colorData = new Color[1];
             colorData[0] = Color.White;
             buttonTexture.SetData(colorData);
             
             donut = new Donut(charaset, new Vector2(_graphicsDevice.Viewport.Width - 96, _graphicsDevice.Viewport.Height - 128), 160f);
+            
+            axeSprite = new Axe(axeTexture, new Vector2(_graphicsDevice.Viewport.Width / 2, _graphicsDevice.Viewport.Height / 2));
             
             pinkDonutButton = new Button(
                 new Rectangle(20, 20, 150, 40),
@@ -231,11 +234,7 @@ namespace monogame
                 return;
             }
 
-            else if (nachoSprite.Health <= 0 && empanadaSprite.Health <= 0)
-            {
-                _mainGame.SwitchGameState(MainGame.GameStateType.Game2);
-                return;
-            }
+            axeSprite.Update(gameTime);
             
             donut.Update(gameTime);
             nachoSprite.Update(gameTime);
@@ -319,6 +318,7 @@ namespace monogame
             }
 
             var mouseState = Mouse.GetState();
+            bool mouseJustClicked = mouseState.LeftButton == ButtonState.Pressed && previousMouseState.LeftButton != ButtonState.Pressed;
             
             float donutNachoDistance = Vector2.Distance(donut.Position, nachoSprite.Position);
             float donutEmpanadaDistance = Vector2.Distance(donut.Position, empanadaSprite.Position);
@@ -334,29 +334,37 @@ namespace monogame
                 }
             }
             
-            if (donutNachoDistance < 70 && mouseState.LeftButton == ButtonState.Pressed && previousMouseState.LeftButton != ButtonState.Pressed)
-            {
-                nachoSprite.SetPostHitFrame(true);
-                nachoSprite.TakeDamage(20f);
-                isNachoHitActive = true;
-                nachoHitFrameTimer = NachoHitFrameDuration;
-                
-                if (nachoSprite.Health <= 0 && empanadaSprite.Health <= 0)
+            if (mouseJustClicked)
+            {   
+                if (enemiesDefeated && !axePickedUp && axeSprite.CheckPickup(donut))
                 {
-                    _mainGame.SwitchGameState(MainGame.GameStateType.Game2);
-                    return;
+                    axePickedUp = true;
+                    _mainGame.HasPickedUpAxe = true;
+                    donut.PickupAxe();
+                }
+                else if (donutNachoDistance < 70 && nachoSprite.Health > 0)
+                {
+                    nachoSprite.SetPostHitFrame(true);
+                    nachoSprite.TakeDamage(20f);
+                    isNachoHitActive = true;
+                    nachoHitFrameTimer = NachoHitFrameDuration;
+                }
+                else if (donutEmpanadaDistance < 70 && empanadaSprite.Health > 0)
+                {
+                    empanadaSprite.TakeDamage(20f);
                 }
             }
             
-            if (donutEmpanadaDistance < 70 && mouseState.LeftButton == ButtonState.Pressed && previousMouseState.LeftButton != ButtonState.Pressed)
+            if (!enemiesDefeated && nachoSprite.Health <= 0 && empanadaSprite.Health <= 0)
             {
-                empanadaSprite.TakeDamage(20f);
-                
-                if (nachoSprite.Health <= 0 && empanadaSprite.Health <= 0)
-                {
-                    _mainGame.SwitchGameState(MainGame.GameStateType.Game2);
-                    return;
-                }
+                enemiesDefeated = true;
+                axeSprite.Show();
+            }
+            
+            if (enemiesDefeated && axePickedUp)
+            {
+                _mainGame.SwitchGameState(MainGame.GameStateType.Game2);
+                return;
             }
             
             previousMouseState = mouseState;
@@ -415,7 +423,6 @@ namespace monogame
                 currentPuprmushFrame = (currentPuprmushFrame + 1) % puprmushFrames.Length;
             }
 
-            // Update pipe animations
             for (int i = 0; i < pipePositions.Length; i++)
             {
                 pipeAnimationTimers[i] += deltaTime;
@@ -493,6 +500,8 @@ namespace monogame
 
             nachoSprite.Draw(_spriteBatch);
             empanadaSprite.Draw(_spriteBatch);
+            
+            axeSprite.Draw(_spriteBatch);
             
             donut.DrawWithColorReplacement(_spriteBatch);
 
