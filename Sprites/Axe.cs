@@ -8,10 +8,16 @@ namespace monogame.Sprites
     {
         private bool isVisible = false;
         private bool isPickedUp = false;
+        private bool isPlayingPickupAnimation = false;
         private float bobTimer = 0f;
         private const float BobFrequency = 2f;
         private const float BobAmplitude = 5f;
         private Vector2 originalPosition;
+        
+        private float pickupAnimationTimer = 0f;
+        private const float PICKUP_ANIMATION_DURATION = 1.5f;
+        private float rotationAngle = 0f;
+        private float scaleMultiplier = 1.0f;
         
         private Random random = new Random();
         private Vector2[] sparklePositions;
@@ -33,6 +39,7 @@ namespace monogame.Sprites
 
         public bool IsVisible => isVisible;
         public bool IsPickedUp => isPickedUp;
+        public bool IsPlayingPickupAnimation => isPlayingPickupAnimation;
 
         public Axe(Texture2D texture, Vector2 position)
             : base(texture, position, 0f)
@@ -80,15 +87,51 @@ namespace monogame.Sprites
         
         private void PickUp()
         {
-            isVisible = false;
-            isPickedUp = true;
+            isPlayingPickupAnimation = true;
+            pickupAnimationTimer = 0f;
+            rotationAngle = 0f;
+            scaleMultiplier = 1.0f;
         }
         
         public override void Update(GameTime gameTime)
         {
-            if (!isVisible || isPickedUp) return;
-            
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            
+            if (isPlayingPickupAnimation)
+            {
+                pickupAnimationTimer += deltaTime;
+                
+                float rotationSpeed = MathHelper.ToRadians(360) * (1.0f + pickupAnimationTimer * 2.0f);
+                rotationAngle += rotationSpeed * deltaTime;
+                
+                float animationProgress = pickupAnimationTimer / PICKUP_ANIMATION_DURATION;
+                
+                if (animationProgress < 0.5f)
+                {
+                    scaleMultiplier = 1.0f + animationProgress * 1.0f;
+                }
+                else
+                {
+                    scaleMultiplier = 2.0f - (animationProgress - 0.5f) * 3.0f;
+                }
+                
+                for (int i = 0; i < SPARKLE_COUNT; i++)
+                {
+                    sparkleTimers[i] += deltaTime * SPARKLE_SPEED * 2.0f;
+                    sparkleAngles[i] += deltaTime * 3.0f;
+                }
+                
+                if (pickupAnimationTimer >= PICKUP_ANIMATION_DURATION)
+                {
+                    isPlayingPickupAnimation = false;
+                    isVisible = false;
+                    isPickedUp = true;
+                }
+                
+                return;
+            }
+            
+            if (!isVisible || isPickedUp) return;
             
             bobTimer += deltaTime;
             float bobOffset = (float)Math.Sin(bobTimer * BobFrequency) * BobAmplitude;
@@ -108,21 +151,45 @@ namespace monogame.Sprites
         
         public override void Draw(SpriteBatch spriteBatch)
         {
-            if (!isVisible || isPickedUp) return;
+            if ((!isVisible && !isPlayingPickupAnimation) || (isPickedUp && !isPlayingPickupAnimation)) return;
             
-            spriteBatch.Draw(
-                texture,
-                position,
-                null,
-                Color.White,
-                0f,
-                new Vector2(texture.Width / 2, texture.Height / 2),
-                0.375f,
-                SpriteEffects.None,
-                0f
-            );
-            
-            DrawSparkles(spriteBatch);
+            if (isPlayingPickupAnimation)
+            {
+                float scale = 0.375f * scaleMultiplier;
+                
+                byte colorPulse = (byte)(155 + 100 * Math.Sin(pickupAnimationTimer * 15));
+                Color pulsingColor = new Color(colorPulse, colorPulse, (byte)255, (byte)255);
+                
+                spriteBatch.Draw(
+                    texture,
+                    position,
+                    null,
+                    pulsingColor,
+                    rotationAngle, // Apply rotation
+                    new Vector2(texture.Width / 2, texture.Height / 2),
+                    scale, // Apply scaling
+                    SpriteEffects.None,
+                    0f
+                );
+                
+                DrawSparklesDuringAnimation(spriteBatch);
+            }
+            else // Normal drawing
+            {
+                spriteBatch.Draw(
+                    texture,
+                    position,
+                    null,
+                    Color.White,
+                    0f,
+                    new Vector2(texture.Width / 2, texture.Height / 2),
+                    0.375f,
+                    SpriteEffects.None,
+                    0f
+                );
+                
+                DrawSparkles(spriteBatch);
+            }
         }
         
         private void DrawSparkles(SpriteBatch spriteBatch)
@@ -144,6 +211,32 @@ namespace monogame.Sprites
                     (byte)(sparkleColors[i].A * twinkleAlpha));
                 
                 DrawStar(spriteBatch, globalPos, sparkleAngles[i], finalScale, adjustedColor);
+            }
+        }
+        
+        private void DrawSparklesDuringAnimation(SpriteBatch spriteBatch)
+        {
+            for (int i = 0; i < SPARKLE_COUNT; i++)
+            {
+                Vector2 offset = sparklePositions[i];
+                
+                float rotatedX = offset.X * (float)Math.Cos(rotationAngle) - offset.Y * (float)Math.Sin(rotationAngle);
+                float rotatedY = offset.X * (float)Math.Sin(rotationAngle) + offset.Y * (float)Math.Cos(rotationAngle);
+                
+                Vector2 scaledOffset = new Vector2(rotatedX, rotatedY) * scaleMultiplier * 0.8f;
+                
+                Vector2 globalPos = position + scaledOffset;
+                
+                float pulseScale = 0.5f * (float)Math.Sin(sparkleTimers[i] * 4.0f) + 1.3f;
+                float finalScale = sparkleScales[i] * pulseScale * 1.2f;
+                
+                Color brightColor = new Color(
+                    (byte)Math.Min(255, sparkleColors[i].R + 50),
+                    (byte)Math.Min(255, sparkleColors[i].G + 50),
+                    (byte)Math.Min(255, sparkleColors[i].B + 80),
+                    sparkleColors[i].A);
+                
+                DrawStar(spriteBatch, globalPos, sparkleAngles[i] + rotationAngle * 0.5f, finalScale, brightColor);
             }
         }
         

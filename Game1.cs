@@ -338,7 +338,6 @@ namespace monogame
             {   
                 if (enemiesDefeated && !axePickedUp && axeSprite.CheckPickup(donut))
                 {
-                    axePickedUp = true;
                     _mainGame.HasPickedUpAxe = true;
                     donut.PickupAxe();
                 }
@@ -359,6 +358,16 @@ namespace monogame
             {
                 enemiesDefeated = true;
                 axeSprite.Show();
+            }
+            
+            if (enemiesDefeated && axeSprite.IsPlayingPickupAnimation)
+            {
+                return;
+            }
+            
+            if (enemiesDefeated && !axePickedUp && axeSprite.IsPickedUp)
+            {
+                axePickedUp = true;
             }
             
             if (enemiesDefeated && axePickedUp)
