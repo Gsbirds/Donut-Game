@@ -6,6 +6,8 @@ using Microsoft.Xna.Framework.Input;
 using monogame.Sprites;
 using monogame.Screens;
 using monogame.Animation;
+using monogame.UI;
+using monogame.Effects;
 
 namespace monogame
 {
@@ -24,6 +26,11 @@ namespace monogame
         private Texture2D mochiTree;
         private Texture2D puprmushSpritesheet;
         private SpriteFont font;
+        private bool isColorEffectActive = false;
+
+        
+        private Button pinkDonutButton;
+        private Texture2D buttonTexture;
         
         private float projectileCooldownTimer = 0f;
         private const float ProjectileCooldown = 2.0f;
@@ -36,7 +43,6 @@ namespace monogame
         private MouseState previousMouseState;
 
         private Direction currentDirection = Direction.Down;
-        private KeyboardState previousKeyboardState;
         private SpriteBatch _spriteBatch;
         private GraphicsDevice _graphicsDevice;
         private MainGame _mainGame;
@@ -101,11 +107,47 @@ namespace monogame
             puprmushFrameTimer = 0f;
             
             gameOverScreen = new GameOverScreen(_mainGame, _graphicsDevice, font);
+            
+            buttonTexture = new Texture2D(_graphicsDevice, 1, 1);
+            Color[] colorData = new Color[1];
+            colorData[0] = Color.White;
+            buttonTexture.SetData(colorData);
+            
+            pinkDonutButton = new Button(
+                new Rectangle(20, 20, 150, 40),
+                buttonTexture, 
+                font, 
+                "Pink Donut");
+            
+
         }
 
         public void Update(GameTime gameTime)
         {
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            
+            MouseState currentMouseState = Mouse.GetState();
+            pinkDonutButton.Update(currentMouseState);
+            
+            if (pinkDonutButton.IsClicked)
+            {
+                if (isColorEffectActive)
+                {
+                    pinkDonutButton.CycleToNextColor();
+                    donut.SetColor(pinkDonutButton.GetCurrentColor());
+                }
+                else
+                {
+                    isColorEffectActive = true;
+                    donut.SetColor(pinkDonutButton.GetCurrentColor());
+                }
+            }
+            
+            KeyboardState keyboardState = Keyboard.GetState();
+            if (keyboardState.IsKeyDown(Keys.P) && !previousMouseState.LeftButton.HasFlag(ButtonState.Pressed))
+            {
+                isColorEffectActive = !isColorEffectActive;
+            }
             
             if (gameOverScreen != null && gameOverScreen.IsActive)
             {
@@ -133,7 +175,6 @@ namespace monogame
             sushiSprite.Update(gameTime);
             gingerSprite.Update(gameTime);
             
-            // Check and resolve collisions between Donut and other sprites
             if (donut.CollidesWith(sushiSprite))
                 Sprite.ResolveCollision(donut, sushiSprite);
                 
@@ -168,12 +209,6 @@ namespace monogame
 
         public void Draw(GameTime gameTime)
         {
-            if (gameOverScreen.IsActive)
-            {
-                gameOverScreen.Draw(_spriteBatch);
-                return;
-            }
-            
             _graphicsDevice.Clear(Color.Black);
 
             _spriteBatch.Draw(sushiWallpaper, new Rectangle(0, 0, 850, 850), Color.White);
@@ -194,9 +229,9 @@ namespace monogame
             );
 
             sushiSprite.Draw(_spriteBatch);
-            gingerSprite.Draw(_spriteBatch);
+            donut.DrawWithColorReplacement(_spriteBatch);
             
-            donut.Draw(_spriteBatch);
+            gingerSprite.Draw(_spriteBatch);
             
             if (cheeseProjectile.IsActive)
             {
@@ -215,18 +250,24 @@ namespace monogame
 
             if (showSplashEffect)
             {
-                float scale = 1.0f - (splashTimer / SPLASH_DURATION);
                 _spriteBatch.Draw(
                     cheeseProjectile.SplashTexture,
                     splashPosition,
                     null,
-                    Color.White * (1.0f - (splashTimer / SPLASH_DURATION)),
+                    Color.White * (1.0f - splashTimer / SPLASH_DURATION),
                     0f,
                     new Vector2(cheeseProjectile.SplashTexture.Width / 2, cheeseProjectile.SplashTexture.Height / 2),
-                    scale,
+                    1.0f,
                     SpriteEffects.None,
-                    0
+                    0f
                 );
+            }
+            
+            pinkDonutButton.Draw(_spriteBatch);
+            
+            if (gameOverScreen.IsActive)
+            {
+                gameOverScreen.Draw(_spriteBatch);
             }
 
         }

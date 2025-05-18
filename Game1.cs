@@ -1,10 +1,12 @@
-﻿using System;
+using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using monogame.Sprites;
 using monogame.Animation;
 using monogame.Screens;
+using monogame.UI;
+using monogame.Effects;
 
 namespace monogame
 {
@@ -63,6 +65,13 @@ namespace monogame
         private Texture2D puprmushSpritesheet;
         private Rectangle[] puprmushFrames;
         private int currentPuprmushFrame;
+        
+        private bool isColorEffectActive = false;
+        private KeyboardState previousKeyboardState;
+        private Button pinkDonutButton;
+        private Texture2D buttonTexture;
+        
+
         private float puprmushFrameTimer;
         private const float PuprmushFrameDuration = 0.4f;
         private Vector2 sombreroPosition = new Vector2(300, 300);
@@ -77,7 +86,6 @@ namespace monogame
         private Texture2D empanada;
         private const float SPLASH_DURATION = 1f;
 
-        // Game state transition management
         private GameOverScreen gameOverScreen;
 
         public Game1(MainGame mainGame, SpriteBatch spriteBatch)
@@ -89,7 +97,22 @@ namespace monogame
 
         public void LoadContent()
         {
+
+
             previousMouseState = Mouse.GetState();
+            
+            buttonTexture = new Texture2D(_graphicsDevice, 1, 1);
+            Color[] colorData = new Color[1];
+            colorData[0] = Color.White;
+            buttonTexture.SetData(colorData);
+            
+            pinkDonutButton = new Button(
+                new Rectangle(20, 20, 150, 40),
+                buttonTexture, 
+                font, 
+                "Pink Donut");
+                
+
 
             charaset = _mainGame.Content.Load<Texture2D>("donutsprites20");
             nacho = _mainGame.Content.Load<Texture2D>("nachosprites4");
@@ -160,6 +183,32 @@ namespace monogame
         public void Update(GameTime gameTime)
         {
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            
+            MouseState currentMouseState = Mouse.GetState();
+            pinkDonutButton.Update(currentMouseState);
+            
+            if (pinkDonutButton.IsClicked)
+            {
+                if (isColorEffectActive)
+                {
+                    // When effect is on, cycling colors also changes the button text/color
+                    pinkDonutButton.CycleToNextColor();
+                    donut.SetColor(pinkDonutButton.GetCurrentColor());
+                }
+                else
+                {
+                    // Turn on the effect with the current button color
+                    isColorEffectActive = true;
+                    donut.SetColor(pinkDonutButton.GetCurrentColor());
+                }
+            }
+            
+            KeyboardState keyboardState = Keyboard.GetState();
+            if (keyboardState.IsKeyDown(Keys.P) && !previousKeyboardState.IsKeyDown(Keys.P))
+            {
+                isColorEffectActive = !isColorEffectActive;
+            }
+            previousKeyboardState = keyboardState;
             
             if (gameOverScreen.IsActive)
             {
@@ -435,12 +484,14 @@ namespace monogame
             nachoSprite.Draw(_spriteBatch);
             empanadaSprite.Draw(_spriteBatch);
             
-            donut.Draw(_spriteBatch);
+            donut.DrawWithColorReplacement(_spriteBatch);
 
             if (cheeseProjectile.IsActive)
             {
                 cheeseProjectile.Draw(_spriteBatch);
             }
+            
+            pinkDonutButton.Draw(_spriteBatch);
 
             if (showSplashEffect)
             {

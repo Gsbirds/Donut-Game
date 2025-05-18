@@ -2,7 +2,9 @@ using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Collections.Generic;
 using monogame.Animation;
+using monogame.Effects;
 
 namespace monogame.Sprites
 {
@@ -33,6 +35,12 @@ namespace monogame.Sprites
         public Direction CurrentDirection => currentDirection;
         
         public new float Health => currentHealth;
+
+        private Dictionary<DonutColor, Texture2D> colorTextures = new Dictionary<DonutColor, Texture2D>();
+        
+        private DonutColor currentColor = DonutColor.Normal;
+
+        public new Texture2D Texture => texture;
 
         public Donut(Texture2D texture, Vector2 position, float speed) 
             : base(texture, position, speed)
@@ -157,6 +165,80 @@ namespace monogame.Sprites
 
         public override void Draw(SpriteBatch spriteBatch)
         {
+            Draw(spriteBatch, Color.White);
+        }
+
+        /// <summary>
+        /// Sets the donut color and returns the previous color
+        /// </summary>
+        public DonutColor SetColor(DonutColor newColor)
+        {
+            DonutColor oldColor = currentColor;
+            currentColor = newColor;
+            return oldColor;
+        }
+
+        public DonutColor GetColor()
+        {
+            return currentColor;
+        }
+        
+        public DonutColor CycleToNextColor()
+        {
+            // Get the next color in the sequence
+            int colorCount = Enum.GetValues(typeof(DonutColor)).Length;
+            int nextColorIndex = ((int)currentColor + 1) % colorCount;
+            currentColor = (DonutColor)nextColorIndex;
+            
+            return currentColor;
+        }
+        
+        public void DrawWithColorReplacement(SpriteBatch spriteBatch)
+        {
+            GraphicsDevice graphicsDevice = spriteBatch.GraphicsDevice;
+            
+            if (currentColor == DonutColor.Normal)
+            {
+                Draw(spriteBatch);
+                return;
+            }
+            
+            if (!colorTextures.TryGetValue(currentColor, out Texture2D coloredTexture))
+            {
+                coloredTexture = ColorReplacer.CreateColoredTexture(graphicsDevice, texture, currentColor);
+                colorTextures[currentColor] = coloredTexture;
+            }
+            
+            Rectangle currentFrame = GetCurrentFrame();
+            
+            Vector2 origin;
+            if (isAttacking && attackTimer <= AttackDuration && 
+                (currentDirection == Direction.Left || currentDirection == Direction.Right))
+            {
+                origin = new Vector2(192 / 2, 128 / 2);
+            }
+            else
+            {
+                origin = new Vector2(96 / 2, 128 / 2);
+            }
+            
+            spriteBatch.Draw(
+                colorTextures[currentColor],
+                Position,
+                currentFrame,
+                Color.White,
+                0f,
+                origin,
+                1.0f,
+                SpriteEffects.None,
+                0f
+            );
+            
+            DrawDonutHealthBar(spriteBatch);
+        }
+
+        public void Draw(SpriteBatch spriteBatch, Color color)
+        {
             Rectangle currentFrame = GetCurrentFrame();
             
             Vector2 origin;
@@ -174,7 +256,7 @@ namespace monogame.Sprites
                 texture,
                 Position,
                 currentFrame,
-                Color.White,
+                color,
                 0f,
                 origin,
                 1.0f,
