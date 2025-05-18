@@ -84,27 +84,32 @@ namespace monogame
             
             font = _mainGame.Content.Load<SpriteFont>("DefaultFont1");
             
-            donut = new Donut(donutTexture, new Vector2(_graphicsDevice.Viewport.Width - 96, _graphicsDevice.Viewport.Height - 128), 160f);
-            sushiSprite = new Sushi(sushiTexture, new Vector2(200, 200), 120f);
-            gingerSprite = new Ginger(gingerTexture, new Vector2(100, 100), 70f);
+            int frameHeight = gingerTexture.Height / 4;            
+            var rnd = new Random();
             
             Texture2D cheeseTexture = _mainGame.Content.Load<Texture2D>("cheeselaunch");
             Texture2D cheeseSplashTexture = _mainGame.Content.Load<Texture2D>("splashcheese");
+            
+            // Set up animation frames
+            int frameWidth = puprmushSpritesheet.Width / 5;
+            int frameHeight2 = puprmushSpritesheet.Height; 
+            puprmushFrames = new Rectangle[5];
+            for (int i = 0; i < 5; i++)
+            {
+                puprmushFrames[i] = new Rectangle(i * frameWidth, 0, frameWidth, frameHeight2);
+            }
+            currentPuprmushFrame = 0;
+            puprmushFrameTimer = 0f;
+            
+            // Create game objects in the correct order
+            donut = new Donut(donutTexture, new Vector2(_graphicsDevice.Viewport.Width - 96, _graphicsDevice.Viewport.Height - 128), 160f);
+            sushiSprite = new Sushi(sushiTexture, new Vector2(200, 200), 120f);
+            gingerSprite = new Ginger(gingerTexture, new Vector2(100, 100), 70f);
             cheeseProjectile = new CheeseProjectile(cheeseTexture, cheeseSplashTexture);
             
             sushiSprite.OnDamageDealt += (damage) => {
                 donut.TakeDamage(3f);  
             };
-            
-            int frameWidth = puprmushSpritesheet.Width / 5;
-            int frameHeight = puprmushSpritesheet.Height;
-            puprmushFrames = new Rectangle[5];
-            for (int i = 0; i < 5; i++)
-            {
-                puprmushFrames[i] = new Rectangle(i * frameWidth, 0, frameWidth, frameHeight);
-            }
-            currentPuprmushFrame = 0;
-            puprmushFrameTimer = 0f;
             
             gameOverScreen = new GameOverScreen(_mainGame, _graphicsDevice, font);
             
@@ -118,6 +123,14 @@ namespace monogame
                 buttonTexture, 
                 font, 
                 "Pink Donut");
+                
+            pinkDonutButton.SetColorIndex(_mainGame.ColorButtonIndex);
+            isColorEffectActive = _mainGame.IsColorEffectActive;
+            
+            if (_mainGame.IsColorEffectActive)
+            {
+                donut.SetColor(pinkDonutButton.GetCurrentColor());
+            }
             
 
         }
@@ -131,15 +144,20 @@ namespace monogame
             
             if (pinkDonutButton.IsClicked)
             {
-                if (isColorEffectActive)
+                if (_mainGame.IsColorEffectActive)
                 {
                     pinkDonutButton.CycleToNextColor();
                     donut.SetColor(pinkDonutButton.GetCurrentColor());
+                    
+                    _mainGame.CurrentDonutColor = pinkDonutButton.GetCurrentColor();
+                    _mainGame.ColorButtonIndex = pinkDonutButton.GetCurrentColorIndex();
                 }
                 else
                 {
-                    isColorEffectActive = true;
+                    _mainGame.IsColorEffectActive = true;
                     donut.SetColor(pinkDonutButton.GetCurrentColor());
+                    
+                    _mainGame.CurrentDonutColor = pinkDonutButton.GetCurrentColor();
                 }
             }
             

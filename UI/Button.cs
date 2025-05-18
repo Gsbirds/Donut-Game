@@ -53,6 +53,17 @@ namespace monogame.UI
 
         private int currentColorIndex = 0;
         
+        public void SetColorIndex(int index)
+        {
+            currentColorIndex = index % ColorCycleOrder.Length;
+            currentButtonColor = ColorCycleOrder[currentColorIndex];
+            
+            string colorName = currentButtonColor == DonutColor.Normal ? "Blue" : ColorNames[(int)currentButtonColor];
+            text = colorName + " Donut";
+            
+            UpdateButtonColors();
+        }
+        
         public void CycleToNextColor()
         {
             currentColorIndex = (currentColorIndex + 1) % ColorCycleOrder.Length;
@@ -84,6 +95,11 @@ namespace monogame.UI
         public DonutColor GetCurrentColor()
         {
             return currentButtonColor;
+        }
+        
+        public int GetCurrentColorIndex()
+        {
+            return currentColorIndex;
         }
         
         private static Texture2D circleTexture;

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -101,19 +101,7 @@ namespace monogame
 
             previousMouseState = Mouse.GetState();
             
-            buttonTexture = new Texture2D(_graphicsDevice, 1, 1);
-            Color[] colorData = new Color[1];
-            colorData[0] = Color.White;
-            buttonTexture.SetData(colorData);
-            
-            pinkDonutButton = new Button(
-                new Rectangle(20, 20, 150, 40),
-                buttonTexture, 
-                font, 
-                "Pink Donut");
-                
-
-
+            // First load all content
             charaset = _mainGame.Content.Load<Texture2D>("donutsprites20");
             nacho = _mainGame.Content.Load<Texture2D>("nachosprites4");
             font = _mainGame.Content.Load<SpriteFont>("DefaultFont1");
@@ -132,8 +120,27 @@ namespace monogame
             WhitePixel = new Texture2D(_graphicsDevice, 1, 1);
             WhitePixel.SetData(new[] { Color.White });
 
-
+            // Then create button
+            buttonTexture = new Texture2D(_graphicsDevice, 1, 1);
+            Color[] colorData = new Color[1];
+            colorData[0] = Color.White;
+            buttonTexture.SetData(colorData);
+            
             donut = new Donut(charaset, new Vector2(_graphicsDevice.Viewport.Width - 96, _graphicsDevice.Viewport.Height - 128), 160f);
+            
+            pinkDonutButton = new Button(
+                new Rectangle(20, 20, 150, 40),
+                buttonTexture, 
+                font, 
+                "Pink Donut");
+            
+            pinkDonutButton.SetColorIndex(_mainGame.ColorButtonIndex);
+            isColorEffectActive = _mainGame.IsColorEffectActive;
+            
+            if (_mainGame.IsColorEffectActive)
+            {
+                donut.SetColor(pinkDonutButton.GetCurrentColor());
+            }
             nachoSprite = new Nacho(nacho, nachoOpenMouthTexture, new Vector2(100, 100), 80f);
             empanadaSprite = new Empanada(empanada, new Vector2(200, 200), 60f);
             cheeseProjectile = new Projectile(cheeseLaunch, new Vector2(0, 0), 400f);
@@ -189,17 +196,20 @@ namespace monogame
             
             if (pinkDonutButton.IsClicked)
             {
-                if (isColorEffectActive)
+                if (_mainGame.IsColorEffectActive)
                 {
-                    // When effect is on, cycling colors also changes the button text/color
                     pinkDonutButton.CycleToNextColor();
                     donut.SetColor(pinkDonutButton.GetCurrentColor());
+                    
+                    _mainGame.CurrentDonutColor = pinkDonutButton.GetCurrentColor();
+                    _mainGame.ColorButtonIndex = (int)pinkDonutButton.GetCurrentColorIndex();
                 }
                 else
                 {
-                    // Turn on the effect with the current button color
-                    isColorEffectActive = true;
+                    _mainGame.IsColorEffectActive = true;
                     donut.SetColor(pinkDonutButton.GetCurrentColor());
+                    
+                    _mainGame.CurrentDonutColor = pinkDonutButton.GetCurrentColor();
                 }
             }
             

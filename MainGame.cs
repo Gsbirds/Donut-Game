@@ -1,6 +1,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using monogame.Effects;
 
 namespace monogame
 {
@@ -16,6 +17,11 @@ namespace monogame
         Vector2 ballPosition;
         Vector2 nachoPosition;
         Vector2 sushiPosition;
+        
+        // Shared game state between levels
+        public DonutColor CurrentDonutColor { get; set; } = DonutColor.Pink;
+        public bool IsColorEffectActive { get; set; } = false;
+        public int ColorButtonIndex { get; set; } = 0;
 
         public enum GameStateType
         {
