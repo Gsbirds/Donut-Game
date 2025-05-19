@@ -13,6 +13,7 @@ namespace monogame
         private Rectangle startButtonArea;
         private Rectangle endButtonArea;
         private IGameState currentGameState;
+        public Game1 Game1Instance { get; private set; }
         private bool inMainMenu = true;
         Vector2 ballPosition;
         Vector2 nachoPosition;
@@ -79,7 +80,8 @@ namespace monogame
                         _graphics.PreferredBackBufferWidth = 850;
                         _graphics.PreferredBackBufferHeight = 850;
                         _graphics.ApplyChanges();
-                        currentGameState = new Game1(this, _spriteBatch);
+                        Game1Instance = new Game1(this, _spriteBatch);
+                        currentGameState = Game1Instance;
                         break;
                     case GameStateType.Game2:
                         _graphics.PreferredBackBufferWidth = 850;

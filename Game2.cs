@@ -110,7 +110,7 @@ namespace monogame
             buttonTexture.SetData(colorData);
             
             pinkDonutButton = new Button(
-                new Rectangle(20, 20, 150, 40),
+                new Rectangle(20, 20, 200, 50),
                 buttonTexture, 
                 font, 
                 "Pink Donut");
@@ -132,6 +132,10 @@ namespace monogame
             
             MouseState currentMouseState = Mouse.GetState();
             pinkDonutButton.Update(currentMouseState);
+            if (_mainGame.Game1Instance != null)
+            {
+                pinkDonutButton.SetCooldownPercentage(_mainGame.Game1Instance.GetFruitCooldownPercentage());
+            }
             
             if (pinkDonutButton.IsClicked)
             {

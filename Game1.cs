@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -12,6 +13,10 @@ namespace monogame
 {
     public class Game1 : IGameState
     {
+        public float GetFruitCooldownPercentage()
+        {
+            return fruitManager?.GetCooldownPercentage() ?? 1.0f;
+        }
         #region Fields
 
         private SpriteBatch _spriteBatch;
@@ -36,6 +41,7 @@ namespace monogame
         private bool isNachoHitActive = false;
 
         private Projectile cheeseProjectile;
+        private FruitProjectileManager fruitManager;
         private float projectileCooldownTimer = 0f;
         private const float ProjectileCooldown = 5f;
 
@@ -88,6 +94,8 @@ namespace monogame
     
         private Texture2D nacho;
         private Texture2D empanada;
+        private Texture2D strawberryTexture;
+        private Texture2D blueberryTexture;
         private const float SPLASH_DURATION = 1f;
 
         private GameOverScreen gameOverScreen;
@@ -132,7 +140,7 @@ namespace monogame
             axeSprite = new Axe(axeTexture, new Vector2(_graphicsDevice.Viewport.Width / 2, _graphicsDevice.Viewport.Height / 2));
             
             pinkDonutButton = new Button(
-                new Rectangle(20, 20, 150, 40),
+                new Rectangle(20, 20, 200, 50),
                 buttonTexture, 
                 font, 
                 "Pink Donut");
@@ -146,8 +154,13 @@ namespace monogame
             }
             nachoSprite = new Nacho(nacho, nachoOpenMouthTexture, new Vector2(100, 100), 80f);
             empanadaSprite = new Empanada(empanada, new Vector2(200, 200), 60f);
-            cheeseProjectile = new Projectile(cheeseLaunch, new Vector2(0, 0), 400f);
+            cheeseProjectile = new Projectile(cheeseLaunch, new Vector2(-100, -100), 600f);
             cheeseProjectile.Reset();
+            
+            strawberryTexture = _mainGame.Content.Load<Texture2D>("strawberry");
+            blueberryTexture = _mainGame.Content.Load<Texture2D>("blueberry");
+            
+            fruitManager = new FruitProjectileManager(strawberryTexture, blueberryTexture);
             
             empanadaSprite.OnDamageDealt += (damage) => {
                 donut.TakeDamage(10f);
@@ -196,6 +209,7 @@ namespace monogame
             
             MouseState currentMouseState = Mouse.GetState();
             pinkDonutButton.Update(currentMouseState);
+            pinkDonutButton.SetCooldownPercentage(fruitManager.GetCooldownPercentage());
             
             if (pinkDonutButton.IsClicked)
             {
@@ -319,6 +333,12 @@ namespace monogame
 
             var mouseState = Mouse.GetState();
             bool mouseJustClicked = mouseState.LeftButton == ButtonState.Pressed && previousMouseState.LeftButton != ButtonState.Pressed;
+            bool mouseJustRightClicked = mouseState.RightButton == ButtonState.Pressed && previousMouseState.RightButton != ButtonState.Pressed;
+            
+            fruitManager.Update(gameTime, donut.Position, donut.GetColor(), mouseState, previousMouseState);
+            
+            Sprite[] enemies = { nachoSprite, empanadaSprite };
+            fruitManager.CheckCollisions(enemies, _graphicsDevice);
             
             float donutNachoDistance = Vector2.Distance(donut.Position, nachoSprite.Position);
             float donutEmpanadaDistance = Vector2.Distance(donut.Position, empanadaSprite.Position);
@@ -518,6 +538,8 @@ namespace monogame
             {
                 cheeseProjectile.Draw(_spriteBatch);
             }
+            
+            fruitManager.Draw(_spriteBatch);
             
             pinkDonutButton.Draw(_spriteBatch);
 

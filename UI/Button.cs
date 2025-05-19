@@ -8,7 +8,7 @@ namespace monogame.UI
 {
     public class Button
     {
-        private static readonly string[] ColorNames = { "Normal", "Pink", "Yellow", "Brown" };
+        private static readonly string[] FlavorNames = { "Blueberry", "Strawberry", "Banana", "Chocolate" };
         private static readonly DonutColor[] ColorCycleOrder = { 
             DonutColor.Pink,
             DonutColor.Yellow,
@@ -22,9 +22,11 @@ namespace monogame.UI
         private Color normalColor;
         private Color hoverColor;
         private Color textColor = Color.White;
+        private Color cooldownColor = new Color(0, 0, 0, 180); // Semi-transparent black for cooldown shade
         private bool isHovered;
         private MouseState currentMouseState;
         private MouseState previousMouseState;
+        private float cooldownPercentage = 0f; // 0.0 to 1.0, where 1.0 means fully cooled down
 
         public bool IsClicked { get; private set; }
 
@@ -58,8 +60,8 @@ namespace monogame.UI
             currentColorIndex = index % ColorCycleOrder.Length;
             currentButtonColor = ColorCycleOrder[currentColorIndex];
             
-            string colorName = currentButtonColor == DonutColor.Normal ? "Blue" : ColorNames[(int)currentButtonColor];
-            text = colorName + " Donut";
+            string flavorName = currentButtonColor == DonutColor.Normal ? FlavorNames[0] : FlavorNames[(int)currentButtonColor];
+            text = flavorName + " Donut";
             
             UpdateButtonColors();
         }
@@ -69,8 +71,8 @@ namespace monogame.UI
             currentColorIndex = (currentColorIndex + 1) % ColorCycleOrder.Length;
             currentButtonColor = ColorCycleOrder[currentColorIndex];
             
-            string colorName = currentButtonColor == DonutColor.Normal ? "Blue" : ColorNames[(int)currentButtonColor];
-            text = colorName + " Donut";
+            string flavorName = currentButtonColor == DonutColor.Normal ? FlavorNames[0] : FlavorNames[(int)currentButtonColor];
+            text = flavorName + " Donut";
             
             UpdateButtonColors();
         }
@@ -100,6 +102,11 @@ namespace monogame.UI
         public int GetCurrentColorIndex()
         {
             return currentColorIndex;
+        }
+        
+        public void SetCooldownPercentage(float percentage)
+        {
+            cooldownPercentage = Math.Clamp(percentage, 0f, 1f);
         }
         
         private static Texture2D circleTexture;
@@ -218,6 +225,115 @@ namespace monogame.UI
                     bounds.Y + (bounds.Height - textSize.Y) / 2
                 );
                 spriteBatch.DrawString(font, text, textPosition, textColor);
+            }
+            
+            if (cooldownPercentage < 1.0f)
+            {
+                int shadeWidth = (int)(bounds.Width * (1.0f - cooldownPercentage));
+                
+                Rectangle shadeRect = new Rectangle(
+                    bounds.X,
+                    bounds.Y,
+                    shadeWidth,
+                    bounds.Height
+                );
+                
+                int shadeCornerRadius = 8;
+                
+                Rectangle centerShadeRect = new Rectangle(
+                    shadeRect.X + shadeCornerRadius,
+                    shadeRect.Y,
+                    Math.Max(0, shadeRect.Width - 2 * shadeCornerRadius),
+                    shadeRect.Height
+                );
+                
+                if (centerShadeRect.Width > 0)
+                {
+                    spriteBatch.Draw(texture, centerShadeRect, cooldownColor);
+                }
+                
+                if (shadeRect.Width > shadeCornerRadius)
+                {
+                    Rectangle leftShadeRect = new Rectangle(
+                        shadeRect.X,
+                        shadeRect.Y + shadeCornerRadius,
+                        shadeCornerRadius,
+                        Math.Max(0, shadeRect.Height - 2 * shadeCornerRadius)
+                    );
+                    
+                    if (leftShadeRect.Height > 0)
+                    {
+                        spriteBatch.Draw(texture, leftShadeRect, cooldownColor);
+                    }
+                    
+                    // Top-left corner
+                    spriteBatch.Draw(
+                        circleTexture,
+                        new Vector2(shadeRect.X, shadeRect.Y + shadeCornerRadius),
+                        null,
+                        cooldownColor,
+                        0f,
+                        new Vector2(0, shadeCornerRadius),
+                        1f,
+                        SpriteEffects.None,
+                        0f
+                    );
+                    
+                    // Bottom-left corner
+                    spriteBatch.Draw(
+                        circleTexture,
+                        new Vector2(shadeRect.X, shadeRect.Y + shadeRect.Height - shadeCornerRadius),
+                        null,
+                        cooldownColor,
+                        0f,
+                        new Vector2(0, shadeCornerRadius),
+                        1f,
+                        SpriteEffects.None,
+                        0f
+                    );
+                }
+                
+                // Only draw right part if shade is covering the full width
+                if (shadeWidth >= bounds.Width - shadeCornerRadius)
+                {
+                    Rectangle rightShadeRect = new Rectangle(
+                        shadeRect.X + shadeRect.Width - shadeCornerRadius,
+                        shadeRect.Y + shadeCornerRadius,
+                        shadeCornerRadius,
+                        Math.Max(0, shadeRect.Height - 2 * shadeCornerRadius)
+                    );
+                    
+                    if (rightShadeRect.Height > 0 && rightShadeRect.X <= bounds.X + bounds.Width - shadeCornerRadius)
+                    {
+                        spriteBatch.Draw(texture, rightShadeRect, cooldownColor);
+                    }
+                    
+                    // Top-right corner
+                    spriteBatch.Draw(
+                        circleTexture,
+                        new Vector2(bounds.X + bounds.Width, shadeRect.Y + shadeCornerRadius),
+                        null,
+                        cooldownColor,
+                        0f,
+                        new Vector2(circleTexture.Width, shadeCornerRadius),
+                        1f,
+                        SpriteEffects.None,
+                        0f
+                    );
+                    
+                    // Bottom-right corner
+                    spriteBatch.Draw(
+                        circleTexture,
+                        new Vector2(bounds.X + bounds.Width, shadeRect.Y + shadeRect.Height - shadeCornerRadius),
+                        null,
+                        cooldownColor,
+                        0f,
+                        new Vector2(circleTexture.Width, shadeCornerRadius),
+                        1f,
+                        SpriteEffects.None,
+                        0f
+                    );
+                }
             }
         }
     }
