@@ -19,7 +19,7 @@ namespace monogame.Sprites
         public Projectile(Texture2D texture, Vector2 position, float speed, float damage = 10f) 
             : base(texture, position, speed)
         {
-            rotationSpeed = MathHelper.TwoPi;
+            rotationSpeed = MathHelper.TwoPi * 0.4f;
             damageAmount = damage;
             Reset();
             showHealthBar = false;
