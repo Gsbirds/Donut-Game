@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -115,6 +115,7 @@ namespace monogame
         private Texture2D empanada;
         private Texture2D strawberryTexture;
         private Texture2D blueberryTexture;
+        private Texture2D bananaTexture;
         private const float SPLASH_DURATION = 1f;
 
         private GameOverScreen gameOverScreen;
@@ -178,8 +179,8 @@ namespace monogame
             
             strawberryTexture = _mainGame.Content.Load<Texture2D>("strawberry");
             blueberryTexture = _mainGame.Content.Load<Texture2D>("blueberry");
-            
-            fruitManager = new FruitProjectileManager(strawberryTexture, blueberryTexture);
+            bananaTexture = _mainGame.Content.Load<Texture2D>("banana");
+            fruitManager = new FruitProjectileManager(strawberryTexture, blueberryTexture, bananaTexture);
             
             empanadaSprite.OnDamageDealt += (damage) => {
                 donut.TakeDamage(10f);

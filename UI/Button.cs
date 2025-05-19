@@ -7,13 +7,13 @@ using monogame.Effects;
 namespace monogame.UI
 {
     public class Button
-    {
+    {//
         private static readonly string[] FlavorNames = { "Blueberry", "Strawberry", "Banana", "Chocolate" };
         private static readonly DonutColor[] ColorCycleOrder = { 
-            DonutColor.Pink,
-            DonutColor.Yellow,
-            DonutColor.Brown,
-            DonutColor.Normal
+            DonutColor.Normal, // Normal = Blueberry (index 0)
+            DonutColor.Pink,   // Pink = Strawberry (index 1)
+            DonutColor.Yellow, // Yellow = Banana (index 2)
+            DonutColor.Brown   // Brown = Chocolate (index 3)
         };
         private Rectangle bounds;
         private Texture2D texture;
@@ -22,15 +22,15 @@ namespace monogame.UI
         private Color normalColor;
         private Color hoverColor;
         private Color textColor = Color.White;
-        private Color cooldownColor = new Color(0, 0, 0, 180); // Semi-transparent black for cooldown shade
+        private Color cooldownColor = new Color(0, 0, 0, 180);
         private bool isHovered;
         private MouseState currentMouseState;
         private MouseState previousMouseState;
-        private float cooldownPercentage = 0f; // 0.0 to 1.0, where 1.0 means fully cooled down
+        private float cooldownPercentage = 0f;
 
         public bool IsClicked { get; private set; }
 
-        private DonutColor currentButtonColor = DonutColor.Pink;
+        private DonutColor currentButtonColor = DonutColor.Normal;
         
         public Button(Rectangle bounds, Texture2D texture, SpriteFont font, string text)
         {
@@ -60,7 +60,7 @@ namespace monogame.UI
             currentColorIndex = index % ColorCycleOrder.Length;
             currentButtonColor = ColorCycleOrder[currentColorIndex];
             
-            string flavorName = currentButtonColor == DonutColor.Normal ? FlavorNames[0] : FlavorNames[(int)currentButtonColor];
+            string flavorName = FlavorNames[(int)currentButtonColor];
             text = flavorName + " Donut";
             
             UpdateButtonColors();
@@ -71,7 +71,7 @@ namespace monogame.UI
             currentColorIndex = (currentColorIndex + 1) % ColorCycleOrder.Length;
             currentButtonColor = ColorCycleOrder[currentColorIndex];
             
-            string flavorName = currentButtonColor == DonutColor.Normal ? FlavorNames[0] : FlavorNames[(int)currentButtonColor];
+            string flavorName = FlavorNames[(int)currentButtonColor];
             text = flavorName + " Donut";
             
             UpdateButtonColors();

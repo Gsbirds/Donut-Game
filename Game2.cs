@@ -21,6 +21,7 @@ namespace monogame
         private FruitProjectileManager fruitManager;
         private Texture2D strawberryTexture;
         private Texture2D blueberryTexture;
+        private Texture2D bananaTexture;
         
         private Texture2D donutTexture;
         private Texture2D sushiTexture;
@@ -88,7 +89,8 @@ namespace monogame
             
             strawberryTexture = _mainGame.Content.Load<Texture2D>("strawberry");
             blueberryTexture = _mainGame.Content.Load<Texture2D>("blueberry");
-            fruitManager = new FruitProjectileManager(strawberryTexture, blueberryTexture);
+            bananaTexture = _mainGame.Content.Load<Texture2D>("banana");
+            fruitManager = new FruitProjectileManager(strawberryTexture, blueberryTexture, bananaTexture);
             
             int frameWidth = puprmushSpritesheet.Width / 5;
             int frameHeight2 = puprmushSpritesheet.Height; 

@@ -23,6 +23,7 @@ namespace monogame.Sprites
         
         private Texture2D strawberryTexture;
         private Texture2D blueberryTexture;
+        private Texture2D bananaTexture;
         
         public bool IsStreaming => isStreaming;
         public bool CanFire => cooldownTimer <= 0f;
@@ -39,10 +40,11 @@ namespace monogame.Sprites
             isStreaming = false;
         }
         
-        public FruitProjectileManager(Texture2D strawberryTexture, Texture2D blueberryTexture)
+        public FruitProjectileManager(Texture2D strawberryTexture, Texture2D blueberryTexture, Texture2D bananaTexture)
         {
             this.strawberryTexture = strawberryTexture;
             this.blueberryTexture = blueberryTexture;
+            this.bananaTexture = bananaTexture;
         }
 
         public void Update(GameTime gameTime, Vector2 donutPosition, DonutColor donutColor, MouseState mouseState, MouseState prevMouseState)
@@ -70,7 +72,7 @@ namespace monogame.Sprites
             
             if (mouseJustRightClicked && cooldownTimer <= 0 && !isStreaming)
             {
-                if (donutColor == DonutColor.Pink || donutColor == DonutColor.Normal)
+                if (donutColor == DonutColor.Normal || donutColor == DonutColor.Pink || donutColor == DonutColor.Yellow)
                 {
                     Vector2 mousePosition = new Vector2(mouseState.X, mouseState.Y);
                     streamDirection = mousePosition - donutPosition;
@@ -92,7 +94,23 @@ namespace monogame.Sprites
                 {
                     spawnTimer = 0;
                     
-                    Texture2D fruitTexture = (currentFruitType == DonutColor.Pink) ? strawberryTexture : blueberryTexture;
+                    Texture2D fruitTexture;
+                    if (currentFruitType == DonutColor.Normal) // Normal = Blueberry
+                    {
+                        fruitTexture = blueberryTexture;
+                    }
+                    else if (currentFruitType == DonutColor.Pink) // Pink = Strawberry
+                    {
+                        fruitTexture = strawberryTexture;
+                    }
+                    else if (currentFruitType == DonutColor.Yellow) // Yellow = Banana
+                    {
+                        fruitTexture = bananaTexture;
+                    }
+                    else
+                    {
+                        fruitTexture = blueberryTexture; // Default fallback
+                    }
                     
                     FruitProjectile.CreateProjectileStream(
                         projectiles,
@@ -165,9 +183,9 @@ namespace monogame.Sprites
     public class FruitProjectile : Projectile
     {
         private DonutColor fruitType;
-        private float scale = 0.125f; 
+        private float scale = 0.125f;
         private static Random random = new Random();
-
+        
         public DonutColor FruitType => fruitType;
         public new Texture2D Texture => texture;
 
@@ -208,6 +226,8 @@ namespace monogame.Sprites
         {
             if (!IsActive) return;
             
+            float currentScale = (fruitType == DonutColor.Yellow) ? scale * 2.0f : scale;
+            
             spriteBatch.Draw(
                 texture, 
                 position, 
@@ -215,7 +235,7 @@ namespace monogame.Sprites
                 Color.White, 
                 Rotation,
                 new Vector2(sourceRectangle.Width / 2, sourceRectangle.Height / 2),
-                scale, 
+                currentScale, 
                 SpriteEffects.None, 
                 0f
             );
