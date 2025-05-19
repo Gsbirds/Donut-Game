@@ -177,10 +177,7 @@ namespace monogame
             cheeseProjectile = new Projectile(cheeseLaunch, new Vector2(-100, -100), 600f);
             cheeseProjectile.Reset();
             
-            strawberryTexture = _mainGame.Content.Load<Texture2D>("strawberry");
-            blueberryTexture = _mainGame.Content.Load<Texture2D>("blueberry");
-            bananaTexture = _mainGame.Content.Load<Texture2D>("banana");
-            fruitManager = new FruitProjectileManager(strawberryTexture, blueberryTexture, bananaTexture);
+            fruitManager = new FruitProjectileManager(_mainGame.Content);
             
             empanadaSprite.OnDamageDealt += (damage) => {
                 donut.TakeDamage(10f);

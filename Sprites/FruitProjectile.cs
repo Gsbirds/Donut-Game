@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Content;
 using monogame.Effects;
 
 namespace monogame.Sprites
@@ -15,15 +16,16 @@ namespace monogame.Sprites
         private const float CooldownDuration = 10f;
         private bool isStreaming = false;
         private float streamTimer = 0f;
-        private const float StreamDuration = 2.0f;
+        private const float StreamDuration = 2.5f;
         private float spawnTimer = 0f;
         private const float SpawnInterval = 0.1f;
         private Vector2 streamDirection = Vector2.Zero;
         private DonutColor currentFruitType = DonutColor.Normal;
+        private static Random random = new Random();
         
-        private Texture2D strawberryTexture;
-        private Texture2D blueberryTexture;
-        private Texture2D bananaTexture;
+        private List<Texture2D> strawberryTextures = new List<Texture2D>();
+        private List<Texture2D> blueberryTextures = new List<Texture2D>();
+        private List<Texture2D> bananaTextures = new List<Texture2D>();
         
         public bool IsStreaming => isStreaming;
         public bool CanFire => cooldownTimer <= 0f;
@@ -40,11 +42,25 @@ namespace monogame.Sprites
             isStreaming = false;
         }
         
-        public FruitProjectileManager(Texture2D strawberryTexture, Texture2D blueberryTexture, Texture2D bananaTexture)
+        public FruitProjectileManager(ContentManager content)
         {
-            this.strawberryTexture = strawberryTexture;
-            this.blueberryTexture = blueberryTexture;
-            this.bananaTexture = bananaTexture;
+            strawberryTextures.Add(content.Load<Texture2D>("strawberry"));
+            blueberryTextures.Add(content.Load<Texture2D>("blueberry"));
+            bananaTextures.Add(content.Load<Texture2D>("banana"));
+            
+            try {
+                strawberryTextures.Add(content.Load<Texture2D>("_gabby/strawberry2"));
+                strawberryTextures.Add(content.Load<Texture2D>("_gabby/strawberry3"));
+                
+                blueberryTextures.Add(content.Load<Texture2D>("_gabby/blueberry2"));
+                blueberryTextures.Add(content.Load<Texture2D>("_gabby/blueberry3"));
+                
+                bananaTextures.Add(content.Load<Texture2D>("_gabby/banana2"));
+                bananaTextures.Add(content.Load<Texture2D>("_gabby/banana3"));
+            } catch (Exception ex) {
+                System.Diagnostics.Debug.WriteLine("Error loading fruit variants: " + ex.Message);
+            }
+
         }
 
         public void Update(GameTime gameTime, Vector2 donutPosition, DonutColor donutColor, MouseState mouseState, MouseState prevMouseState)
@@ -97,19 +113,19 @@ namespace monogame.Sprites
                     Texture2D fruitTexture;
                     if (currentFruitType == DonutColor.Normal) // Normal = Blueberry
                     {
-                        fruitTexture = blueberryTexture;
+                        fruitTexture = blueberryTextures[random.Next(blueberryTextures.Count)];
                     }
                     else if (currentFruitType == DonutColor.Pink) // Pink = Strawberry
                     {
-                        fruitTexture = strawberryTexture;
+                        fruitTexture = strawberryTextures[random.Next(strawberryTextures.Count)];
                     }
                     else if (currentFruitType == DonutColor.Yellow) // Yellow = Banana
                     {
-                        fruitTexture = bananaTexture;
+                        fruitTexture = bananaTextures[random.Next(bananaTextures.Count)];
                     }
                     else
                     {
-                        fruitTexture = blueberryTexture; // Default fallback
+                        fruitTexture = blueberryTextures[random.Next(blueberryTextures.Count)];
                     }
                     
                     FruitProjectile.CreateProjectileStream(
@@ -226,7 +242,20 @@ namespace monogame.Sprites
         {
             if (!IsActive) return;
             
-            float currentScale = (fruitType == DonutColor.Yellow) ? scale * 2.0f : scale;
+            float currentScale = scale;
+            
+            if (fruitType == DonutColor.Yellow)
+            {
+                string textureName = texture.Name ?? "";
+                if (textureName.Contains("banana2") || textureName.Contains("banana3"))
+                {
+                    currentScale = scale * 1.5f;
+                }
+                else
+                {
+                    currentScale = scale * 2.0f;
+                }
+            }
             
             spriteBatch.Draw(
                 texture, 

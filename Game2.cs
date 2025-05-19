@@ -18,11 +18,7 @@ namespace monogame
         private Sushi sushiSprite;
         private Ginger gingerSprite;
         private CheeseProjectile cheeseProjectile;
-        private FruitProjectileManager fruitManager;
-        private Texture2D strawberryTexture;
-        private Texture2D blueberryTexture;
-        private Texture2D bananaTexture;
-        
+        private FruitProjectileManager fruitManager;        
         private Texture2D donutTexture;
         private Texture2D sushiTexture;
         private Texture2D gingerTexture;
@@ -87,10 +83,7 @@ namespace monogame
             Texture2D cheeseTexture = _mainGame.Content.Load<Texture2D>("cheeselaunch");
             Texture2D cheeseSplashTexture = _mainGame.Content.Load<Texture2D>("splashcheese");
             
-            strawberryTexture = _mainGame.Content.Load<Texture2D>("strawberry");
-            blueberryTexture = _mainGame.Content.Load<Texture2D>("blueberry");
-            bananaTexture = _mainGame.Content.Load<Texture2D>("banana");
-            fruitManager = new FruitProjectileManager(strawberryTexture, blueberryTexture, bananaTexture);
+            fruitManager = new FruitProjectileManager(_mainGame.Content);
             
             int frameWidth = puprmushSpritesheet.Width / 5;
             int frameHeight2 = puprmushSpritesheet.Height; 
@@ -165,20 +158,21 @@ namespace monogame
                 }
             }
             
-            if (gameOverScreen != null && gameOverScreen.IsActive)
+            MouseState mouseState = Mouse.GetState();
+            HandleMouseAttacks();
+            
+            fruitManager.Update(gameTime, donut.Position, donut.GetColor(), mouseState, previousMouseState);
+            fruitManager.CheckCollisions(new Sprite[] { sushiSprite, gingerSprite }, _graphicsDevice);
+            
+            if (pinkDonutButton != null)
             {
-                gameOverScreen.Update(deltaTime);
-                return;
+                pinkDonutButton.SetCooldownPercentage(fruitManager.GetCooldownPercentage());
             }
-            else if (donut.Health <= 0)
+            
+            if (donut.Health <= 0)
             {
                 if (gameOverScreen != null)
                     gameOverScreen.Activate();
-                return;
-            }
-            else if (sushiSprite.Health <= 0 && gingerSprite.Health <= 0)
-            {
-                _mainGame.SwitchGameState(MainGame.GameStateType.Game1);
                 return;
             }
 
