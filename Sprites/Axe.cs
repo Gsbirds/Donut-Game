@@ -165,16 +165,16 @@ namespace monogame.Sprites
                     position,
                     null,
                     pulsingColor,
-                    rotationAngle, // Apply rotation
+                    rotationAngle,
                     new Vector2(texture.Width / 2, texture.Height / 2),
-                    scale, // Apply scaling
+                    scale,
                     SpriteEffects.None,
                     0f
                 );
                 
                 DrawSparklesDuringAnimation(spriteBatch);
             }
-            else // Normal drawing
+            else
             {
                 spriteBatch.Draw(
                     texture,

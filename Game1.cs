@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using monogame.Sprites;
-using monogame.Animation;
 using monogame.Screens;
 using monogame.UI;
 using monogame.Effects;
@@ -16,6 +14,27 @@ namespace monogame
         public float GetFruitCooldownPercentage()
         {
             return fruitManager?.GetCooldownPercentage() ?? 1.0f;
+        }
+        
+        public void UpdateDonutColor(DonutColor newColor, int colorIndex)
+        {
+            if (donut != null)
+            {
+                donut.SetColor(newColor);
+            }
+            
+            if (pinkDonutButton != null)
+            {
+                pinkDonutButton.SetColorIndex(colorIndex);
+            }
+        }
+        
+        public void ResetFruitCooldown()
+        {
+            if (fruitManager != null)
+            {
+                fruitManager.ResetCooldown();
+            }
         }
         #region Fields
 

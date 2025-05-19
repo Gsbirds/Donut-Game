@@ -33,6 +33,12 @@ namespace monogame.Sprites
             return 1.0f - (cooldownTimer / CooldownDuration);
         }
         
+        public void ResetCooldown()
+        {
+            cooldownTimer = 0f;
+            isStreaming = false;
+        }
+        
         public FruitProjectileManager(Texture2D strawberryTexture, Texture2D blueberryTexture)
         {
             this.strawberryTexture = strawberryTexture;
@@ -62,7 +68,7 @@ namespace monogame.Sprites
             bool mouseJustRightClicked = mouseState.RightButton == ButtonState.Pressed && 
                                         prevMouseState.RightButton == ButtonState.Released;
             
-            if (mouseJustRightClicked && CanFire && !isStreaming)
+            if (mouseJustRightClicked && cooldownTimer <= 0 && !isStreaming)
             {
                 if (donutColor == DonutColor.Pink || donutColor == DonutColor.Normal)
                 {

@@ -18,6 +18,9 @@ namespace monogame
         private Sushi sushiSprite;
         private Ginger gingerSprite;
         private CheeseProjectile cheeseProjectile;
+        private FruitProjectileManager fruitManager;
+        private Texture2D strawberryTexture;
+        private Texture2D blueberryTexture;
         
         private Texture2D donutTexture;
         private Texture2D sushiTexture;
@@ -63,6 +66,11 @@ namespace monogame
 
         public void LoadContent()
         {
+            if (_mainGame.Game1Instance != null)
+            {
+                _mainGame.Game1Instance.ResetFruitCooldown();
+            }
+            
             donutTexture = _mainGame.Content.Load<Texture2D>("donutspritesnew");
             sushiTexture = _mainGame.Content.Load<Texture2D>("sushisprites10");
             gingerTexture = _mainGame.Content.Load<Texture2D>("gingersprites4");
@@ -77,6 +85,10 @@ namespace monogame
             
             Texture2D cheeseTexture = _mainGame.Content.Load<Texture2D>("cheeselaunch");
             Texture2D cheeseSplashTexture = _mainGame.Content.Load<Texture2D>("splashcheese");
+            
+            strawberryTexture = _mainGame.Content.Load<Texture2D>("strawberry");
+            blueberryTexture = _mainGame.Content.Load<Texture2D>("blueberry");
+            fruitManager = new FruitProjectileManager(strawberryTexture, blueberryTexture);
             
             int frameWidth = puprmushSpritesheet.Width / 5;
             int frameHeight2 = puprmushSpritesheet.Height; 
@@ -131,35 +143,24 @@ namespace monogame
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
             
             MouseState currentMouseState = Mouse.GetState();
+            
+            fruitManager.Update(gameTime, donut.Position, donut.GetColor(), currentMouseState, previousMouseState);
+            
             pinkDonutButton.Update(currentMouseState);
-            if (_mainGame.Game1Instance != null)
-            {
-                pinkDonutButton.SetCooldownPercentage(_mainGame.Game1Instance.GetFruitCooldownPercentage());
-            }
+            pinkDonutButton.SetCooldownPercentage(fruitManager.GetCooldownPercentage());
             
             if (pinkDonutButton.IsClicked)
             {
-                if (_mainGame.IsColorEffectActive)
+                pinkDonutButton.CycleToNextColor();
+                DonutColor newColor = pinkDonutButton.GetCurrentColor();
+                donut.SetColor(newColor);
+                _mainGame.CurrentDonutColor = newColor;
+                _mainGame.ColorButtonIndex = pinkDonutButton.GetCurrentColorIndex();
+                
+                if (_mainGame.Game1Instance != null)
                 {
-                    pinkDonutButton.CycleToNextColor();
-                    donut.SetColor(pinkDonutButton.GetCurrentColor());
-                    
-                    _mainGame.CurrentDonutColor = pinkDonutButton.GetCurrentColor();
-                    _mainGame.ColorButtonIndex = pinkDonutButton.GetCurrentColorIndex();
+                    _mainGame.Game1Instance.UpdateDonutColor(newColor, pinkDonutButton.GetCurrentColorIndex());
                 }
-                else
-                {
-                    _mainGame.IsColorEffectActive = true;
-                    donut.SetColor(pinkDonutButton.GetCurrentColor());
-                    
-                    _mainGame.CurrentDonutColor = pinkDonutButton.GetCurrentColor();
-                }
-            }
-            
-            KeyboardState keyboardState = Keyboard.GetState();
-            if (keyboardState.IsKeyDown(Keys.P) && !previousMouseState.LeftButton.HasFlag(ButtonState.Pressed))
-            {
-                isColorEffectActive = !isColorEffectActive;
             }
             
             if (gameOverScreen != null && gameOverScreen.IsActive)
@@ -217,7 +218,10 @@ namespace monogame
             
             HandleMouseAttacks();
             
-            previousMouseState = Mouse.GetState();
+            Sprite[] enemies = { sushiSprite, gingerSprite };
+            fruitManager.CheckCollisions(enemies, _graphicsDevice);
+            
+            previousMouseState = currentMouseState;
         }
 
         public void Draw(GameTime gameTime)
@@ -245,6 +249,8 @@ namespace monogame
             donut.DrawWithColorReplacement(_spriteBatch);
             
             gingerSprite.Draw(_spriteBatch);
+            
+            fruitManager.Draw(_spriteBatch);
             
             if (cheeseProjectile.IsActive)
             {

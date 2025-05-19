@@ -11,8 +11,6 @@ namespace monogame.Sprites
         protected Vector2 previousPosition;
         protected float speed;
         protected float rotation;
-        
-        // Health system
         protected float maxHealth;
         protected float currentHealth;
         protected bool isInvulnerable;
@@ -53,7 +51,6 @@ namespace monogame.Sprites
 
         public virtual void Update(GameTime gameTime)
         {
-            // Store previous position for collision detection
             previousPosition = position;
             
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
