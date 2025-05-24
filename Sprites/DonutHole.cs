@@ -10,7 +10,7 @@ namespace monogame.Sprites
         private readonly Rectangle[] animationFrames;
         private int currentFrameIndex;
         private float animationTimer;
-        private const float FRAME_DURATION = 0.15f; 
+        private const float FRAME_DURATION = 0.3f; // Slower animation speed
         private Vector2 offsetFromDonut; 
         private Donut parentDonut; 
 
