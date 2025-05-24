@@ -325,7 +325,7 @@ namespace monogame
             }
 
             var mouse = Mouse.GetState();
-            if (distanceToDonutNacho < 200f)
+            if (distanceToDonutNacho < 200f && !nachoSprite.IsDefeated)
             {
                 nachoSprite.SetOpenMouthFrame(true);
                 

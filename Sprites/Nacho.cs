@@ -145,7 +145,14 @@ namespace monogame.Sprites
 
         public void SetOpenMouth(bool open)
         {
-            useOpenMouthFrame = open;
+            if (!isDefeated)
+            {
+                useOpenMouthFrame = open;
+            }
+            else
+            {
+                useOpenMouthFrame = false;
+            }
         }
 
         public override Rectangle GetBounds()

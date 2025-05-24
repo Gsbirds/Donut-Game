@@ -83,7 +83,7 @@ namespace monogame.Sprites
         
         public void StartAttack()
         {
-            if (!isAttacking)
+            if (!isAttacking && !isDefeated)
             {
                 isAttacking = true;
                 attackTimer = 0f;
