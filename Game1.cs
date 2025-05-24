@@ -44,6 +44,7 @@ namespace monogame
         private SpriteFont font;
 
         private Donut donut;
+        private DonutHole donutHole;
         private Nacho nachoSprite;
         private Empanada empanadaSprite;
         private const float MinDistanceBetweenNachoAndEmpanada = 170f;
@@ -70,6 +71,7 @@ namespace monogame
         private Vector2 splashPosition;
 
         private Texture2D charaset;
+        private Texture2D donutHoleTexture;
         private Texture2D cheeseLaunch;
         private Texture2D sombreroWallpaper;
         private Texture2D splashCheese;
@@ -132,6 +134,7 @@ namespace monogame
             previousMouseState = Mouse.GetState();
             
             charaset = _mainGame.Content.Load<Texture2D>("donutspritesnew");
+            donutHoleTexture = _mainGame.Content.Load<Texture2D>("Donuthole");
             axeTexture = _mainGame.Content.Load<Texture2D>("Axe");
             nacho = _mainGame.Content.Load<Texture2D>("nachosprites4");
             font = _mainGame.Content.Load<SpriteFont>("DefaultFont1");
@@ -156,6 +159,8 @@ namespace monogame
             buttonTexture.SetData(colorData);
             
             donut = new Donut(charaset, new Vector2(_graphicsDevice.Viewport.Width - 96, _graphicsDevice.Viewport.Height - 128), 160f);
+
+            donutHole = new DonutHole(donutHoleTexture, donut, new Vector2(-55, -55), 160f);
             
             axeSprite = new Axe(axeTexture, new Vector2(_graphicsDevice.Viewport.Width / 2, _graphicsDevice.Viewport.Height / 2));
             
@@ -268,6 +273,7 @@ namespace monogame
             axeSprite.Update(gameTime);
             
             donut.Update(gameTime);
+            donutHole.Update(gameTime);
             nachoSprite.Update(gameTime);
             empanadaSprite.Update(deltaTime, donut.Position, nachoSprite.Position);
             
@@ -550,6 +556,7 @@ namespace monogame
             axeSprite.Draw(_spriteBatch);
             
             donut.DrawWithColorReplacement(_spriteBatch);
+            donutHole.Draw(_spriteBatch);
 
             if (cheeseProjectile.IsActive)
             {

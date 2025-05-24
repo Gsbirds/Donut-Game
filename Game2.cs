@@ -15,11 +15,13 @@ namespace monogame
     public class Game2 : IGameState
     {
         private Donut donut;
+        private DonutHole donutHole; 
         private Sushi sushiSprite;
         private Ginger gingerSprite;
         private CheeseProjectile cheeseProjectile;
         private FruitProjectileManager fruitManager;        
         private Texture2D donutTexture;
+        private Texture2D donutHoleTexture;
         private Texture2D sushiTexture;
         private Texture2D gingerTexture;
         private Texture2D sushiWallpaper;
@@ -69,6 +71,7 @@ namespace monogame
             }
             
             donutTexture = _mainGame.Content.Load<Texture2D>("donutspritesnew");
+            donutHoleTexture = _mainGame.Content.Load<Texture2D>("Donuthole"); 
             sushiTexture = _mainGame.Content.Load<Texture2D>("sushisprites10");
             gingerTexture = _mainGame.Content.Load<Texture2D>("gingersprites4");
             sushiWallpaper = _mainGame.Content.Load<Texture2D>("sushilevelsetting");
@@ -96,6 +99,7 @@ namespace monogame
             puprmushFrameTimer = 0f;
             
             donut = new Donut(donutTexture, new Vector2(_graphicsDevice.Viewport.Width - 96, _graphicsDevice.Viewport.Height - 128), 160f);
+            donutHole = new DonutHole(donutHoleTexture, donut, new Vector2(-55, -55), 160f);
             donut.SetInGame2(true);
             if (_mainGame.HasPickedUpAxe)
             {
@@ -177,6 +181,7 @@ namespace monogame
             }
 
             donut.Update(gameTime);
+            donutHole.Update(gameTime);
             
             Vector2 donutPos = donut.Position;
             
@@ -243,6 +248,7 @@ namespace monogame
 
             sushiSprite.Draw(_spriteBatch);
             donut.DrawWithColorReplacement(_spriteBatch);
+            donutHole.Draw(_spriteBatch);
             
             gingerSprite.Draw(_spriteBatch);
             
