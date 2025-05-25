@@ -212,19 +212,19 @@ namespace monogame.Sprites
                 
                 if (directionToUse == Direction.Right)
                 {
-                    row = 1; 
+                    row = 3; 
                 }
                 else if (directionToUse == Direction.Left)
                 {
-                    row = 3; 
+                    row = 1; 
                 }
                 else if (directionToUse == Direction.Down)
                 {
-                    row = 2; 
+                    row = 0; 
                 }
                 else if (directionToUse == Direction.Up)
                 {
-                    row = 0; 
+                    row = 2; 
                 }
                 
                 int frameX = (int)(3.75 * frameWidth);
