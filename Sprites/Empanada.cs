@@ -27,6 +27,12 @@ namespace monogame.Sprites
         private Vector2 nachoPosition;
         private float halfScreenHeight;
         public event Action<float> OnDamageDealt;
+        
+        private Texture2D hitTexture; 
+        private bool isHit = false; 
+        private float hitAnimationTimer = 0f;
+        private const float HIT_ANIMATION_DURATION = 0.5f; 
+        private Direction hitDirection; 
 
         private float periodicAttackTimer;
         private const float PeriodicAttackInterval = 1.5f;
@@ -40,7 +46,7 @@ namespace monogame.Sprites
             set => empanadaMoving = value;
         }
 
-        public Empanada(Texture2D texture, Vector2 position, float speed) 
+        public Empanada(Texture2D texture, Texture2D hitTexture, Vector2 position, float speed) 
             : base(texture, position, speed)
         {
             maxHealth = 80f;
@@ -58,6 +64,7 @@ namespace monogame.Sprites
             periodicAttackTimer = 0f;
             canPeriodicAttack = true;
             targetPosition = new Vector2(1000, 1000);
+            this.hitTexture = hitTexture;
         }
 
         public void Update(float deltaTime, Vector2 targetPos, Vector2 nachoPos)
@@ -67,6 +74,17 @@ namespace monogame.Sprites
                 empanadaMoving = false;
                 isEmpanadaAttacking = false;
                 return;
+            }
+            
+            // Update hit animation timer if currently showing hit animation
+            if (isHit)
+            {
+                hitAnimationTimer += deltaTime;
+                if (hitAnimationTimer >= HIT_ANIMATION_DURATION)
+                {
+                    isHit = false;
+                    hitAnimationTimer = 0f;
+                }
             }
             
             targetPosition = targetPos;
@@ -193,13 +211,60 @@ namespace monogame.Sprites
             }
         }
 
-        public override void Draw(SpriteBatch spriteBatch)
+        public void Draw(SpriteBatch spriteBatch, bool useAttackFrames = false)
         {
+            if (isHit)
+            {
+                int row = 0;
+                
+                Direction directionToUse = hitDirection; 
+                
+                if (directionToUse == Direction.Right)
+                {
+                    row = 1; 
+                }
+                else if (directionToUse == Direction.Left)
+                {
+                    row = 3; 
+                }
+                else if (directionToUse == Direction.Down)
+                {
+                    row = 2; 
+                }
+                else if (directionToUse == Direction.Up)
+                {
+                    row = 0; 
+                }
+                
+                int frameX = (int)(3.25 * frameWidth);
+                
+                Rectangle hitFrame = new Rectangle(
+                    frameX - 10,     
+                    (row * frameHeight) + (int)(frameHeight * 1.5f), 
+                    frameWidth + 60, 
+                    frameHeight
+                );
+                
+                Vector2 hitOrigin = new Vector2(frameWidth / 2, frameHeight / 2);
+                
+                spriteBatch.Draw(
+                    hitTexture,
+                    position,
+                    hitFrame,
+                    Color.White,
+                    0f,
+                    hitOrigin,
+                    1.0f,
+                    SpriteEffects.None,
+                    0f
+                );
+                
+                DrawHealthBar(spriteBatch);
+                return;
+            }
+            
             Rectangle[] frames;
             int frameIndex;
-          
-            float distanceToDonut = Vector2.Distance(Position, targetPosition);
-            bool useAttackFrames = distanceToDonut <= AttackRange * 2.0f;
             
             if (useAttackFrames)
             {
@@ -362,7 +427,12 @@ namespace monogame.Sprites
         {
             bool damageDealt = base.TakeDamage(damage);
             
-            // Optional: Add empanada-specific damage reactions here
+            if (damageDealt)
+            {
+                isHit = true;
+                hitAnimationTimer = 0f;
+                hitDirection = empanadaFacingDirection; 
+            }
             
             return damageDealt;
         }

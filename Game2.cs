@@ -23,6 +23,7 @@ namespace monogame
         private Texture2D donutTexture;
         private Texture2D donutHoleTexture;
         private Texture2D sushiTexture;
+        private Texture2D sushiHitTexture;
         private Texture2D gingerTexture;
         private Texture2D sushiWallpaper;
         private Texture2D mochiTree;
@@ -73,6 +74,7 @@ namespace monogame
             donutTexture = _mainGame.Content.Load<Texture2D>("donutspritesnew");
             donutHoleTexture = _mainGame.Content.Load<Texture2D>("Donuthole"); 
             sushiTexture = _mainGame.Content.Load<Texture2D>("sushisprites10");
+            sushiHitTexture = _mainGame.Content.Load<Texture2D>("Sushihit");
             gingerTexture = _mainGame.Content.Load<Texture2D>("gingersprites4");
             sushiWallpaper = _mainGame.Content.Load<Texture2D>("sushilevelsetting");
             mochiTree = _mainGame.Content.Load<Texture2D>("mochitree");
@@ -105,7 +107,7 @@ namespace monogame
             {
                 donut.PickupAxe();
             }
-            sushiSprite = new Sushi(sushiTexture, new Vector2(200, 200), 120f);
+            sushiSprite = new Sushi(sushiTexture, sushiHitTexture, new Vector2(200, 200), 120f);
             gingerSprite = new Ginger(gingerTexture, new Vector2(100, 100), 70f);
             cheeseProjectile = new CheeseProjectile(cheeseTexture, cheeseSplashTexture);
             
@@ -134,7 +136,6 @@ namespace monogame
                 donut.SetColor(pinkDonutButton.GetCurrentColor());
             }
             
-
         }
 
         public void Update(GameTime gameTime)

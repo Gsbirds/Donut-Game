@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -115,6 +115,7 @@ namespace monogame
     
         private Texture2D nacho;
         private Texture2D empanada;
+        private Texture2D empanadaHit;
         private Texture2D strawberryTexture;
         private Texture2D blueberryTexture;
         private Texture2D bananaTexture;
@@ -143,6 +144,7 @@ namespace monogame
             sombreroWallpaper = _mainGame.Content.Load<Texture2D>("sombrerosetting");
             splashCheese = _mainGame.Content.Load<Texture2D>("splashcheese");
             empanada = _mainGame.Content.Load<Texture2D>("empanadasprites11");
+            empanadaHit = _mainGame.Content.Load<Texture2D>("Empanadahit");
             sombrero = _mainGame.Content.Load<Texture2D>("Sombrero");
             background = _mainGame.Content.Load<Texture2D>("pink_purp_background");
             weed = _mainGame.Content.Load<Texture2D>("weed");
@@ -178,7 +180,7 @@ namespace monogame
                 donut.SetColor(pinkDonutButton.GetCurrentColor());
             }
             nachoSprite = new Nacho(nacho, nachoOpenMouthTexture, new Vector2(100, 100), 80f);
-            empanadaSprite = new Empanada(empanada, new Vector2(200, 200), 60f);
+            empanadaSprite = new Empanada(empanada, empanadaHit, new Vector2(200, 200), 60f);
             cheeseProjectile = new Projectile(cheeseLaunch, new Vector2(-100, -100), 600f);
             cheeseProjectile.Reset();
             

@@ -97,18 +97,24 @@ namespace monogame.Sprites
             
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
             
-            UpdateAttack(deltaTime);
-            UpdateMovement(deltaTime);
-            UpdateAnimation(deltaTime, gameTime);
-            
             if (currentHealth <= 0)
             {
                 isDefeated = true;
             }
+            
+            if (!isDefeated)
+            {
+                UpdateAttack(deltaTime);
+                UpdateMovement(deltaTime);
+            }
+            
+            UpdateAnimation(deltaTime, gameTime);
         }
         
         private void UpdateAttack(float deltaTime)
         {
+            if (isDefeated) return;
+            
             if (isAttacking)
             {
                 attackTimer += deltaTime;

@@ -85,6 +85,18 @@
 /processorParam:TextureFormat=Color
 /build:_gabby/strawberry3.png
 
+#begin ../../../Downloads/Empanadahit.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../../Downloads/Empanadahit.png;Empanadahit.png
+
 #begin ../../../Downloads/Puprmush.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -211,30 +223,6 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
 /build:DefaultFont1.spritefont
-
-#begin Donuthole.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Donuthole.png
-
-#begin Donuthole.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Donuthole.png
 
 #begin Donuthole.png
 /importer:TextureImporter
@@ -895,6 +883,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:strawberry.png
+
+#begin Sushihit.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Sushihit.png
 
 #begin sushilevelsetting.png
 /importer:TextureImporter

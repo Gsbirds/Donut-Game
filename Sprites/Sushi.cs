@@ -21,13 +21,19 @@ namespace monogame.Sprites
         private const float AttackDamage = 15f;
         private float moveSpeed;
         
+        private Texture2D hitTexture; 
+        private bool isHit = false; 
+        private float hitAnimationTimer = 0f; 
+        private const float HIT_ANIMATION_DURATION = 0.5f; 
+        private Direction hitDirection; 
+
         public event Action<float> OnDamageDealt;
 
         public bool IsDefeated => isDefeated;
         public Direction FacingDirection => facingDirection;
         public bool IsAttacking => isAttacking;
 
-        public Sushi(Texture2D texture, Vector2 position, float speed) 
+        public Sushi(Texture2D texture, Texture2D hitTexture, Vector2 position, float speed) 
             : base(texture, position, speed)
         {
             maxHealth = 100f;
@@ -36,6 +42,7 @@ namespace monogame.Sprites
             facingDirection = Direction.Down;
             moveSpeed = speed;
             animations = new SpriteAnimation[4];
+            this.hitTexture = hitTexture;
             InitializeAnimations();
         }
         
@@ -72,6 +79,16 @@ namespace monogame.Sprites
                 isDefeated = true;
                 isAttacking = false;
                 return;
+            }
+
+            if (isHit)
+            {
+                hitAnimationTimer += deltaTime;
+                if (hitAnimationTimer >= HIT_ANIMATION_DURATION)
+                {
+                    isHit = false;
+                    hitAnimationTimer = 0f;
+                }
             }
 
             if (isAttacking)
@@ -167,9 +184,16 @@ namespace monogame.Sprites
         {
             bool damageDealt = base.TakeDamage(damage);
             
-            if (damageDealt && currentHealth <= 0)
+            if (damageDealt)
             {
-                isDefeated = true;
+                isHit = true;
+                hitAnimationTimer = 0f;
+                hitDirection = facingDirection; 
+                
+                if (currentHealth <= 0)
+                {
+                    isDefeated = true;
+                }
             }
             
             return damageDealt;
@@ -177,56 +201,110 @@ namespace monogame.Sprites
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            Rectangle currentFrame;
-            
-            if (isAttacking)
+            if (isHit)
             {
                 int frameWidth = 110;
                 int frameHeight = 133;
                 
-                int attackFrame = attackTimer < 0.5f ? 3 : 4; 
+                int row = 0;
                 
-                currentFrame = new Rectangle(
-                    attackFrame * frameWidth,
-                    (int)facingDirection * frameHeight,
-                    frameWidth,
+                Direction directionToUse = hitDirection; 
+                
+                if (directionToUse == Direction.Right)
+                {
+                    row = 1; 
+                }
+                else if (directionToUse == Direction.Left)
+                {
+                    row = 3; 
+                }
+                else if (directionToUse == Direction.Down)
+                {
+                    row = 2; 
+                }
+                else if (directionToUse == Direction.Up)
+                {
+                    row = 0; 
+                }
+                
+                int frameX = (int)(3.75 * frameWidth);
+                
+                Rectangle hitFrame = new Rectangle(
+                    frameX - 5,      
+                    (row * frameHeight) + (int)(frameHeight * 1.3f), 
+                    frameWidth + 15, 
                     frameHeight
                 );
+                
+                Vector2 origin = new Vector2(frameWidth / 2, frameHeight / 2);
+                
+                spriteBatch.Draw(
+                    hitTexture,
+                    position,
+                    hitFrame,
+                    Color.White,
+                    rotation,
+                    origin,
+                    Vector2.One,
+                    SpriteEffects.None,
+                    0f
+                );
+                DrawHealthBar(spriteBatch);
+                return;
             }
             else
             {
-                currentFrame = animations[(int)facingDirection].GetCurrentFrame();
+                Rectangle currentFrame;
+                
+                if (isAttacking)
+                {
+                    int frameWidth = 110;
+                    int frameHeight = 133;
+                    
+                    int attackFrame = attackTimer < 0.5f ? 3 : 4; 
+                    
+                    currentFrame = new Rectangle(
+                        attackFrame * frameWidth,
+                        (int)facingDirection * frameHeight,
+                        frameWidth,
+                        frameHeight
+                    );
+                }
+                else
+                {
+                    currentFrame = animations[(int)facingDirection].GetCurrentFrame();
+                }
+                
+                Color spriteColor;
+                if (isDefeated || currentHealth <= 0)
+                {
+                    spriteColor = Color.Gray;
+                }
+                else if (isInvulnerable && (int)(invulnerabilityTimer * 10) % 2 == 0)
+                {
+                    spriteColor = Color.Red;
+                }
+                else
+                {
+                    spriteColor = Color.White;
+                }
+                
+                Vector2 origin = new Vector2(currentFrame.Width / 2, currentFrame.Height / 2);
+                
+                spriteBatch.Draw(
+                    texture,
+                    position,
+                    currentFrame,
+                    spriteColor,
+                    rotation,
+                    origin,
+                    Vector2.One,
+                    SpriteEffects.None,
+                    0f
+                );
+                
+                DrawHealthBar(spriteBatch);
             }
-            
-            Color spriteColor;
-            if (isDefeated || currentHealth <= 0)
-            {
-                spriteColor = Color.Gray;
-            }
-            else if (isInvulnerable && (int)(invulnerabilityTimer * 10) % 2 == 0)
-            {
-                spriteColor = Color.Red;
-            }
-            else
-            {
-                spriteColor = Color.White;
-            }
-            
-            Vector2 origin = new Vector2(currentFrame.Width / 2, currentFrame.Height / 2);
-            
-            spriteBatch.Draw(
-                texture,
-                position,
-                currentFrame,
-                spriteColor,
-                rotation,
-                origin,
-                Vector2.One,
-                SpriteEffects.None,
-                0f
-            );
-            
-            DrawHealthBar(spriteBatch);
         }
 
         public override Rectangle GetBounds()
