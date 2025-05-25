@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -179,8 +179,14 @@ namespace monogame
             {
                 donut.SetColor(pinkDonutButton.GetCurrentColor());
             }
-            nachoSprite = new Nacho(nacho, nachoOpenMouthTexture, new Vector2(100, 100), 80f);
-            empanadaSprite = new Empanada(empanada, empanadaHit, new Vector2(200, 200), 60f);
+            int screenWidth = _graphicsDevice.Viewport.Width;
+            int screenHeight = _graphicsDevice.Viewport.Height;
+            
+            nachoSprite = new Nacho(nacho, nachoOpenMouthTexture, 
+                new Vector2(50, screenHeight / 2 - 100), 80f);
+                
+            empanadaSprite = new Empanada(empanada, empanadaHit, 
+                new Vector2(150, screenHeight - 100), 60f);
             cheeseProjectile = new Projectile(cheeseLaunch, new Vector2(-100, -100), 600f);
             cheeseProjectile.Reset();
             

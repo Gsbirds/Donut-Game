@@ -157,7 +157,6 @@ namespace monogame.Sprites
 
         public override Rectangle GetBounds()
         {
-            // Moderate collision boundary for Nacho
             return new Rectangle(
                 (int)position.X - 15,   // Moderate size for collision
                 (int)position.Y - 18,

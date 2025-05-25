@@ -107,8 +107,14 @@ namespace monogame
             {
                 donut.PickupAxe();
             }
-            sushiSprite = new Sushi(sushiTexture, sushiHitTexture, new Vector2(200, 200), 120f);
-            gingerSprite = new Ginger(gingerTexture, new Vector2(100, 100), 70f);
+            int screenWidth = _graphicsDevice.Viewport.Width;
+            int screenHeight = _graphicsDevice.Viewport.Height;
+            
+            sushiSprite = new Sushi(sushiTexture, sushiHitTexture, 
+                new Vector2(50, screenHeight - 150), 120f);
+                
+            gingerSprite = new Ginger(gingerTexture, 
+                new Vector2(150, screenHeight / 2 - 100), 70f);
             cheeseProjectile = new CheeseProjectile(cheeseTexture, cheeseSplashTexture);
             
             sushiSprite.OnDamageDealt += (damage) => {
