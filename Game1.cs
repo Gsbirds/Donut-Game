@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -559,7 +559,8 @@ namespace monogame
             }
 
             nachoSprite.Draw(_spriteBatch);
-            empanadaSprite.Draw(_spriteBatch);
+            // Draw Empanada with attack frames if attacking
+            empanadaSprite.Draw(_spriteBatch, empanadaSprite.IsAttacking);
             
             axeSprite.Draw(_spriteBatch);
             

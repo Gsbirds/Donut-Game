@@ -21,7 +21,7 @@ namespace monogame.Sprites
         private float animationTimer;
         private const float AnimationThreshold = 300f;
         private const float MinDistanceFromNacho = 170f;
-        private const float AttackRange = 20f; 
+        private const float AttackRange = 100f; // Increased from 20f to detect player better
         private const float AttackDamage = 10.0f;
         private Vector2 targetPosition;
         private Vector2 nachoPosition;
@@ -126,26 +126,17 @@ namespace monogame.Sprites
 
             float distanceToTarget = Vector2.Distance(Position, targetPosition);
             
+            // When in attack state, maintain it for a reasonable duration
             if (isEmpanadaAttacking)
             {
                 empanadaAttackTimer += deltaTime;
-                if (empanadaAttackTimer >= empanadaAttackCooldown)
+                
+                // Keep the attack state active for 2 seconds to ensure animation is visible
+                if (empanadaAttackTimer >= 2.0f) // Extended from empanadaAttackCooldown to 2.0f
                 {
                     isEmpanadaAttacking = false;
                     empanadaAttackTimer = 0f;
-                    
-                    if (distanceToTarget <= AttackRange * 2.0f)
-                    {
-                        canPeriodicAttack = true;
-                        
-                        if (distanceToTarget <= AttackRange * 1.5f)
-                        {
-                            isEmpanadaAttacking = true;
-                            empanadaAttackTimer = 0f;
-                            
-                            OnDamageDealt?.Invoke(AttackDamage * 0.8f);
-                        }
-                    }
+                    canPeriodicAttack = true; // Allow attacking again after cooldown
                 }
             }
             
@@ -194,20 +185,24 @@ namespace monogame.Sprites
                 animationTimer = 0f;
             }
             
-            if (isEmpanadaAttacking || distanceToTarget <= AttackRange * 2.0f) 
+            // Handle attack animation
+            if (isEmpanadaAttacking) 
             {
+                // Slow down the animation frame rate for attack animations
                 attackAnimationTimer += deltaTime * 1000;
                 
-                if (attackAnimationTimer > 200) 
+                // Change frames every 750ms for a clearer attack animation
+                if (attackAnimationTimer > 750) 
                 {
+                    // Toggle between the two attack frames (0 and 1)
                     currentAttackFrame = (byte)((currentAttackFrame + 1) % 2);
                     attackAnimationTimer = 0f;
-                    
-                    if (distanceToTarget <= AttackRange * 1.5f && isEmpanadaAttacking)
-                    {
-                        OnDamageDealt?.Invoke(AttackDamage * 2.0f);
-                    }
                 }
+            }
+            else
+            {
+                // Reset attack animation when not attacking
+                currentAttackFrame = 0;
             }
         }
 
