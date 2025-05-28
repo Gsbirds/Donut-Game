@@ -14,6 +14,7 @@ namespace monogame.Sprites
         private float attackCooldown;
         private bool useAttackFrame = false;
         private byte currentAnimationIndex = 0;
+        private byte currentAttackFrame = 0;
         private bool hasDealtDamageThisAttack = false; 
         private SpriteAnimation[] animations;
         private Vector2 targetPosition;
@@ -105,12 +106,30 @@ namespace monogame.Sprites
                     }
                 }
                 
+                if (attackTimer < 0.75f)
+                {
+                    currentAttackFrame = 0; 
+                }
+                else if (attackTimer < 1.5f)
+                {
+                    currentAttackFrame = 1; 
+                }
+                else if (attackTimer < 2.25f)
+                {
+                    currentAttackFrame = 0; 
+                }
+                else if (attackTimer < 3.0f)
+                {
+                    currentAttackFrame = 1; 
+                }
+                
                 if (attackTimer >= attackCooldown)
                 {
                     isAttacking = false;
                     attackTimer = 0f;
                     useAttackFrame = false;
                     hasDealtDamageThisAttack = false; 
+                    currentAttackFrame = 0;
                 }
             }
             
@@ -260,11 +279,11 @@ namespace monogame.Sprites
                 {
                     int frameWidth = 110;
                     int frameHeight = 133;
-                    
-                    int attackFrame = attackTimer < 0.5f ? 3 : 4; 
+
+                    int attackFrameIndex = currentAttackFrame == 0 ? 4 : 5;
                     
                     currentFrame = new Rectangle(
-                        attackFrame * frameWidth,
+                        attackFrameIndex * frameWidth,
                         (int)facingDirection * frameHeight,
                         frameWidth,
                         frameHeight
