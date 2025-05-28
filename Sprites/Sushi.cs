@@ -168,13 +168,13 @@ namespace monogame.Sprites
             {
                 direction.Normalize();
                 
-                if (distance > 20.0f)
+                if (distance > 80.0f)
                 {
                     Position += direction * moveSpeed * deltaTime;
                 }
-                else if (distance < 10.0f)
+                else if (distance < 70.0f)
                 {
-                    Position -= direction * moveSpeed * 0.5f * deltaTime;
+                    Position -= direction * moveSpeed * 0.7f * deltaTime;
                 }
                 
                 if (!isAttacking)

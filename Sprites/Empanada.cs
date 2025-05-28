@@ -99,13 +99,15 @@ namespace monogame.Sprites
             {
                 directionToDonut.Normalize();
                 
-                if (distanceToDonut > 20.0f)
+                // Increased minimum distance (was 20.0f) to keep more space from player
+                if (distanceToDonut > 40.0f)
                 {
                     Position += directionToDonut * Speed * deltaTime;
                 }
-                else if (distanceToDonut < 10.0f)
+                // Start backing up sooner (was 10.0f) and more aggressively
+                else if (distanceToDonut < 30.0f)
                 {
-                    Position -= directionToDonut * Speed * 0.5f * deltaTime;
+                    Position -= directionToDonut * Speed * 0.7f * deltaTime;
                 }
                 if (!isEmpanadaAttacking)
                 {

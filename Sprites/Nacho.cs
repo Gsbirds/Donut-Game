@@ -95,10 +95,20 @@ namespace monogame.Sprites
             }
 
             Vector2 direction = targetPosition - position;
+            float distance = direction.Length();
+            
             if (direction != Vector2.Zero)
             {
                 direction.Normalize();
-                position += direction * speed * deltaTime;
+                
+                if (distance > 80.0f)
+                {
+                    position += direction * speed * deltaTime;
+                }
+                else if (distance < 70.0f)
+                {
+                    position -= direction * speed * 0.7f * deltaTime;
+                }
             }
 
             if (Math.Abs(direction.X) > Math.Abs(direction.Y))

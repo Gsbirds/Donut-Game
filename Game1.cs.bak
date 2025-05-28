@@ -583,7 +583,7 @@ namespace monogame
                     texture,
                     position,
                     currentFrame,
-                    Color.Gray * nachoSprite.FadeAlpha,
+                    Color.Gray,
                     MathHelper.PiOver2, // 90 degrees rotation
                     origin,
                     1.0f,
@@ -622,7 +622,7 @@ namespace monogame
                     texture,
                     position,
                     currentFrame,
-                    Color.Gray * empanadaSprite.FadeAlpha,
+                    Color.Gray,
                     MathHelper.PiOver2, // 90 degrees rotation
                     origin,
                     1.0f,

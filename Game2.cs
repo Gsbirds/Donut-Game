@@ -253,11 +253,86 @@ namespace monogame
                 0f
             );
 
-            sushiSprite.Draw(_spriteBatch);
+            // Custom drawing code for Sushi to ensure it shows defeated state properly
+            if (sushiSprite.Health <= 0)
+            {
+                // When defeated, draw with rotation and gray color
+                Texture2D texture = sushiSprite.Texture;
+                Vector2 position = sushiSprite.Position;
+                Rectangle currentFrame;
+                
+                // Use first frame of the appropriate direction for simplicity
+                if (sushiSprite.FacingDirection == Direction.Up)
+                    currentFrame = new Rectangle(0, 0, 110, 133);
+                else if (sushiSprite.FacingDirection == Direction.Right)
+                    currentFrame = new Rectangle(0, 133, 110, 133);
+                else if (sushiSprite.FacingDirection == Direction.Down)
+                    currentFrame = new Rectangle(0, 266, 110, 133);
+                else // Left
+                    currentFrame = new Rectangle(0, 399, 110, 133);
+                
+                Vector2 origin = new Vector2(currentFrame.Width / 2, currentFrame.Height / 2);
+                
+                // Draw with rotation and gray color
+                _spriteBatch.Draw(
+                    texture,
+                    position,
+                    currentFrame,
+                    Color.Gray * sushiSprite.FadeAlpha,
+                    MathHelper.PiOver2, // 90 degrees rotation
+                    origin,
+                    1.0f,
+                    SpriteEffects.None,
+                    0f
+                );
+            }
+            else
+            {
+                // Normal drawing when not defeated
+                sushiSprite.Draw(_spriteBatch);
+            }
+            
             donut.DrawWithColorReplacement(_spriteBatch);
             donutHole.Draw(_spriteBatch);
             
-            gingerSprite.Draw(_spriteBatch);
+            // Custom drawing code for Ginger to ensure it shows defeated state properly
+            if (gingerSprite.Health <= 0)
+            {
+                // When defeated, draw with rotation and gray color
+                Texture2D texture = gingerSprite.Texture;
+                Vector2 position = gingerSprite.Position;
+                Rectangle currentFrame;
+                
+                // Use first frame of the appropriate direction for simplicity
+                if (gingerSprite.FacingDirection == Direction.Up)
+                    currentFrame = new Rectangle(0, 0, 110, 133);
+                else if (gingerSprite.FacingDirection == Direction.Right)
+                    currentFrame = new Rectangle(0, 133, 110, 133);
+                else if (gingerSprite.FacingDirection == Direction.Down)
+                    currentFrame = new Rectangle(0, 266, 110, 133);
+                else // Left
+                    currentFrame = new Rectangle(0, 399, 110, 133);
+                
+                Vector2 origin = new Vector2(currentFrame.Width / 2, currentFrame.Height / 2);
+                
+                // Draw with rotation and gray color
+                _spriteBatch.Draw(
+                    texture,
+                    position,
+                    currentFrame,
+                    Color.Gray * gingerSprite.FadeAlpha,
+                    MathHelper.PiOver2, // 90 degrees rotation
+                    origin,
+                    1.0f,
+                    SpriteEffects.None,
+                    0f
+                );
+            }
+            else
+            {
+                // Normal drawing when not defeated
+                gingerSprite.Draw(_spriteBatch);
+            }
             
             fruitManager.Draw(_spriteBatch);
             
