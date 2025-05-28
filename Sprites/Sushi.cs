@@ -52,21 +52,29 @@ namespace monogame.Sprites
             int frameWidth = 110;
             int frameHeight = 133;
             
-            for (int dir = 0; dir < 4; dir++)
+            animations[0] = CreateDirectionalAnimation(frameWidth, frameHeight, 2);
+            
+            animations[1] = CreateDirectionalAnimation(frameWidth, frameHeight, 0);
+            
+            animations[2] = CreateDirectionalAnimation(frameWidth, frameHeight, 3);
+            
+            animations[3] = CreateDirectionalAnimation(frameWidth, frameHeight, 1);
+        }
+        
+        private SpriteAnimation CreateDirectionalAnimation(int frameWidth, int frameHeight, int row)
+        {
+            Rectangle[] frames = new Rectangle[3];
+            for (int frame = 0; frame < 3; frame++)
             {
-                Rectangle[] frames = new Rectangle[3];
-                for (int frame = 0; frame < 3; frame++)
-                {
-                    frames[frame] = new Rectangle(
-                        frame * frameWidth,
-                        dir * frameHeight,
-                        frameWidth,
-                        frameHeight
-                    );
-                }
-                
-                animations[dir] = new SpriteAnimation(frames, 0.15f, true);
+                frames[frame] = new Rectangle(
+                    frame * frameWidth,
+                    row * frameHeight,
+                    frameWidth,
+                    frameHeight
+                );
             }
+            
+            return new SpriteAnimation(frames, 0.15f, true);
         }
 
         public override void Update(GameTime gameTime)
@@ -156,26 +164,35 @@ namespace monogame.Sprites
                 StartAttack();
             }
             
-            if (distance > 20f)
+            if (direction != Vector2.Zero)
             {
-                if (distance > 0)
-                    direction /= distance;
+                direction.Normalize();
                 
-                Position += direction * moveSpeed * deltaTime;
+                if (distance > 20.0f)
+                {
+                    Position += direction * moveSpeed * deltaTime;
+                }
+                else if (distance < 10.0f)
+                {
+                    Position -= direction * moveSpeed * 0.5f * deltaTime;
+                }
                 
-                UpdateFacingDirection(direction);
+                if (!isAttacking)
+                {
+                    UpdateFacingDirection(direction);
+                }
             }
         }
-        
+
         private void UpdateFacingDirection(Vector2 direction)
         {
             if (Math.Abs(direction.X) > Math.Abs(direction.Y))
             {
-                facingDirection = direction.X > 0 ? Direction.Left : Direction.Right;
+                facingDirection = direction.X > 0 ? Direction.Right : Direction.Left;
             }
             else
             {
-                facingDirection = direction.Y > 0 ? Direction.Up : Direction.Down;
+                facingDirection = direction.Y > 0 ? Direction.Down : Direction.Up;
             }
         }
 
@@ -280,11 +297,22 @@ namespace monogame.Sprites
                     int frameWidth = 110;
                     int frameHeight = 133;
 
+
                     int attackFrameIndex = currentAttackFrame == 0 ? 4 : 5;
+                    
+                    int row;
+                    if (facingDirection == Direction.Up)
+                        row = 0;
+                    else if (facingDirection == Direction.Right)
+                        row = 1;
+                    else if (facingDirection == Direction.Down)
+                        row = 2;
+                    else // Left
+                        row = 3;
                     
                     currentFrame = new Rectangle(
                         attackFrameIndex * frameWidth,
-                        (int)facingDirection * frameHeight,
+                        row * frameHeight,
                         frameWidth,
                         frameHeight
                     );
