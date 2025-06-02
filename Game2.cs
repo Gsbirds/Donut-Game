@@ -253,15 +253,12 @@ namespace monogame
                 0f
             );
 
-            // Custom drawing code for Sushi to ensure it shows defeated state properly
             if (sushiSprite.Health <= 0)
             {
-                // When defeated, draw with rotation and gray color
                 Texture2D texture = sushiSprite.Texture;
                 Vector2 position = sushiSprite.Position;
                 Rectangle currentFrame;
                 
-                // Use first frame of the appropriate direction for simplicity
                 if (sushiSprite.FacingDirection == Direction.Up)
                     currentFrame = new Rectangle(0, 0, 110, 133);
                 else if (sushiSprite.FacingDirection == Direction.Right)
@@ -273,7 +270,6 @@ namespace monogame
                 
                 Vector2 origin = new Vector2(currentFrame.Width / 2, currentFrame.Height / 2);
                 
-                // Draw with rotation and gray color
                 _spriteBatch.Draw(
                     texture,
                     position,
@@ -288,22 +284,18 @@ namespace monogame
             }
             else
             {
-                // Normal drawing when not defeated
                 sushiSprite.Draw(_spriteBatch);
             }
             
             donut.DrawWithColorReplacement(_spriteBatch);
             donutHole.Draw(_spriteBatch);
             
-            // Custom drawing code for Ginger to ensure it shows defeated state properly
             if (gingerSprite.Health <= 0)
             {
-                // When defeated, draw with rotation and gray color
                 Texture2D texture = gingerSprite.Texture;
                 Vector2 position = gingerSprite.Position;
                 Rectangle currentFrame;
                 
-                // Use first frame of the appropriate direction for simplicity
                 if (gingerSprite.FacingDirection == Direction.Up)
                     currentFrame = new Rectangle(0, 0, 110, 133);
                 else if (gingerSprite.FacingDirection == Direction.Right)
@@ -315,7 +307,6 @@ namespace monogame
                 
                 Vector2 origin = new Vector2(currentFrame.Width / 2, currentFrame.Height / 2);
                 
-                // Draw with rotation and gray color
                 _spriteBatch.Draw(
                     texture,
                     position,
@@ -330,7 +321,6 @@ namespace monogame
             }
             else
             {
-                // Normal drawing when not defeated
                 gingerSprite.Draw(_spriteBatch);
             }
             
@@ -452,7 +442,7 @@ namespace monogame
                 float donutSushiDistance = Vector2.Distance(donut.Position, sushiSprite.Position);
                 if (donutSushiDistance < 70) 
                 {
-                    sushiSprite.TakeDamage(20f);
+                    sushiSprite.TakeDamage(20f, donut.Position);
                     
                     if (sushiSprite.Health <= 0 && gingerSprite.Health <= 0)
                     {

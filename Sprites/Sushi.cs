@@ -235,6 +235,35 @@ namespace monogame.Sprites
             return damageDealt;
         }
 
+        public bool TakeDamage(float damage, Vector2 attackerPosition)
+        {
+            bool damageDealt = base.TakeDamage(damage);
+            
+            if (damageDealt)
+            {
+                isHit = true;
+                hitAnimationTimer = 0f;
+                
+                Vector2 direction = Position - attackerPosition;
+                
+                if (Math.Abs(direction.X) > Math.Abs(direction.Y))
+                {
+                    hitDirection = direction.X > 0 ? Direction.Right : Direction.Left;
+                }
+                else
+                {
+                    hitDirection = direction.Y > 0 ? Direction.Down : Direction.Up;
+                }
+                
+                if (currentHealth <= 0)
+                {
+                    isDefeated = true;
+                }
+            }
+            
+            return damageDealt;
+        }
+            
         public override void Draw(SpriteBatch spriteBatch)
         {
             if (isHit)
