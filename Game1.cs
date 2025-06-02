@@ -160,9 +160,9 @@ namespace monogame
             colorData[0] = Color.White;
             buttonTexture.SetData(colorData);
             
-            donut = new Donut(charaset, new Vector2(_graphicsDevice.Viewport.Width - 96, _graphicsDevice.Viewport.Height - 128), 160f);
+            donut = new Donut(charaset, new Vector2(_graphicsDevice.Viewport.Width - 96, _graphicsDevice.Viewport.Height - 128), 240f);
 
-            donutHole = new DonutHole(donutHoleTexture, donut, new Vector2(-55, -55), 160f);
+            donutHole = new DonutHole(donutHoleTexture, donut, new Vector2(-55, -55), 240f);
             
             axeSprite = new Axe(axeTexture, new Vector2(_graphicsDevice.Viewport.Width / 2, _graphicsDevice.Viewport.Height / 2));
             
@@ -183,11 +183,11 @@ namespace monogame
             int screenHeight = _graphicsDevice.Viewport.Height;
             
             nachoSprite = new Nacho(nacho, nachoOpenMouthTexture, 
-                new Vector2(50, screenHeight / 2 - 100), 80f);
+                new Vector2(50, screenHeight / 2 - 100), 120f);
                 
             empanadaSprite = new Empanada(empanada, empanadaHit, 
-                new Vector2(150, screenHeight - 100), 60f);
-            cheeseProjectile = new Projectile(cheeseLaunch, new Vector2(-100, -100), 600f);
+                new Vector2(150, screenHeight - 100), 90f);
+            cheeseProjectile = new Projectile(cheeseLaunch, new Vector2(-100, -100), 900f);
             cheeseProjectile.Reset();
             
             fruitManager = new FruitProjectileManager(_mainGame.Content);

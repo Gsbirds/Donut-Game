@@ -100,8 +100,8 @@ namespace monogame
             currentPuprmushFrame = 0;
             puprmushFrameTimer = 0f;
             
-            donut = new Donut(donutTexture, new Vector2(_graphicsDevice.Viewport.Width - 96, _graphicsDevice.Viewport.Height - 128), 160f);
-            donutHole = new DonutHole(donutHoleTexture, donut, new Vector2(-55, -55), 160f);
+            donut = new Donut(donutTexture, new Vector2(_graphicsDevice.Viewport.Width - 96, _graphicsDevice.Viewport.Height - 128), 240f);
+            donutHole = new DonutHole(donutHoleTexture, donut, new Vector2(-55, -55), 240f);
             donut.SetInGame2(true);
             if (_mainGame.HasPickedUpAxe)
             {
@@ -111,10 +111,10 @@ namespace monogame
             int screenHeight = _graphicsDevice.Viewport.Height;
             
             sushiSprite = new Sushi(sushiTexture, sushiHitTexture, 
-                new Vector2(50, screenHeight - 150), 120f);
+                new Vector2(50, screenHeight - 150), 180f);
                 
             gingerSprite = new Ginger(gingerTexture, 
-                new Vector2(150, screenHeight / 2 - 100), 70f);
+                new Vector2(150, screenHeight / 2 - 100), 105f);
             cheeseProjectile = new CheeseProjectile(cheeseTexture, cheeseSplashTexture);
             
             sushiSprite.OnDamageDealt += (damage) => {
