@@ -167,7 +167,6 @@ namespace monogame.Sprites
                 Vector2 targetPos = target.Position + new Vector2(offsetX, offsetY);
                 
                 ShootAt(targetPos);
-                Console.WriteLine($"DonutHole targeting enemy at {targetPos}");
             }
         }
         
@@ -176,7 +175,6 @@ namespace monogame.Sprites
             if (isShooting && !isReturning)
             {
                 isReturning = true;
-                Console.WriteLine("DonutHole returning to Donut");
             }
         }
         
@@ -205,17 +203,14 @@ namespace monogame.Sprites
                         return false; 
                     }
                     
-                    Console.WriteLine($"DonutHole collided with {target.GetType().Name}");
                     
                     if (target is Sushi sushi)
                     {
                         sushi.TakeDamage(20f, position);
-                        Console.WriteLine($"Applied 20 damage to Sushi, health now: {sushi.Health}");
                     }
                     else
                     {
                         target.TakeDamage(20f);
-                        Console.WriteLine($"Applied 20 damage to {target.GetType().Name}, health now: {target.Health}");
                     }
                     
                     lastHitTarget = target;
