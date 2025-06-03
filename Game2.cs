@@ -54,6 +54,97 @@ namespace monogame
         private const float PuprmushFrameDuration = 0.2f;
         
         private GameOverScreen gameOverScreen;
+        
+        private void UpdateUIControls(MouseState currentMouseState)
+        {
+            pinkDonutButton.Update(currentMouseState);
+            pinkDonutButton.SetCooldownPercentage(fruitManager.GetCooldownPercentage());
+            
+            if (pinkDonutButton.IsClicked)
+            {
+                pinkDonutButton.CycleToNextColor();
+                DonutColor newColor = pinkDonutButton.GetCurrentColor();
+                donut.SetColor(newColor);
+                _mainGame.CurrentDonutColor = newColor;
+                _mainGame.ColorButtonIndex = pinkDonutButton.GetCurrentColorIndex();
+                
+                if (_mainGame.Game1Instance != null)
+                {
+                    _mainGame.Game1Instance.UpdateDonutColor(newColor, pinkDonutButton.GetCurrentColorIndex());
+                }
+            }
+        }
+        
+        private void UpdatePlayer(GameTime gameTime)
+        {
+            donut.Update(gameTime);
+            donutHole.Update(gameTime);
+            
+            donut.Position = new Vector2(
+                Math.Clamp(donut.Position.X, 48, _graphicsDevice.Viewport.Width - 48),
+                Math.Clamp(donut.Position.Y, 64, _graphicsDevice.Viewport.Height - 64)
+            );
+        }
+        
+        private void UpdateEnemies(GameTime gameTime)
+        {
+            Vector2 donutPos = donut.Position;
+            
+            sushiSprite.SetTargetPosition(donutPos);
+            gingerSprite.SetTargetPosition(donutPos);
+            sushiSprite.Update(gameTime);
+            gingerSprite.Update(gameTime);
+            
+            Vector2 sushiToGinger = gingerSprite.Position - sushiSprite.Position;
+            if (sushiToGinger.Length() < minDistanceBetweenSushiAndGinger)
+            {
+                Vector2 separation = Vector2.Normalize(sushiToGinger) * minDistanceBetweenSushiAndGinger;
+                gingerSprite.Position = sushiSprite.Position + separation;
+            }
+        }
+        
+        private void HandleCollisions(GameTime gameTime, MouseState currentMouseState)
+        {
+            if (donut.CollidesWith(sushiSprite))
+                Sprite.ResolveCollision(donut, sushiSprite);
+                
+            if (donut.CollidesWith(gingerSprite))
+                Sprite.ResolveCollision(donut, gingerSprite);
+            
+            donutHole.CheckCollision(sushiSprite);
+            donutHole.CheckCollision(gingerSprite);
+            
+            Sprite[] enemies = { sushiSprite, gingerSprite };
+            fruitManager.CheckCollisions(enemies, _graphicsDevice);
+        }
+        
+        private void UpdateAnimations(float deltaTime)
+        {
+            puprmushFrameTimer += deltaTime;
+            if (puprmushFrameTimer >= PuprmushFrameDuration)
+            {
+                puprmushFrameTimer = 0f;
+                currentPuprmushFrame = (currentPuprmushFrame + 1) % puprmushFrames.Length;
+            }
+        }
+        
+        private bool CheckGameCompletion()
+        {
+            if (donut.Health <= 0)
+            {
+                if (gameOverScreen != null)
+                    gameOverScreen.Activate();
+                return true;
+            }
+            
+            if (sushiSprite.Health <= 0 && gingerSprite.Health <= 0)
+            {
+                _mainGame.SwitchGameState(MainGame.GameStateType.Game1);
+                return true;
+            }
+            
+            return false;
+        }
 
         public Game2(MainGame mainGame, SpriteBatch spriteBatch)
         {
@@ -147,105 +238,35 @@ namespace monogame
             
         }
 
+        private void UpdateProjectiles(GameTime gameTime, MouseState currentMouseState)
+        {
+            fruitManager.Update(gameTime, donut.Position, donut.GetColor(), currentMouseState, previousMouseState);
+            UpdateProjectile(gameTime, (float)gameTime.ElapsedGameTime.TotalSeconds);
+        }
+        
         public void Update(GameTime gameTime)
         {
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
-            
             MouseState currentMouseState = Mouse.GetState();
             
-            fruitManager.Update(gameTime, donut.Position, donut.GetColor(), currentMouseState, previousMouseState);
+            UpdateUIControls(currentMouseState);
             
-            pinkDonutButton.Update(currentMouseState);
-            pinkDonutButton.SetCooldownPercentage(fruitManager.GetCooldownPercentage());
-            
-            if (pinkDonutButton.IsClicked)
+            if (CheckGameCompletion())
             {
-                pinkDonutButton.CycleToNextColor();
-                DonutColor newColor = pinkDonutButton.GetCurrentColor();
-                donut.SetColor(newColor);
-                _mainGame.CurrentDonutColor = newColor;
-                _mainGame.ColorButtonIndex = pinkDonutButton.GetCurrentColorIndex();
-                
-                if (_mainGame.Game1Instance != null)
-                {
-                    _mainGame.Game1Instance.UpdateDonutColor(newColor, pinkDonutButton.GetCurrentColorIndex());
-                }
-            }
-            
-            MouseState mouseState = Mouse.GetState();
-            HandleMouseAttacks();
-            
-            fruitManager.Update(gameTime, donut.Position, donut.GetColor(), mouseState, previousMouseState);
-            fruitManager.CheckCollisions(new Sprite[] { sushiSprite, gingerSprite }, _graphicsDevice);
-            
-            if (pinkDonutButton != null)
-            {
-                pinkDonutButton.SetCooldownPercentage(fruitManager.GetCooldownPercentage());
-            }
-            
-            if (donut.Health <= 0)
-            {
-                if (gameOverScreen != null)
-                    gameOverScreen.Activate();
-                return;
-            }
-
-            donut.Update(gameTime);
-            donutHole.Update(gameTime);
-            
-            bool sushiHit = donutHole.CheckCollision(sushiSprite);
-            bool gingerHit = donutHole.CheckCollision(gingerSprite);
-            
-            if (sushiHit || gingerHit)
-            {
-                Console.WriteLine($"Sushi health: {sushiSprite.Health}, Ginger health: {gingerSprite.Health}");
-            }
-            
-            if (sushiSprite.Health <= 0 && gingerSprite.Health <= 0)
-            {
-                Console.WriteLine("All enemies defeated! Switching to Game1");
-                _mainGame.SwitchGameState(MainGame.GameStateType.Game1);
                 return;
             }
             
-            Vector2 donutPos = donut.Position;
+            UpdatePlayer(gameTime);
             
-            sushiSprite.SetTargetPosition(donutPos);
-            gingerSprite.SetTargetPosition(donutPos);
-            sushiSprite.Update(gameTime);
-            gingerSprite.Update(gameTime);
+            UpdateProjectiles(gameTime, currentMouseState);
             
-            if (donut.CollidesWith(sushiSprite))
-                Sprite.ResolveCollision(donut, sushiSprite);
-                
-            if (donut.CollidesWith(gingerSprite))
-                Sprite.ResolveCollision(donut, gingerSprite);
+            UpdateEnemies(gameTime);
             
-            Vector2 sushiToGinger = gingerSprite.Position - sushiSprite.Position;
-            if (sushiToGinger.Length() < minDistanceBetweenSushiAndGinger)
-            {
-                Vector2 separation = Vector2.Normalize(sushiToGinger) * minDistanceBetweenSushiAndGinger;
-                gingerSprite.Position = sushiSprite.Position + separation;
-            }
-            
-            puprmushFrameTimer += deltaTime;
-            if (puprmushFrameTimer >= PuprmushFrameDuration)
-            {
-                puprmushFrameTimer = 0f;
-                currentPuprmushFrame = (currentPuprmushFrame + 1) % puprmushFrames.Length;
-            }
-            
-            donut.Position = new Vector2(
-                Math.Clamp(donut.Position.X, 48, _graphicsDevice.Viewport.Width - 48),
-                Math.Clamp(donut.Position.Y, 64, _graphicsDevice.Viewport.Height - 64)
-            );
-            
-            UpdateProjectile(gameTime, deltaTime);
+            HandleCollisions(gameTime, currentMouseState);
             
             HandleMouseAttacks();
             
-            Sprite[] enemies = { sushiSprite, gingerSprite };
-            fruitManager.CheckCollisions(enemies, _graphicsDevice);
+            UpdateAnimations(deltaTime);
             
             previousMouseState = currentMouseState;
         }
@@ -457,7 +478,6 @@ namespace monogame
             
             if (mouseState.LeftButton == ButtonState.Pressed && previousMouseState.LeftButton != ButtonState.Pressed)
             {
-                // Check for melee attacks if close enough
                 float donutSushiDistance = Vector2.Distance(donut.Position, sushiSprite.Position);
                 if (donutSushiDistance < 70) 
                 {
