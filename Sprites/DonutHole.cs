@@ -203,15 +203,7 @@ namespace monogame.Sprites
                         return false; 
                     }
                     
-                    
-                    if (target is Sushi sushi)
-                    {
-                        sushi.TakeDamage(20f, position);
-                    }
-                    else
-                    {
-                        target.TakeDamage(20f);
-                    }
+                    target.TakeDamage(20f);
                     
                     lastHitTarget = target;
                     
