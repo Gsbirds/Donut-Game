@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -240,7 +240,14 @@ namespace monogame
         {
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
             
+            // ==========================================
+            // 1. Handle Input and UI Updates
+            // ==========================================
             MouseState currentMouseState = Mouse.GetState();
+            KeyboardState keyboardState = Keyboard.GetState();
+            bool mouseJustClicked = currentMouseState.LeftButton == ButtonState.Pressed && previousMouseState.LeftButton != ButtonState.Pressed;
+            
+            // UI Button handling
             pinkDonutButton.Update(currentMouseState);
             pinkDonutButton.SetCooldownPercentage(fruitManager.GetCooldownPercentage());
             
@@ -249,27 +256,28 @@ namespace monogame
                 if (_mainGame.IsColorEffectActive)
                 {
                     pinkDonutButton.CycleToNextColor();
-                    donut.SetColor(pinkDonutButton.GetCurrentColor());
-                    
-                    _mainGame.CurrentDonutColor = pinkDonutButton.GetCurrentColor();
                     _mainGame.ColorButtonIndex = (int)pinkDonutButton.GetCurrentColorIndex();
                 }
                 else
                 {
                     _mainGame.IsColorEffectActive = true;
-                    donut.SetColor(pinkDonutButton.GetCurrentColor());
-                    
-                    _mainGame.CurrentDonutColor = pinkDonutButton.GetCurrentColor();
                 }
+                
+                // Set donut color in both cases
+                donut.SetColor(pinkDonutButton.GetCurrentColor());
+                _mainGame.CurrentDonutColor = pinkDonutButton.GetCurrentColor();
             }
             
-            KeyboardState keyboardState = Keyboard.GetState();
+            // Keyboard toggle
             if (keyboardState.IsKeyDown(Keys.P) && !previousKeyboardState.IsKeyDown(Keys.P))
             {
                 isColorEffectActive = !isColorEffectActive;
             }
             previousKeyboardState = keyboardState;
             
+            // ==========================================
+            // 2. Game State Checks
+            // ==========================================
             if (gameOverScreen.IsActive)
             {
                 gameOverScreen.Update(deltaTime);
@@ -281,33 +289,22 @@ namespace monogame
                 return;
             }
 
-            axeSprite.Update(gameTime);
-            
+            // ==========================================
+            // 3. Update Game Objects
+            // ==========================================
+            // Core sprites
             donut.Update(gameTime);
             donutHole.Update(gameTime);
+            axeSprite.Update(gameTime);
+            
+            // Enemy updates
             nachoSprite.Update(gameTime);
             empanadaSprite.Update(deltaTime, donut.Position, nachoSprite.Position);
             
-            
-            Sprite.ResolveCollision(donut, nachoSprite);
-            Sprite.ResolveCollision(donut, empanadaSprite);
-            Sprite.ResolveCollision(nachoSprite, empanadaSprite);
-
-            Vector2 donutPos = donut.Position;
-            float distanceToDonut = Vector2.Distance(empanadaSprite.Position, donutPos);
-
-            if (distanceToDonut <= AttackRange * 3.0f)
-            {
-                empanadaSprite.StartAttack();
-            }
-
-            Vector2 nachoToEmpanada = empanadaSprite.Position - nachoSprite.Position;
-            if (nachoToEmpanada.Length() < MinDistanceBetweenNachoAndEmpanada)
-            {
-                Vector2 separation = Vector2.Normalize(nachoToEmpanada) * MinDistanceBetweenNachoAndEmpanada;
-                nachoSprite.Position = empanadaSprite.Position - separation;
-            }
-
+            // ==========================================
+            // 4. Level Elements and Animation Updates
+            // ==========================================
+            // Pipe animations
             for (int i = 0; i < pipePositions.Length; i++)
             {
                 pipeAnimationTimers[i] += deltaTime;
@@ -318,31 +315,50 @@ namespace monogame
                 }
             }
 
+            // Puprmush animations
             puprmushFrameTimer += deltaTime;
             if (puprmushFrameTimer >= PuprmushFrameDuration)
             {
                 puprmushFrameTimer = 0f;
                 currentPuprmushFrame = (currentPuprmushFrame + 1) % 5;
             }
-
+            
+            // ==========================================
+            // 5. Player and Enemy Behavior
+            // ==========================================
+            // Keep player in bounds
             donut.Position = new Vector2(
                 Math.Clamp(donut.Position.X, 48, _graphicsDevice.Viewport.Width - 48),
                 Math.Clamp(donut.Position.Y, 64, _graphicsDevice.Viewport.Height - 64)
             );
 
+            // Enemy AI and behavior
             nachoSprite.SetTargetPosition(donut.Position);
             empanadaSprite.SetTargetPosition(donut.Position);
-            nachoSprite.Update(gameTime);
-            empanadaSprite.Update(gameTime);
-
+            
+            float distanceToDonut = Vector2.Distance(empanadaSprite.Position, donut.Position);
             float distanceToDonutNacho = Vector2.Distance(nachoSprite.Position, donut.Position);
 
+            // Empanada attack behavior
+            if (distanceToDonut <= AttackRange * 3.0f)
+            {
+                empanadaSprite.StartAttack();
+            }
+
+            // Keep enemies separated
+            Vector2 nachoToEmpanada = empanadaSprite.Position - nachoSprite.Position;
+            if (nachoToEmpanada.Length() < MinDistanceBetweenNachoAndEmpanada)
+            {
+                Vector2 separation = Vector2.Normalize(nachoToEmpanada) * MinDistanceBetweenNachoAndEmpanada;
+                nachoSprite.Position = empanadaSprite.Position - separation;
+            }
+
+            // Nacho cheese projectile logic
             if (projectileCooldownTimer > 0)
             {
                 projectileCooldownTimer -= deltaTime;
             }
 
-            var mouse = Mouse.GetState();
             if (distanceToDonutNacho < 200f && !nachoSprite.IsDefeated)
             {
                 nachoSprite.SetOpenMouthFrame(true);
@@ -365,20 +381,27 @@ namespace monogame
                     cheeseProjectile.Reset();
                 }
             }
+            
+            // ==========================================
+            // 6. Collision Detection and Resolution
+            // ==========================================
+            // Physical collision resolution
+            Sprite.ResolveCollision(donut, nachoSprite);
+            Sprite.ResolveCollision(donut, empanadaSprite);
+            Sprite.ResolveCollision(nachoSprite, empanadaSprite);
 
-            var mouseState = Mouse.GetState();
-            bool mouseJustClicked = mouseState.LeftButton == ButtonState.Pressed && previousMouseState.LeftButton != ButtonState.Pressed;
-            bool mouseJustRightClicked = mouseState.RightButton == ButtonState.Pressed && previousMouseState.RightButton != ButtonState.Pressed;
+            // DonutHole collision with enemies
+            donutHole.CheckCollision(nachoSprite);
+            donutHole.CheckCollision(empanadaSprite);
             
-            fruitManager.Update(gameTime, donut.Position, donut.GetColor(), mouseState, previousMouseState);
+            // Fruit manager collisions
+            Sprite[] enemies = { nachoSprite, empanadaSprite };
+            fruitManager.Update(gameTime, donut.Position, donut.GetColor(), currentMouseState, previousMouseState);
+            fruitManager.CheckCollisions(enemies, _graphicsDevice);
             
-            bool nachoHit = donutHole.CheckCollision(nachoSprite);
-            bool empanadaHit = donutHole.CheckCollision(empanadaSprite);
-            
-            if (nachoHit || empanadaHit)
-            {
-            }
-            
+            // ==========================================
+            // 7. Level Completion Check
+            // ==========================================
             if (nachoSprite.Health <= 0 && empanadaSprite.Health <= 0)
             {
                 if (!enemiesDefeated)
@@ -392,9 +415,6 @@ namespace monogame
                     axeSprite.Show();
                 }
             }
-
-            Sprite[] enemies = { nachoSprite, empanadaSprite };
-            fruitManager.CheckCollisions(enemies, _graphicsDevice);
             
             float donutNachoDistance = Vector2.Distance(donut.Position, nachoSprite.Position);
             float donutEmpanadaDistance = Vector2.Distance(donut.Position, empanadaSprite.Position);
@@ -469,7 +489,7 @@ namespace monogame
                 return;
             }
             
-            previousMouseState = mouseState;
+            previousMouseState = currentMouseState;
 
             if (cheeseProjectile.IsActive)
             {
