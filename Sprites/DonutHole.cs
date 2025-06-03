@@ -1,6 +1,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Collections.Generic;
 
 namespace monogame.Sprites
 {
@@ -10,9 +11,22 @@ namespace monogame.Sprites
         private readonly Rectangle[] animationFrames;
         private int currentFrameIndex;
         private float animationTimer;
-        private const float FRAME_DURATION = 0.3f; // Slower animation speed
+        private const float FRAME_DURATION = 0.3f;
         private Vector2 offsetFromDonut; 
-        private Donut parentDonut; 
+        private Donut parentDonut;
+        
+        // Shooting properties
+        private bool isShooting = false;
+        private Vector2 targetPosition;
+        private Vector2 shootDirection;
+        private float shootSpeed = 400f;
+        private bool isReturning = false;
+        private float rotationAngle = 0f;
+        private Sprite lastHitTarget = null;
+        
+        private float shootTimer = 0f;
+        private float shootInterval = 3f;
+        private Random random = new Random();
 
         public DonutHole(Texture2D texture, Donut donut, Vector2 offset, float speed) 
             : base(texture, donut.Position + offset, speed)
@@ -49,7 +63,51 @@ namespace monogame.Sprites
                 currentFrameIndex = (currentFrameIndex + 1) % animationFrames.Length;
             }
             
-            position = parentDonut.Position + offsetFromDonut;
+            if (!isShooting)
+            {
+                shootTimer += deltaTime;
+                if (shootTimer >= shootInterval)
+                {
+                    shootTimer = 0f;
+                    ShootAtRandomTarget();
+                    shootInterval = 2f + (float)random.NextDouble() * 8f;
+                }
+            }
+            
+            if (isShooting)
+            {
+                rotationAngle += 10f * deltaTime;
+                
+                if (isReturning)
+                {
+                    Vector2 returnVector = parentDonut.Position + offsetFromDonut - position;
+                    if (returnVector.Length() < 10)
+                    {
+                        isShooting = false;
+                        isReturning = false;
+                        lastHitTarget = null;
+                        position = parentDonut.Position + offsetFromDonut;
+                    }
+                    else
+                    {
+                        shootDirection = Vector2.Normalize(returnVector);
+                        position += shootDirection * shootSpeed * deltaTime;
+                    }
+                }
+                else
+                {
+                    position += shootDirection * shootSpeed * deltaTime;
+                    
+                    if (Vector2.Distance(position, parentDonut.Position) > 800)
+                    {
+                        ReturnToDonut();
+                    }
+                }
+            }
+            else
+            {
+                position = parentDonut.Position + offsetFromDonut;
+            }
         }
 
         public override void Draw(SpriteBatch spriteBatch)
@@ -61,12 +119,112 @@ namespace monogame.Sprites
                 position,
                 animationFrames[currentFrameIndex],
                 Color.White,
-                0f,
+                isShooting ? rotationAngle : 0f,
                 new Vector2(animationFrames[currentFrameIndex].Width / 2, animationFrames[currentFrameIndex].Height / 2),
                 new Vector2(scale, scale),
                 SpriteEffects.None,
                 0f
             );
+        }
+        
+        public void ShootAt(Vector2 target)
+        {
+            if (!isShooting)
+            {
+                isShooting = true;
+                isReturning = false;
+                lastHitTarget = null;
+                targetPosition = target;
+                shootDirection = Vector2.Normalize(targetPosition - position);
+            }
+        }
+        
+        private Sprite sushiTarget;
+        private Sprite gingerTarget;
+        
+        public void SetTargets(Sprite sushi, Sprite ginger)
+        {
+            sushiTarget = sushi;
+            gingerTarget = ginger;
+        }
+        
+        private void ShootAtRandomTarget()
+        {
+            Sprite target = null;
+            
+            var validTargets = new List<Sprite>();
+            if (sushiTarget != null && sushiTarget.Health > 0)
+                validTargets.Add(sushiTarget);
+            if (gingerTarget != null && gingerTarget.Health > 0)
+                validTargets.Add(gingerTarget);
+                
+            if (validTargets.Count > 0)
+            {
+                target = validTargets[random.Next(validTargets.Count)];
+                
+                float offsetX = -5f + (float)random.NextDouble() * 10f;
+                float offsetY = -5f + (float)random.NextDouble() * 10f;
+                Vector2 targetPos = target.Position + new Vector2(offsetX, offsetY);
+                
+                ShootAt(targetPos);
+                Console.WriteLine($"DonutHole targeting enemy at {targetPos}");
+            }
+        }
+        
+        public void ReturnToDonut()
+        {
+            if (isShooting && !isReturning)
+            {
+                isReturning = true;
+                Console.WriteLine("DonutHole returning to Donut");
+            }
+        }
+        
+        public bool CheckCollision(Sprite target)
+        {
+            if (isShooting && !isReturning && target.Health > 0)
+            {
+                Rectangle myBounds = new Rectangle(
+                    (int)(position.X - 20), // Wider hit box
+                    (int)(position.Y - 20), // Taller hit box
+                    40,  // Fixed width 
+                    40   // Fixed height
+                );
+                
+                Rectangle targetBounds = new Rectangle(
+                    (int)(target.Position.X - 30),
+                    (int)(target.Position.Y - 30),
+                    60,
+                    60
+                );
+                
+                if (myBounds.Intersects(targetBounds))
+                {
+                    if (target == lastHitTarget)
+                    {
+                        return false; 
+                    }
+                    
+                    Console.WriteLine($"DonutHole collided with {target.GetType().Name}");
+                    
+                    if (target is Sushi sushi)
+                    {
+                        sushi.TakeDamage(20f, position);
+                        Console.WriteLine($"Applied 20 damage to Sushi, health now: {sushi.Health}");
+                    }
+                    else
+                    {
+                        target.TakeDamage(20f);
+                        Console.WriteLine($"Applied 20 damage to {target.GetType().Name}, health now: {target.Health}");
+                    }
+                    
+                    lastHitTarget = target;
+                    
+                    ReturnToDonut();
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

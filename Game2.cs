@@ -117,6 +117,9 @@ namespace monogame
                 new Vector2(150, screenHeight / 2 - 100), 105f);
             cheeseProjectile = new CheeseProjectile(cheeseTexture, cheeseSplashTexture);
             
+            // Set targets for DonutHole
+            donutHole.SetTargets(sushiSprite, gingerSprite);
+            
             sushiSprite.OnDamageDealt += (damage) => {
                 donut.TakeDamage(3f);  
             };
@@ -189,6 +192,21 @@ namespace monogame
 
             donut.Update(gameTime);
             donutHole.Update(gameTime);
+            
+            bool sushiHit = donutHole.CheckCollision(sushiSprite);
+            bool gingerHit = donutHole.CheckCollision(gingerSprite);
+            
+            if (sushiHit || gingerHit)
+            {
+                Console.WriteLine($"Sushi health: {sushiSprite.Health}, Ginger health: {gingerSprite.Health}");
+            }
+            
+            if (sushiSprite.Health <= 0 && gingerSprite.Health <= 0)
+            {
+                Console.WriteLine("All enemies defeated! Switching to Game1");
+                _mainGame.SwitchGameState(MainGame.GameStateType.Game1);
+                return;
+            }
             
             Vector2 donutPos = donut.Position;
             
@@ -265,7 +283,7 @@ namespace monogame
                     currentFrame = new Rectangle(0, 133, 110, 133);
                 else if (sushiSprite.FacingDirection == Direction.Down)
                     currentFrame = new Rectangle(0, 266, 110, 133);
-                else // Left
+                else 
                     currentFrame = new Rectangle(0, 399, 110, 133);
                 
                 Vector2 origin = new Vector2(currentFrame.Width / 2, currentFrame.Height / 2);
@@ -275,7 +293,7 @@ namespace monogame
                     position,
                     currentFrame,
                     Color.Gray * sushiSprite.FadeAlpha,
-                    MathHelper.PiOver2, // 90 degrees rotation
+                    MathHelper.PiOver2, 
                     origin,
                     1.0f,
                     SpriteEffects.None,
@@ -302,7 +320,7 @@ namespace monogame
                     currentFrame = new Rectangle(0, 133, 110, 133);
                 else if (gingerSprite.FacingDirection == Direction.Down)
                     currentFrame = new Rectangle(0, 266, 110, 133);
-                else // Left
+                else
                     currentFrame = new Rectangle(0, 399, 110, 133);
                 
                 Vector2 origin = new Vector2(currentFrame.Width / 2, currentFrame.Height / 2);
@@ -312,7 +330,7 @@ namespace monogame
                     position,
                     currentFrame,
                     Color.Gray * gingerSprite.FadeAlpha,
-                    MathHelper.PiOver2, // 90 degrees rotation
+                    MathHelper.PiOver2,
                     origin,
                     1.0f,
                     SpriteEffects.None,
@@ -439,6 +457,7 @@ namespace monogame
             
             if (mouseState.LeftButton == ButtonState.Pressed && previousMouseState.LeftButton != ButtonState.Pressed)
             {
+                // Check for melee attacks if close enough
                 float donutSushiDistance = Vector2.Distance(donut.Position, sushiSprite.Position);
                 if (donutSushiDistance < 70) 
                 {

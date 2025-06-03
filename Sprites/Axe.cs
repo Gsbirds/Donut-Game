@@ -87,6 +87,7 @@ namespace monogame.Sprites
         
         private void PickUp()
         {
+            Console.WriteLine("Axe PickUp() method called");
             isPlayingPickupAnimation = true;
             pickupAnimationTimer = 0f;
             rotationAngle = 0f;
@@ -121,11 +122,19 @@ namespace monogame.Sprites
                     sparkleAngles[i] += deltaTime * 3.0f;
                 }
                 
+                // Immediately set isPickedUp flag when animation is 50% complete to trigger level transition faster
+                if (pickupAnimationTimer >= PICKUP_ANIMATION_DURATION * 0.5f && !isPickedUp)
+                {
+                    Console.WriteLine("Axe pickup 50% complete - setting IsPickedUp to true");
+                    isPickedUp = true;
+                }
+                
+                // Animation complete
                 if (pickupAnimationTimer >= PICKUP_ANIMATION_DURATION)
                 {
+                    Console.WriteLine("Axe animation complete");
                     isPlayingPickupAnimation = false;
                     isVisible = false;
-                    isPickedUp = true;
                 }
                 
                 return;

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -192,6 +192,9 @@ namespace monogame
             
             fruitManager = new FruitProjectileManager(_mainGame.Content);
             
+            // Set targets for DonutHole
+            donutHole.SetTargets(nachoSprite, empanadaSprite);
+            
             empanadaSprite.OnDamageDealt += (damage) => {
                 donut.TakeDamage(10f);
             };
@@ -285,6 +288,7 @@ namespace monogame
             nachoSprite.Update(gameTime);
             empanadaSprite.Update(deltaTime, donut.Position, nachoSprite.Position);
             
+            
             Sprite.ResolveCollision(donut, nachoSprite);
             Sprite.ResolveCollision(donut, empanadaSprite);
             Sprite.ResolveCollision(nachoSprite, empanadaSprite);
@@ -368,6 +372,27 @@ namespace monogame
             
             fruitManager.Update(gameTime, donut.Position, donut.GetColor(), mouseState, previousMouseState);
             
+            bool nachoHit = donutHole.CheckCollision(nachoSprite);
+            bool empanadaHit = donutHole.CheckCollision(empanadaSprite);
+            
+            if (nachoHit || empanadaHit)
+            {
+            }
+            
+            if (nachoSprite.Health <= 0 && empanadaSprite.Health <= 0)
+            {
+                if (!enemiesDefeated)
+                {
+                    enemiesDefeated = true;
+                    axeSprite.Show();
+                }
+                
+                if (!axePickedUp && !axeSprite.IsVisible)
+                {
+                    axeSprite.Show();
+                }
+            }
+
             Sprite[] enemies = { nachoSprite, empanadaSprite };
             fruitManager.CheckCollisions(enemies, _graphicsDevice);
             
@@ -386,7 +411,7 @@ namespace monogame
             }
             
             if (mouseJustClicked)
-            {   
+            {
                 if (enemiesDefeated && !axePickedUp && axeSprite.CheckPickup(donut))
                 {
                     _mainGame.HasPickedUpAxe = true;
@@ -405,20 +430,37 @@ namespace monogame
                 }
             }
             
-            if (!enemiesDefeated && nachoSprite.Health <= 0 && empanadaSprite.Health <= 0)
+            // This is redundant with the check above, but we'll keep it as a backup
+            if (nachoSprite.Health <= 0 && empanadaSprite.Health <= 0)
             {
-                enemiesDefeated = true;
-                axeSprite.Show();
+                if (!enemiesDefeated)
+                {
+                    enemiesDefeated = true;
+                    axeSprite.Show();
+                }
+                
+                if (!axePickedUp && !axeSprite.IsVisible)
+                {
+                    axeSprite.Show();
+                }
             }
             
             if (enemiesDefeated && axeSprite.IsPlayingPickupAnimation)
             {
+                if (axeSprite.IsPickedUp)
+                {
+                    axePickedUp = true;
+                    _mainGame.SwitchGameState(MainGame.GameStateType.Game2);
+                    return;
+                }
                 return;
             }
             
             if (enemiesDefeated && !axePickedUp && axeSprite.IsPickedUp)
             {
                 axePickedUp = true;
+                _mainGame.SwitchGameState(MainGame.GameStateType.Game2);
+                return;
             }
             
             if (enemiesDefeated && axePickedUp)
@@ -578,7 +620,6 @@ namespace monogame
                 
                 Vector2 origin = new Vector2(currentFrame.Width / 2, currentFrame.Height / 2);
                 
-                // Draw with rotation and gray color
                 _spriteBatch.Draw(
                     texture,
                     position,
@@ -593,19 +634,15 @@ namespace monogame
             }
             else
             {
-                // Normal drawing when not defeated
                 nachoSprite.Draw(_spriteBatch);
             }
             
-            // Custom drawing code for Empanada to ensure it shows defeated state properly
             if (empanadaSprite.Health <= 0)
             {
-                // When defeated, draw with rotation and gray color
                 Texture2D texture = empanadaSprite.Texture;
                 Vector2 position = empanadaSprite.Position;
                 Rectangle currentFrame;
                 
-                // Use first frame of the appropriate direction for simplicity
                 if (empanadaSprite.FacingDirection == monogame.Animation.Direction.Up)
                     currentFrame = new Rectangle(0, 0, 110, 133);
                 else if (empanadaSprite.FacingDirection == monogame.Animation.Direction.Right)
@@ -617,13 +654,12 @@ namespace monogame
                 
                 Vector2 origin = new Vector2(currentFrame.Width / 2, currentFrame.Height / 2);
                 
-                // Draw with rotation and gray color
                 _spriteBatch.Draw(
                     texture,
                     position,
                     currentFrame,
                     Color.Gray * empanadaSprite.FadeAlpha,
-                    MathHelper.PiOver2, // 90 degrees rotation
+                    MathHelper.PiOver2,
                     origin,
                     1.0f,
                     SpriteEffects.None,
@@ -632,7 +668,6 @@ namespace monogame
             }
             else
             {
-                // Normal drawing when not defeated
                 empanadaSprite.Draw(_spriteBatch, empanadaSprite.IsAttacking);
             }
             
