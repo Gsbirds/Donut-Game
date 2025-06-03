@@ -123,6 +123,270 @@ namespace monogame
 
         private GameOverScreen gameOverScreen;
 
+        private void UpdateUIControls(MouseState currentMouseState, KeyboardState keyboardState)
+        {
+            pinkDonutButton.Update(currentMouseState);
+            pinkDonutButton.SetCooldownPercentage(fruitManager.GetCooldownPercentage());
+            
+            if (pinkDonutButton.IsClicked)
+            {
+                if (_mainGame.IsColorEffectActive)
+                {
+                    pinkDonutButton.CycleToNextColor();
+                    donut.SetColor(pinkDonutButton.GetCurrentColor());
+                    
+                    _mainGame.CurrentDonutColor = pinkDonutButton.GetCurrentColor();
+                    _mainGame.ColorButtonIndex = (int)pinkDonutButton.GetCurrentColorIndex();
+                }
+                else
+                {
+                    _mainGame.IsColorEffectActive = true;
+                    donut.SetColor(pinkDonutButton.GetCurrentColor());
+                    
+                    _mainGame.CurrentDonutColor = pinkDonutButton.GetCurrentColor();
+                }
+            }
+            
+            if (keyboardState.IsKeyDown(Keys.P) && !previousKeyboardState.IsKeyDown(Keys.P))
+            {
+                isColorEffectActive = !isColorEffectActive;
+            }
+        }
+        
+        private void UpdatePlayer(GameTime gameTime)
+        {
+            donut.Update(gameTime);
+            donutHole.Update(gameTime);
+            
+            donut.Position = new Vector2(
+                Math.Clamp(donut.Position.X, 48, _graphicsDevice.Viewport.Width - 48),
+                Math.Clamp(donut.Position.Y, 64, _graphicsDevice.Viewport.Height - 64)
+            );
+        }
+        
+        private void UpdateEnemies(float deltaTime, GameTime gameTime)
+        {
+            nachoSprite.Update(gameTime);
+            empanadaSprite.Update(gameTime);
+            
+            empanadaSprite.Update(deltaTime, donut.Position, nachoSprite.Position);
+            
+            nachoSprite.SetTargetPosition(donut.Position);
+            empanadaSprite.SetTargetPosition(donut.Position);
+            
+            Vector2 donutPos = donut.Position;
+            float distanceToDonut = Vector2.Distance(empanadaSprite.Position, donutPos);
+            
+            if (distanceToDonut <= AttackRange * 3.0f)
+            {
+                empanadaSprite.StartAttack();
+            }
+            
+            Vector2 nachoToEmpanada = empanadaSprite.Position - nachoSprite.Position;
+            if (nachoToEmpanada.Length() < MinDistanceBetweenNachoAndEmpanada)
+            {
+                Vector2 separation = Vector2.Normalize(nachoToEmpanada) * MinDistanceBetweenNachoAndEmpanada;
+                nachoSprite.Position = empanadaSprite.Position - separation;
+            }
+        }
+        
+        private void UpdateNachoProjectile(float deltaTime, GameTime gameTime)
+        {
+            float distanceToDonutNacho = Vector2.Distance(nachoSprite.Position, donut.Position);
+            
+            if (projectileCooldownTimer > 0)
+            {
+                projectileCooldownTimer -= deltaTime;
+            }
+
+            if (distanceToDonutNacho < 200f && !nachoSprite.IsDefeated)
+            {
+                nachoSprite.SetOpenMouthFrame(true);
+                
+                if (projectileCooldownTimer <= 0 && !cheeseProjectile.IsActive)
+                {
+                    Vector2 launchPosition = nachoSprite.Position + new Vector2(0, -40);
+                    Vector2 directionToDonut = donut.Position - launchPosition;
+                    cheeseProjectile.Launch(launchPosition, directionToDonut);
+                    
+                    projectileCooldownTimer = ProjectileCooldown;
+                }
+            }
+            else
+            {
+                nachoSprite.SetOpenMouthFrame(false);
+                
+                if (cheeseProjectile.IsActive && Vector2.Distance(cheeseProjectile.Position, donut.Position) > 500f)
+                {
+                    cheeseProjectile.Reset();
+                }
+            }
+        }
+        
+        private void UpdateAnimations(float deltaTime)
+        {
+            for (int i = 0; i < pipePositions.Length; i++)
+            {
+                pipeAnimationTimers[i] += deltaTime;
+                if (pipeAnimationTimers[i] >= pipeFrameDuration)
+                {
+                    pipeAnimationTimers[i] = 0f;
+                    currentPipeFrameIndices[i] = (currentPipeFrameIndices[i] + 1) % pipeSourceRectangles.Length;
+                }
+            }
+
+            puprmushFrameTimer += deltaTime;
+            if (puprmushFrameTimer >= PuprmushFrameDuration)
+            {
+                puprmushFrameTimer = 0f;
+                currentPuprmushFrame = (currentPuprmushFrame + 1) % puprmushFrames.Length;
+            }
+            
+            if (isNachoHitActive)
+            {
+                nachoHitFrameTimer -= deltaTime;
+                if (nachoHitFrameTimer <= 0)
+                {
+                    nachoHitFrameTimer = 0;
+                    isNachoHitActive = false;
+                    nachoSprite.SetPostHitFrame(false);
+                }
+            }
+        }
+        
+        private void HandlePlayerAttack(MouseState currentMouseState)
+        {
+            bool mouseJustClicked = currentMouseState.LeftButton == ButtonState.Pressed && 
+                                   previousMouseState.LeftButton != ButtonState.Pressed;
+                                   
+            if (!mouseJustClicked) return;
+            
+            float donutNachoDistance = Vector2.Distance(donut.Position, nachoSprite.Position);
+            float donutEmpanadaDistance = Vector2.Distance(donut.Position, empanadaSprite.Position);
+            
+            if (enemiesDefeated && !axePickedUp && axeSprite.CheckPickup(donut))
+            {
+                _mainGame.HasPickedUpAxe = true;
+                donut.PickupAxe();
+            }
+            else if (donutNachoDistance < 70 && nachoSprite.Health > 0)
+            {
+                nachoSprite.SetPostHitFrame(true);
+                nachoSprite.TakeDamage(20f);
+                isNachoHitActive = true;
+                nachoHitFrameTimer = NachoHitFrameDuration;
+            }
+            else if (donutEmpanadaDistance < 70 && empanadaSprite.Health > 0)
+            {
+                empanadaSprite.TakeDamage(20f);
+            }
+        }
+        
+        private void CheckCollisions(MouseState currentMouseState, GameTime gameTime)
+        {
+            Sprite.ResolveCollision(donut, nachoSprite);
+            Sprite.ResolveCollision(donut, empanadaSprite);
+            Sprite.ResolveCollision(nachoSprite, empanadaSprite);
+            
+            donutHole.CheckCollision(nachoSprite);
+            donutHole.CheckCollision(empanadaSprite);
+            
+            Sprite[] enemies = { nachoSprite, empanadaSprite };
+            fruitManager.Update(gameTime, donut.Position, donut.GetColor(), currentMouseState, previousMouseState);
+            fruitManager.CheckCollisions(enemies, _graphicsDevice);
+        }
+        
+        private void CheckCheeseProjectile(float deltaTime)
+        {
+            if (cheeseProjectile.IsActive)
+            {
+                Vector2 projectilePos = cheeseProjectile.Position;
+                
+                if (projectilePos.X < -100 || projectilePos.Y < -100 || 
+                    projectilePos.X > _graphicsDevice.Viewport.Width + 100 || 
+                    projectilePos.Y > _graphicsDevice.Viewport.Height + 100)
+                {
+                    cheeseProjectile.Reset();
+                }
+                else
+                {
+                    Rectangle cheeseRect = new Rectangle(
+                        (int)cheeseProjectile.Position.X - 32,
+                        (int)cheeseProjectile.Position.Y - 32,
+                        64, 64
+                    );
+
+                    Rectangle donutRect = new Rectangle(
+                        (int)donut.Position.X - 48,
+                        (int)donut.Position.Y - 64,
+                        96, 128
+                    );
+
+                    if (cheeseRect.Intersects(donutRect) && !cheeseProjectile.HasDealtDamage)
+                    {
+                        showSplashEffect = true;
+                        splashPosition = donut.Position;
+                        splashTimer = 0f;
+                        
+                        cheeseProjectile.DealDamageTo(donut);
+                        cheeseProjectile.Reset();
+                    }
+                }
+            }
+            
+            if (showSplashEffect)
+            {
+                splashTimer += deltaTime;
+                if (splashTimer >= SPLASH_DURATION)
+                {
+                    showSplashEffect = false;
+                }
+            }
+        }
+        
+        private bool CheckLevelCompletion()
+        {
+            if (nachoSprite.Health <= 0 && empanadaSprite.Health <= 0)
+            {
+                if (!enemiesDefeated)
+                {
+                    enemiesDefeated = true;
+                    axeSprite.Show();
+                }
+                
+                if (!axePickedUp && !axeSprite.IsVisible)
+                {
+                    axeSprite.Show();
+                }
+            }
+            
+            if (enemiesDefeated && axeSprite.IsPlayingPickupAnimation)
+            {
+                if (axeSprite.IsPickedUp)
+                {
+                    axePickedUp = true;
+                    _mainGame.SwitchGameState(MainGame.GameStateType.Game2);
+                    return true;
+                }
+                return true;
+            }
+            
+            if (enemiesDefeated && !axePickedUp && axeSprite.IsPickedUp)
+            {
+                axePickedUp = true;
+                _mainGame.SwitchGameState(MainGame.GameStateType.Game2);
+                return true;
+            }
+            
+            if (enemiesDefeated && axePickedUp)
+            {
+                _mainGame.SwitchGameState(MainGame.GameStateType.Game2);
+                return true;
+            }
+            
+            return false;
+        }
+
         public Game1(MainGame mainGame, SpriteBatch spriteBatch)
         {
             _mainGame = mainGame;
@@ -192,7 +456,6 @@ namespace monogame
             
             fruitManager = new FruitProjectileManager(_mainGame.Content);
             
-            // Set targets for DonutHole
             donutHole.SetTargets(nachoSprite, empanadaSprite);
             
             empanadaSprite.OnDamageDealt += (damage) => {
@@ -241,34 +504,9 @@ namespace monogame
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
             
             MouseState currentMouseState = Mouse.GetState();
-            pinkDonutButton.Update(currentMouseState);
-            pinkDonutButton.SetCooldownPercentage(fruitManager.GetCooldownPercentage());
-            
-            if (pinkDonutButton.IsClicked)
-            {
-                if (_mainGame.IsColorEffectActive)
-                {
-                    pinkDonutButton.CycleToNextColor();
-                    donut.SetColor(pinkDonutButton.GetCurrentColor());
-                    
-                    _mainGame.CurrentDonutColor = pinkDonutButton.GetCurrentColor();
-                    _mainGame.ColorButtonIndex = (int)pinkDonutButton.GetCurrentColorIndex();
-                }
-                else
-                {
-                    _mainGame.IsColorEffectActive = true;
-                    donut.SetColor(pinkDonutButton.GetCurrentColor());
-                    
-                    _mainGame.CurrentDonutColor = pinkDonutButton.GetCurrentColor();
-                }
-            }
-            
             KeyboardState keyboardState = Keyboard.GetState();
-            if (keyboardState.IsKeyDown(Keys.P) && !previousKeyboardState.IsKeyDown(Keys.P))
-            {
-                isColorEffectActive = !isColorEffectActive;
-            }
-            previousKeyboardState = keyboardState;
+            
+            UpdateUIControls(currentMouseState, keyboardState);
             
             if (gameOverScreen.IsActive)
             {
@@ -282,253 +520,27 @@ namespace monogame
             }
 
             axeSprite.Update(gameTime);
+            UpdatePlayer(gameTime);
+            UpdateEnemies(deltaTime, gameTime);
             
-            donut.Update(gameTime);
-            donutHole.Update(gameTime);
-            nachoSprite.Update(gameTime);
-            empanadaSprite.Update(deltaTime, donut.Position, nachoSprite.Position);
+            HandlePlayerAttack(currentMouseState);
             
+            CheckCollisions(currentMouseState, gameTime);
             
-            Sprite.ResolveCollision(donut, nachoSprite);
-            Sprite.ResolveCollision(donut, empanadaSprite);
-            Sprite.ResolveCollision(nachoSprite, empanadaSprite);
-
-            Vector2 donutPos = donut.Position;
-            float distanceToDonut = Vector2.Distance(empanadaSprite.Position, donutPos);
-
-            if (distanceToDonut <= AttackRange * 3.0f)
-            {
-                empanadaSprite.StartAttack();
-            }
-
-            Vector2 nachoToEmpanada = empanadaSprite.Position - nachoSprite.Position;
-            if (nachoToEmpanada.Length() < MinDistanceBetweenNachoAndEmpanada)
-            {
-                Vector2 separation = Vector2.Normalize(nachoToEmpanada) * MinDistanceBetweenNachoAndEmpanada;
-                nachoSprite.Position = empanadaSprite.Position - separation;
-            }
-
-            for (int i = 0; i < pipePositions.Length; i++)
-            {
-                pipeAnimationTimers[i] += deltaTime;
-                if (pipeAnimationTimers[i] >= pipeFrameDuration)
-                {
-                    pipeAnimationTimers[i] = 0f;
-                    currentPipeFrameIndices[i] = (currentPipeFrameIndices[i] + 1) % 3;
-                }
-            }
-
-            puprmushFrameTimer += deltaTime;
-            if (puprmushFrameTimer >= PuprmushFrameDuration)
-            {
-                puprmushFrameTimer = 0f;
-                currentPuprmushFrame = (currentPuprmushFrame + 1) % 5;
-            }
-
-            donut.Position = new Vector2(
-                Math.Clamp(donut.Position.X, 48, _graphicsDevice.Viewport.Width - 48),
-                Math.Clamp(donut.Position.Y, 64, _graphicsDevice.Viewport.Height - 64)
-            );
-
-            nachoSprite.SetTargetPosition(donut.Position);
-            empanadaSprite.SetTargetPosition(donut.Position);
-            nachoSprite.Update(gameTime);
-            empanadaSprite.Update(gameTime);
-
-            float distanceToDonutNacho = Vector2.Distance(nachoSprite.Position, donut.Position);
-
-            if (projectileCooldownTimer > 0)
-            {
-                projectileCooldownTimer -= deltaTime;
-            }
-
-            var mouse = Mouse.GetState();
-            if (distanceToDonutNacho < 200f && !nachoSprite.IsDefeated)
-            {
-                nachoSprite.SetOpenMouthFrame(true);
-                
-                if (projectileCooldownTimer <= 0 && !cheeseProjectile.IsActive)
-                {
-                    Vector2 launchPosition = nachoSprite.Position + new Vector2(0, -40);
-                    Vector2 directionToDonut = donut.Position - launchPosition;
-                    cheeseProjectile.Launch(launchPosition, directionToDonut);
-                    
-                    projectileCooldownTimer = ProjectileCooldown;
-                }
-            }
-            else
-            {
-                nachoSprite.SetOpenMouthFrame(false);
-                
-                if (cheeseProjectile.IsActive && Vector2.Distance(cheeseProjectile.Position, donut.Position) > 500f)
-                {
-                    cheeseProjectile.Reset();
-                }
-            }
-
-            var mouseState = Mouse.GetState();
-            bool mouseJustClicked = mouseState.LeftButton == ButtonState.Pressed && previousMouseState.LeftButton != ButtonState.Pressed;
+            UpdateAnimations(deltaTime);
             
-            fruitManager.Update(gameTime, donut.Position, donut.GetColor(), mouseState, previousMouseState);
+            UpdateNachoProjectile(deltaTime, gameTime);
             
-            donutHole.CheckCollision(nachoSprite);
-            donutHole.CheckCollision(empanadaSprite);
+            cheeseProjectile.Update(gameTime);
+            CheckCheeseProjectile(deltaTime);
             
-            if (nachoSprite.Health <= 0 && empanadaSprite.Health <= 0)
+            if (CheckLevelCompletion())
             {
-                if (!enemiesDefeated)
-                {
-                    enemiesDefeated = true;
-                    axeSprite.Show();
-                }
-                
-                if (!axePickedUp && !axeSprite.IsVisible)
-                {
-                    axeSprite.Show();
-                }
-            }
-
-            Sprite[] enemies = { nachoSprite, empanadaSprite };
-            fruitManager.CheckCollisions(enemies, _graphicsDevice);
-            
-            float donutNachoDistance = Vector2.Distance(donut.Position, nachoSprite.Position);
-            float donutEmpanadaDistance = Vector2.Distance(donut.Position, empanadaSprite.Position);
-
-            if (isNachoHitActive)
-            {
-                nachoHitFrameTimer -= deltaTime;
-                if (nachoHitFrameTimer <= 0)
-                {
-                    nachoHitFrameTimer = 0;
-                    isNachoHitActive = false;
-                    nachoSprite.SetPostHitFrame(false);
-                }
-            }
-            
-            if (mouseJustClicked)
-            {
-                if (enemiesDefeated && !axePickedUp && axeSprite.CheckPickup(donut))
-                {
-                    _mainGame.HasPickedUpAxe = true;
-                    donut.PickupAxe();
-                }
-                else if (donutNachoDistance < 70 && nachoSprite.Health > 0)
-                {
-                    nachoSprite.SetPostHitFrame(true);
-                    nachoSprite.TakeDamage(20f);
-                    isNachoHitActive = true;
-                    nachoHitFrameTimer = NachoHitFrameDuration;
-                }
-                else if (donutEmpanadaDistance < 70 && empanadaSprite.Health > 0)
-                {
-                    empanadaSprite.TakeDamage(20f);
-                }
-            }
-            
-            // This is redundant with the check above, but we'll keep it as a backup
-            if (nachoSprite.Health <= 0 && empanadaSprite.Health <= 0)
-            {
-                if (!enemiesDefeated)
-                {
-                    enemiesDefeated = true;
-                    axeSprite.Show();
-                }
-                
-                if (!axePickedUp && !axeSprite.IsVisible)
-                {
-                    axeSprite.Show();
-                }
-            }
-            
-            if (enemiesDefeated && axeSprite.IsPlayingPickupAnimation)
-            {
-                if (axeSprite.IsPickedUp)
-                {
-                    axePickedUp = true;
-                    _mainGame.SwitchGameState(MainGame.GameStateType.Game2);
-                    return;
-                }
                 return;
             }
             
-            if (enemiesDefeated && !axePickedUp && axeSprite.IsPickedUp)
-            {
-                axePickedUp = true;
-                _mainGame.SwitchGameState(MainGame.GameStateType.Game2);
-                return;
-            }
-            
-            if (enemiesDefeated && axePickedUp)
-            {
-                _mainGame.SwitchGameState(MainGame.GameStateType.Game2);
-                return;
-            }
-            
-            previousMouseState = mouseState;
-
-            if (cheeseProjectile.IsActive)
-            {
-                cheeseProjectile.Update(gameTime);
-                Vector2 projectilePos = cheeseProjectile.Position;
-                if (projectilePos.X < -100 || projectilePos.Y < -100 || 
-                    projectilePos.X > _graphicsDevice.Viewport.Width + 100 || 
-                    projectilePos.Y > _graphicsDevice.Viewport.Height + 100)
-                {
-                    cheeseProjectile.Reset();
-                }
-                else
-                {
-                    Rectangle cheeseRect = new Rectangle(
-                        (int)cheeseProjectile.Position.X - 32,
-                        (int)cheeseProjectile.Position.Y - 32,
-                        64,
-                        64
-                    );
-
-                    Rectangle donutRect = new Rectangle(
-                        (int)donut.Position.X - 48,
-                        (int)donut.Position.Y - 64,
-                        96,
-                        128
-                    );
-
-                    if (cheeseRect.Intersects(donutRect) && !cheeseProjectile.HasDealtDamage)
-                    {
-                        showSplashEffect = true;
-                        splashPosition = donut.Position;
-                        splashTimer = 0f;
-                        
-                        cheeseProjectile.DealDamageTo(donut);
-                        
-                        cheeseProjectile.Reset();
-                    }
-                }
-            }
-            if (showSplashEffect)
-            {
-                splashTimer += deltaTime;
-                if (splashTimer >= SPLASH_DURATION)
-                {
-                    showSplashEffect = false;
-                }
-            }
-
-            puprmushFrameTimer += deltaTime;
-            if (puprmushFrameTimer >= PuprmushFrameDuration)
-            {
-                puprmushFrameTimer = 0f;
-                currentPuprmushFrame = (currentPuprmushFrame + 1) % puprmushFrames.Length;
-            }
-
-            for (int i = 0; i < pipePositions.Length; i++)
-            {
-                pipeAnimationTimers[i] += deltaTime;
-                if (pipeAnimationTimers[i] >= pipeFrameDuration)
-                {
-                    pipeAnimationTimers[i] = 0f;
-                    currentPipeFrameIndices[i] = (currentPipeFrameIndices[i] + 1) % pipeSourceRectangles.Length;
-                }
-            }
+            previousMouseState = currentMouseState;
+            previousKeyboardState = keyboardState;
         }
 
         public void Draw(GameTime gameTime)
@@ -595,15 +607,12 @@ namespace monogame
                 );
             }
 
-            // Custom drawing code for Nacho to ensure it shows defeated state properly
             if (nachoSprite.Health <= 0)
             {
-                // When defeated, draw with rotation and gray color
                 Texture2D texture = nachoSprite.Texture;
                 Vector2 position = nachoSprite.Position;
                 Rectangle currentFrame;
                 
-                // Use first frame of the appropriate direction for simplicity
                 if (nachoSprite.FacingDirection == monogame.Animation.Direction.Up)
                     currentFrame = new Rectangle(0, 0, 110, 133);
                 else if (nachoSprite.FacingDirection == monogame.Animation.Direction.Right)
