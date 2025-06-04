@@ -40,7 +40,7 @@ namespace monogame
         private float projectileCooldownTimer = 0f;
         private const float ProjectileCooldown = 2.0f;
         private float minDistanceBetweenSushiAndGinger = 100f;
-        private const float minDistanceBetweenGingers = 80f; // Min distance between Ginger sprites
+        private const float minDistanceBetweenGingers = 80f;
         
         private bool showSplashEffect = false;
         private Vector2 splashPosition;
@@ -95,14 +95,13 @@ namespace monogame
             
             sushiSprite.SetTargetPosition(donutPos);
             gingerSprite.SetTargetPosition(donutPos);
-            gingerSprite2.SetTargetPosition(donutPos); // Add target for Ginger 2
-            gingerSprite3.SetTargetPosition(donutPos); // Add target for Ginger 3
+            gingerSprite2.SetTargetPosition(donutPos);
+            gingerSprite3.SetTargetPosition(donutPos);
             sushiSprite.Update(gameTime);
             gingerSprite.Update(gameTime);
             gingerSprite2.Update(gameTime);
             gingerSprite3.Update(gameTime);
             
-            // Separation logic
             Vector2 sushiToGinger = gingerSprite.Position - sushiSprite.Position;
             if (sushiToGinger.Length() < minDistanceBetweenSushiAndGinger)
             {
@@ -124,7 +123,6 @@ namespace monogame
                 gingerSprite3.Position = sushiSprite.Position + separation3;
             }
 
-            // Ginger to Ginger separation
             Vector2 ginger1ToGinger2 = gingerSprite2.Position - gingerSprite.Position;
             if (ginger1ToGinger2.Length() < minDistanceBetweenGingers)
             {
@@ -262,7 +260,6 @@ namespace monogame
                 new Vector2(screenWidth / 2, 100), 105f); // Third Ginger
             cheeseProjectile = new CheeseProjectile(cheeseTexture, cheeseSplashTexture);
             
-            // Set targets for DonutHole
             donutHole.SetTargets(sushiSprite, gingerSprite, gingerSprite2, gingerSprite3);
             
             sushiSprite.OnDamageDealt += (damage) => {
@@ -417,7 +414,6 @@ namespace monogame
                 gingerSprite.Draw(_spriteBatch);
             }
 
-            // Draw Ginger 2
             if (gingerSprite2.Health <= 0)
             {
                 Texture2D texture = gingerSprite2.Texture;
@@ -435,7 +431,6 @@ namespace monogame
                 gingerSprite2.Draw(_spriteBatch);
             }
 
-            // Draw Ginger 3
             if (gingerSprite3.Health <= 0)
             {
                 Texture2D texture = gingerSprite3.Texture;

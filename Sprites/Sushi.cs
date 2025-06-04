@@ -252,6 +252,7 @@ namespace monogame.Sprites
                 }
                 else
                 {
+                    // Vertical direction is dominant - SWAPPED
                     hitDirection = direction.Y > 0 ? Direction.Down : Direction.Up;
                 }
                 

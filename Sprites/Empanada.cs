@@ -99,12 +99,10 @@ namespace monogame.Sprites
             {
                 directionToDonut.Normalize();
                 
-                // Increased minimum distance (was 20.0f) to keep more space from player
                 if (distanceToDonut > 40.0f)
                 {
                     Position += directionToDonut * Speed * deltaTime;
                 }
-                // Start backing up sooner (was 10.0f) and more aggressively
                 else if (distanceToDonut < 30.0f)
                 {
                     Position -= directionToDonut * Speed * 0.7f * deltaTime;
@@ -128,17 +126,15 @@ namespace monogame.Sprites
 
             float distanceToTarget = Vector2.Distance(Position, targetPosition);
             
-            // When in attack state, maintain it for a reasonable duration
             if (isEmpanadaAttacking)
             {
                 empanadaAttackTimer += deltaTime;
                 
-                // Keep the attack state active for 2 seconds to ensure animation is visible
-                if (empanadaAttackTimer >= 2.0f) // Extended from empanadaAttackCooldown to 2.0f
+                if (empanadaAttackTimer >= 2.0f)
                 {
                     isEmpanadaAttacking = false;
                     empanadaAttackTimer = 0f;
-                    canPeriodicAttack = true; // Allow attacking again after cooldown
+                    canPeriodicAttack = true;
                 }
             }
             
@@ -187,23 +183,18 @@ namespace monogame.Sprites
                 animationTimer = 0f;
             }
             
-            // Handle attack animation
             if (isEmpanadaAttacking) 
             {
-                // Slow down the animation frame rate for attack animations
                 attackAnimationTimer += deltaTime * 1000;
                 
-                // Change frames every 750ms for a clearer attack animation
                 if (attackAnimationTimer > 750) 
                 {
-                    // Toggle between the two attack frames (0 and 1)
                     currentAttackFrame = (byte)((currentAttackFrame + 1) % 2);
                     attackAnimationTimer = 0f;
                 }
             }
             else
             {
-                // Reset attack animation when not attacking
                 currentAttackFrame = 0;
             }
         }

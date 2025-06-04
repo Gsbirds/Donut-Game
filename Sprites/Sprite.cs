@@ -17,7 +17,7 @@ namespace monogame.Sprites
         protected bool isDefeated = false;
         protected float fadeTimer = 0f;
         protected float fadeAlpha = 1.0f;
-        protected const float FadeDuration = 8.0f; // Increased to 8 seconds for a slower fade-out effect
+        protected const float FadeDuration = 8.0f;
         protected float invulnerabilityTimer;
         protected const float InvulnerabilityDuration = 0.5f;
         protected bool showHealthBar = true;
@@ -38,7 +38,7 @@ namespace monogame.Sprites
 
         public float Health => currentHealth;
         public float MaxHealth => maxHealth;
-        public float FadeAlpha => fadeAlpha; // Public accessor for fade alpha
+        public float FadeAlpha => fadeAlpha;
         public bool IsInvulnerable => isInvulnerable;
         
         public Sprite(Texture2D texture, Vector2 position, float speed)
@@ -69,11 +69,9 @@ namespace monogame.Sprites
                 }
             }
             
-            // Handle fading out if defeated
             if (isDefeated || currentHealth <= 0)
             {
                 fadeTimer += deltaTime;
-                // Calculate fade alpha from 1.0 to 0.0 over FadeDuration seconds
                 fadeAlpha = 1.0f - Math.Min(1.0f, fadeTimer / FadeDuration);
             }
         }

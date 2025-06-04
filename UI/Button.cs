@@ -10,10 +10,10 @@ namespace monogame.UI
     {//
         private static readonly string[] FlavorNames = { "Blueberry", "Strawberry", "Banana", "Chocolate" };
         private static readonly DonutColor[] ColorCycleOrder = { 
-            DonutColor.Normal, // Normal = Blueberry (index 0)
-            DonutColor.Pink,   // Pink = Strawberry (index 1)
-            DonutColor.Yellow, // Yellow = Banana (index 2)
-            DonutColor.Brown   // Brown = Chocolate (index 3)
+            DonutColor.Normal, 
+            DonutColor.Pink,   
+            DonutColor.Yellow, 
+            DonutColor.Brown   
         };
         private Rectangle bounds;
         private Texture2D texture;
@@ -81,7 +81,7 @@ namespace monogame.UI
         {
             if (currentButtonColor == DonutColor.Normal)
             {
-                normalColor = new Color(30, 144, 255); // DodgerBlue
+                normalColor = new Color(30, 144, 255); 
             }
             else
             {
@@ -266,7 +266,6 @@ namespace monogame.UI
                         spriteBatch.Draw(texture, leftShadeRect, cooldownColor);
                     }
                     
-                    // Top-left corner
                     spriteBatch.Draw(
                         circleTexture,
                         new Vector2(shadeRect.X, shadeRect.Y + shadeCornerRadius),
@@ -279,7 +278,6 @@ namespace monogame.UI
                         0f
                     );
                     
-                    // Bottom-left corner
                     spriteBatch.Draw(
                         circleTexture,
                         new Vector2(shadeRect.X, shadeRect.Y + shadeRect.Height - shadeCornerRadius),
@@ -293,7 +291,6 @@ namespace monogame.UI
                     );
                 }
                 
-                // Only draw right part if shade is covering the full width
                 if (shadeWidth >= bounds.Width - shadeCornerRadius)
                 {
                     Rectangle rightShadeRect = new Rectangle(
@@ -308,7 +305,6 @@ namespace monogame.UI
                         spriteBatch.Draw(texture, rightShadeRect, cooldownColor);
                     }
                     
-                    // Top-right corner
                     spriteBatch.Draw(
                         circleTexture,
                         new Vector2(bounds.X + bounds.Width, shadeRect.Y + shadeCornerRadius),
@@ -321,7 +317,6 @@ namespace monogame.UI
                         0f
                     );
                     
-                    // Bottom-right corner
                     spriteBatch.Draw(
                         circleTexture,
                         new Vector2(bounds.X + bounds.Width, shadeRect.Y + shadeRect.Height - shadeCornerRadius),

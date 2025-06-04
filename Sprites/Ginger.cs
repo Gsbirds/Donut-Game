@@ -230,6 +230,16 @@ namespace monogame.Sprites
             return new Rectangle(column * frameWidth, row * frameHeight, frameWidth, frameHeight);
         }
         
+        public override Rectangle GetBounds()
+        {
+            return new Rectangle(
+                (int)(position.X - texture.Width / 5),
+                (int)(position.Y - texture.Height / 5),
+                (int)(texture.Width / 2.5f),
+                (int)(texture.Height / 2.5f)
+            );
+        }
+        
         public override void Draw(SpriteBatch spriteBatch)
         {
             Rectangle currentFrame = GetCurrentFrame();
