@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -46,8 +46,10 @@ namespace monogame
         private Donut donut;
         private DonutHole donutHole;
         private Nacho nachoSprite;
+        private Nacho nachoSprite2; // Second Nacho
         private Empanada empanadaSprite;
         private const float MinDistanceBetweenNachoAndEmpanada = 170f;
+        private const float MinDistanceBetweenNachos = 100f; // Min distance between the two Nachos
         private const float AttackRange = 50f;
         private Rectangle[] empanadaFrames;
         private Rectangle[] downRectangles;
@@ -60,9 +62,14 @@ namespace monogame
         private const float NachoHitFrameDuration = .65f;
         private bool isNachoHitActive = false;
 
+        private float nacho2HitFrameTimer = 0f; // Timer for second Nacho's hit animation
+        private bool isNacho2HitActive = false; // Flag for second Nacho's hit animation
+
         private Projectile cheeseProjectile;
         private FruitProjectileManager fruitManager;
         private float projectileCooldownTimer = 0f;
+        private Projectile cheeseProjectile2; // Projectile for the second Nacho
+        private float projectileCooldownTimer2 = 0f; // Cooldown timer for the second Nacho's projectile
         private const float ProjectileCooldown = 5f;
 
         private bool showSplashCheese = false;
@@ -167,11 +174,13 @@ namespace monogame
         private void UpdateEnemies(float deltaTime, GameTime gameTime)
         {
             nachoSprite.Update(gameTime);
+            nachoSprite2.Update(gameTime); // Update second Nacho
             empanadaSprite.Update(gameTime);
             
             empanadaSprite.Update(deltaTime, donut.Position, nachoSprite.Position);
             
             nachoSprite.SetTargetPosition(donut.Position);
+            nachoSprite2.SetTargetPosition(donut.Position); // Second Nacho targets player
             empanadaSprite.SetTargetPosition(donut.Position);
             
             Vector2 donutPos = donut.Position;
@@ -182,43 +191,85 @@ namespace monogame
                 empanadaSprite.StartAttack();
             }
             
+            // Separation: Nacho1 vs Empanada
             Vector2 nachoToEmpanada = empanadaSprite.Position - nachoSprite.Position;
-            if (nachoToEmpanada.Length() < MinDistanceBetweenNachoAndEmpanada)
+            if (nachoToEmpanada.Length() < MinDistanceBetweenNachoAndEmpanada && nachoToEmpanada.Length() > 0)
             {
                 Vector2 separation = Vector2.Normalize(nachoToEmpanada) * MinDistanceBetweenNachoAndEmpanada;
                 nachoSprite.Position = empanadaSprite.Position - separation;
+            }
+
+            // Separation: Nacho2 vs Empanada
+            Vector2 nacho2ToEmpanada = empanadaSprite.Position - nachoSprite2.Position;
+            if (nacho2ToEmpanada.Length() < MinDistanceBetweenNachoAndEmpanada && nacho2ToEmpanada.Length() > 0)
+            {
+                Vector2 separation2 = Vector2.Normalize(nacho2ToEmpanada) * MinDistanceBetweenNachoAndEmpanada;
+                nachoSprite2.Position = empanadaSprite.Position - separation2;
+            }
+
+            // Separation: Nacho1 vs Nacho2
+            Vector2 nacho1ToNacho2 = nachoSprite2.Position - nachoSprite.Position;
+            if (nacho1ToNacho2.Length() < MinDistanceBetweenNachos && nacho1ToNacho2.Length() > 0)
+            {
+                Vector2 separation3 = Vector2.Normalize(nacho1ToNacho2) * MinDistanceBetweenNachos;
+                // Move nachoSprite away from nachoSprite2 (consistent with original Nacho-Empanada logic where the first mentioned sprite moves)
+                nachoSprite.Position = nachoSprite2.Position - separation3;
             }
         }
         
         private void UpdateNachoProjectile(float deltaTime, GameTime gameTime)
         {
-            float distanceToDonutNacho = Vector2.Distance(nachoSprite.Position, donut.Position);
-            
+            // Handle first Nacho's projectile
+            float distanceToDonutNacho1 = Vector2.Distance(nachoSprite.Position, donut.Position);
             if (projectileCooldownTimer > 0)
             {
                 projectileCooldownTimer -= deltaTime;
             }
 
-            if (distanceToDonutNacho < 200f && !nachoSprite.IsDefeated)
+            if (distanceToDonutNacho1 < 200f && !nachoSprite.IsDefeated)
             {
                 nachoSprite.SetOpenMouthFrame(true);
-                
                 if (projectileCooldownTimer <= 0 && !cheeseProjectile.IsActive)
                 {
                     Vector2 launchPosition = nachoSprite.Position + new Vector2(0, -40);
                     Vector2 directionToDonut = donut.Position - launchPosition;
                     cheeseProjectile.Launch(launchPosition, directionToDonut);
-                    
                     projectileCooldownTimer = ProjectileCooldown;
                 }
             }
             else
             {
                 nachoSprite.SetOpenMouthFrame(false);
-                
                 if (cheeseProjectile.IsActive && Vector2.Distance(cheeseProjectile.Position, donut.Position) > 500f)
                 {
                     cheeseProjectile.Reset();
+                }
+            }
+
+            // Handle second Nacho's projectile
+            float distanceToDonutNacho2 = Vector2.Distance(nachoSprite2.Position, donut.Position);
+            if (projectileCooldownTimer2 > 0)
+            {
+                projectileCooldownTimer2 -= deltaTime;
+            }
+
+            if (distanceToDonutNacho2 < 200f && !nachoSprite2.IsDefeated)
+            {
+                nachoSprite2.SetOpenMouthFrame(true);
+                if (projectileCooldownTimer2 <= 0 && !cheeseProjectile2.IsActive) // Use cheeseProjectile2 and projectileCooldownTimer2
+                {
+                    Vector2 launchPosition2 = nachoSprite2.Position + new Vector2(0, -40);
+                    Vector2 directionToDonut2 = donut.Position - launchPosition2;
+                    cheeseProjectile2.Launch(launchPosition2, directionToDonut2); // Launch second projectile
+                    projectileCooldownTimer2 = ProjectileCooldown; // Use second cooldown timer
+                }
+            }
+            else
+            {
+                nachoSprite2.SetOpenMouthFrame(false);
+                if (cheeseProjectile2.IsActive && Vector2.Distance(cheeseProjectile2.Position, donut.Position) > 500f) // Check second projectile
+                {
+                    cheeseProjectile2.Reset(); // Reset second projectile
                 }
             }
         }
@@ -252,6 +303,17 @@ namespace monogame
                     nachoSprite.SetPostHitFrame(false);
                 }
             }
+
+            // Handle second Nacho's hit animation
+            if (isNacho2HitActive)
+            {
+                nacho2HitFrameTimer -= deltaTime;
+                if (nacho2HitFrameTimer <= 0)
+                {
+                    isNacho2HitActive = false;
+                    nachoSprite2.SetPostHitFrame(false);
+                }
+            }
         }
         
         private void HandlePlayerAttack(MouseState currentMouseState)
@@ -280,18 +342,31 @@ namespace monogame
             {
                 empanadaSprite.TakeDamage(20f);
             }
+            // Handle attack on second Nacho
+            float donutNacho2Distance = Vector2.Distance(donut.Position, nachoSprite2.Position);
+            if (donutNacho2Distance < 70 && nachoSprite2.Health > 0)
+            {
+                nachoSprite2.SetPostHitFrame(true);
+                nachoSprite2.TakeDamage(20f);
+                isNacho2HitActive = true;
+                nacho2HitFrameTimer = NachoHitFrameDuration;
+            }
         }
         
         private void CheckCollisions(MouseState currentMouseState, GameTime gameTime)
         {
             Sprite.ResolveCollision(donut, nachoSprite);
+            Sprite.ResolveCollision(donut, nachoSprite2); // Collision with second Nacho
             Sprite.ResolveCollision(donut, empanadaSprite);
             Sprite.ResolveCollision(nachoSprite, empanadaSprite);
+            Sprite.ResolveCollision(nachoSprite2, empanadaSprite); // Second Nacho with Empanada
+            Sprite.ResolveCollision(nachoSprite, nachoSprite2); // Collision between Nachos
             
             donutHole.CheckCollision(nachoSprite);
+            donutHole.CheckCollision(nachoSprite2); // DonutHole collision with second Nacho
             donutHole.CheckCollision(empanadaSprite);
             
-            Sprite[] enemies = { nachoSprite, empanadaSprite };
+            Sprite[] enemies = { nachoSprite, nachoSprite2, empanadaSprite }; // Add second Nacho to enemies array for fruit projectiles
             fruitManager.Update(gameTime, donut.Position, donut.GetColor(), currentMouseState, previousMouseState);
             fruitManager.CheckCollisions(enemies, _graphicsDevice);
         }
@@ -346,7 +421,7 @@ namespace monogame
         
         private bool CheckLevelCompletion()
         {
-            if (nachoSprite.Health <= 0 && empanadaSprite.Health <= 0)
+            if (nachoSprite.Health <= 0 && nachoSprite2.Health <= 0 && empanadaSprite.Health <= 0) // Include second Nacho in completion check
             {
                 if (!enemiesDefeated)
                 {
@@ -448,15 +523,20 @@ namespace monogame
             
             nachoSprite = new Nacho(nacho, nachoOpenMouthTexture, 
                 new Vector2(50, screenHeight / 2 - 100), 120f);
+            nachoSprite2 = new Nacho(nacho, nachoOpenMouthTexture, // Initialize second Nacho
+                new Vector2(screenWidth - 100, screenHeight / 2 + 50), 120f); // Different position
                 
             empanadaSprite = new Empanada(empanada, empanadaHit, 
                 new Vector2(150, screenHeight - 100), 90f);
             cheeseProjectile = new Projectile(cheeseLaunch, new Vector2(-100, -100), 900f);
             cheeseProjectile.Reset();
+
+            cheeseProjectile2 = new Projectile(cheeseLaunch, new Vector2(-100, -100), 900f); // Initialize second projectile
+            cheeseProjectile2.Reset();
             
             fruitManager = new FruitProjectileManager(_mainGame.Content);
             
-            donutHole.SetTargets(nachoSprite, empanadaSprite);
+            donutHole.SetTargets(nachoSprite, empanadaSprite); // Assuming SetTargets might be for something else or needs a list; individual CheckCollision calls will handle damage.
             
             empanadaSprite.OnDamageDealt += (damage) => {
                 donut.TakeDamage(10f);
@@ -532,6 +612,8 @@ namespace monogame
             UpdateNachoProjectile(deltaTime, gameTime);
             
             cheeseProjectile.Update(gameTime);
+            cheeseProjectile2.Update(gameTime); // Update second projectile
+            
             CheckCheeseProjectile(deltaTime);
             
             if (CheckLevelCompletion())
@@ -640,7 +722,43 @@ namespace monogame
             {
                 nachoSprite.Draw(_spriteBatch);
             }
-            
+
+            // Draw second Nacho
+            if (nachoSprite2.Health <= 0)
+            {
+                Texture2D texture2 = nachoSprite2.Texture; // Use appropriate texture variable if different
+                Vector2 position2 = nachoSprite2.Position;
+                Rectangle currentFrame2;
+                
+                // Assuming same frame logic for defeated state as the first Nacho
+                if (nachoSprite2.FacingDirection == monogame.Animation.Direction.Up)
+                    currentFrame2 = new Rectangle(0, 0, 110, 133);
+                else if (nachoSprite2.FacingDirection == monogame.Animation.Direction.Right)
+                    currentFrame2 = new Rectangle(0, 133, 110, 133);
+                else if (nachoSprite2.FacingDirection == monogame.Animation.Direction.Down)
+                    currentFrame2 = new Rectangle(0, 266, 110, 133);
+                else // Left
+                    currentFrame2 = new Rectangle(0, 399, 110, 133);
+                
+                Vector2 origin2 = new Vector2(currentFrame2.Width / 2, currentFrame2.Height / 2);
+                
+                _spriteBatch.Draw(
+                    texture2,
+                    position2,
+                    currentFrame2,
+                    Color.Gray * nachoSprite2.FadeAlpha,
+                    MathHelper.PiOver2, // 90 degrees rotation
+                    origin2,
+                    1.0f,
+                    SpriteEffects.None,
+                    0f
+                );
+            }
+            else
+            {
+                nachoSprite2.Draw(_spriteBatch);
+            }
+
             if (empanadaSprite.Health <= 0)
             {
                 Texture2D texture = empanadaSprite.Texture;
@@ -683,6 +801,11 @@ namespace monogame
             if (cheeseProjectile.IsActive)
             {
                 cheeseProjectile.Draw(_spriteBatch);
+            }
+
+            if (cheeseProjectile2.IsActive) // Draw second projectile
+            {
+                cheeseProjectile2.Draw(_spriteBatch);
             }
             
             fruitManager.Draw(_spriteBatch);

@@ -18,6 +18,8 @@ namespace monogame
         private DonutHole donutHole; 
         private Sushi sushiSprite;
         private Ginger gingerSprite;
+        private Ginger gingerSprite2;
+        private Ginger gingerSprite3;
         private CheeseProjectile cheeseProjectile;
         private FruitProjectileManager fruitManager;        
         private Texture2D donutTexture;
@@ -38,6 +40,7 @@ namespace monogame
         private float projectileCooldownTimer = 0f;
         private const float ProjectileCooldown = 2.0f;
         private float minDistanceBetweenSushiAndGinger = 100f;
+        private const float minDistanceBetweenGingers = 80f; // Min distance between Ginger sprites
         
         private bool showSplashEffect = false;
         private Vector2 splashPosition;
@@ -92,14 +95,55 @@ namespace monogame
             
             sushiSprite.SetTargetPosition(donutPos);
             gingerSprite.SetTargetPosition(donutPos);
+            gingerSprite2.SetTargetPosition(donutPos); // Add target for Ginger 2
+            gingerSprite3.SetTargetPosition(donutPos); // Add target for Ginger 3
             sushiSprite.Update(gameTime);
             gingerSprite.Update(gameTime);
+            gingerSprite2.Update(gameTime);
+            gingerSprite3.Update(gameTime);
             
+            // Separation logic
             Vector2 sushiToGinger = gingerSprite.Position - sushiSprite.Position;
             if (sushiToGinger.Length() < minDistanceBetweenSushiAndGinger)
             {
                 Vector2 separation = Vector2.Normalize(sushiToGinger) * minDistanceBetweenSushiAndGinger;
                 gingerSprite.Position = sushiSprite.Position + separation;
+            }
+
+            Vector2 sushiToGinger2 = gingerSprite2.Position - sushiSprite.Position;
+            if (sushiToGinger2.Length() < minDistanceBetweenSushiAndGinger)
+            {
+                Vector2 separation2 = Vector2.Normalize(sushiToGinger2) * minDistanceBetweenSushiAndGinger;
+                gingerSprite2.Position = sushiSprite.Position + separation2;
+            }
+
+            Vector2 sushiToGinger3 = gingerSprite3.Position - sushiSprite.Position;
+            if (sushiToGinger3.Length() < minDistanceBetweenSushiAndGinger)
+            {
+                Vector2 separation3 = Vector2.Normalize(sushiToGinger3) * minDistanceBetweenSushiAndGinger;
+                gingerSprite3.Position = sushiSprite.Position + separation3;
+            }
+
+            // Ginger to Ginger separation
+            Vector2 ginger1ToGinger2 = gingerSprite2.Position - gingerSprite.Position;
+            if (ginger1ToGinger2.Length() < minDistanceBetweenGingers)
+            {
+                Vector2 separationG1G2 = Vector2.Normalize(ginger1ToGinger2) * minDistanceBetweenGingers;
+                gingerSprite2.Position = gingerSprite.Position + separationG1G2;
+            }
+
+            Vector2 ginger1ToGinger3 = gingerSprite3.Position - gingerSprite.Position;
+            if (ginger1ToGinger3.Length() < minDistanceBetweenGingers)
+            {
+                Vector2 separationG1G3 = Vector2.Normalize(ginger1ToGinger3) * minDistanceBetweenGingers;
+                gingerSprite3.Position = gingerSprite.Position + separationG1G3;
+            }
+
+            Vector2 ginger2ToGinger3 = gingerSprite3.Position - gingerSprite2.Position;
+            if (ginger2ToGinger3.Length() < minDistanceBetweenGingers)
+            {
+                Vector2 separationG2G3 = Vector2.Normalize(ginger2ToGinger3) * minDistanceBetweenGingers;
+                gingerSprite3.Position = gingerSprite2.Position + separationG2G3;
             }
         }
         
@@ -110,11 +154,17 @@ namespace monogame
                 
             if (donut.CollidesWith(gingerSprite))
                 Sprite.ResolveCollision(donut, gingerSprite);
+            if (donut.CollidesWith(gingerSprite2))
+                Sprite.ResolveCollision(donut, gingerSprite2);
+            if (donut.CollidesWith(gingerSprite3))
+                Sprite.ResolveCollision(donut, gingerSprite3);
             
             donutHole.CheckCollision(sushiSprite);
             donutHole.CheckCollision(gingerSprite);
+            donutHole.CheckCollision(gingerSprite2);
+            donutHole.CheckCollision(gingerSprite3);
             
-            Sprite[] enemies = { sushiSprite, gingerSprite };
+            Sprite[] enemies = { sushiSprite, gingerSprite, gingerSprite2, gingerSprite3 };
             fruitManager.CheckCollisions(enemies, _graphicsDevice);
         }
         
@@ -137,7 +187,7 @@ namespace monogame
                 return true;
             }
             
-            if (sushiSprite.Health <= 0 && gingerSprite.Health <= 0)
+            if (sushiSprite.Health <= 0 && gingerSprite.Health <= 0 && gingerSprite2.Health <= 0 && gingerSprite3.Health <= 0)
             {
                 _mainGame.SwitchGameState(MainGame.GameStateType.Game1);
                 return true;
@@ -206,10 +256,14 @@ namespace monogame
                 
             gingerSprite = new Ginger(gingerTexture, 
                 new Vector2(150, screenHeight / 2 - 100), 105f);
+            gingerSprite2 = new Ginger(gingerTexture, 
+                new Vector2(screenWidth - 150, screenHeight / 2 - 100), 105f); // Second Ginger
+            gingerSprite3 = new Ginger(gingerTexture, 
+                new Vector2(screenWidth / 2, 100), 105f); // Third Ginger
             cheeseProjectile = new CheeseProjectile(cheeseTexture, cheeseSplashTexture);
             
             // Set targets for DonutHole
-            donutHole.SetTargets(sushiSprite, gingerSprite);
+            donutHole.SetTargets(sushiSprite, gingerSprite, gingerSprite2, gingerSprite3);
             
             sushiSprite.OnDamageDealt += (damage) => {
                 donut.TakeDamage(3f);  
@@ -361,6 +415,42 @@ namespace monogame
             else
             {
                 gingerSprite.Draw(_spriteBatch);
+            }
+
+            // Draw Ginger 2
+            if (gingerSprite2.Health <= 0)
+            {
+                Texture2D texture = gingerSprite2.Texture;
+                Vector2 position = gingerSprite2.Position;
+                Rectangle currentFrame;
+                if (gingerSprite2.FacingDirection == Direction.Up) currentFrame = new Rectangle(0, 0, 110, 133);
+                else if (gingerSprite2.FacingDirection == Direction.Right) currentFrame = new Rectangle(0, 133, 110, 133);
+                else if (gingerSprite2.FacingDirection == Direction.Down) currentFrame = new Rectangle(0, 266, 110, 133);
+                else currentFrame = new Rectangle(0, 399, 110, 133);
+                Vector2 origin = new Vector2(currentFrame.Width / 2, currentFrame.Height / 2);
+                _spriteBatch.Draw(texture, position, currentFrame, Color.Gray * gingerSprite2.FadeAlpha, MathHelper.PiOver2, origin, 1.0f, SpriteEffects.None, 0f);
+            }
+            else
+            {
+                gingerSprite2.Draw(_spriteBatch);
+            }
+
+            // Draw Ginger 3
+            if (gingerSprite3.Health <= 0)
+            {
+                Texture2D texture = gingerSprite3.Texture;
+                Vector2 position = gingerSprite3.Position;
+                Rectangle currentFrame;
+                if (gingerSprite3.FacingDirection == Direction.Up) currentFrame = new Rectangle(0, 0, 110, 133);
+                else if (gingerSprite3.FacingDirection == Direction.Right) currentFrame = new Rectangle(0, 133, 110, 133);
+                else if (gingerSprite3.FacingDirection == Direction.Down) currentFrame = new Rectangle(0, 266, 110, 133);
+                else currentFrame = new Rectangle(0, 399, 110, 133);
+                Vector2 origin = new Vector2(currentFrame.Width / 2, currentFrame.Height / 2);
+                _spriteBatch.Draw(texture, position, currentFrame, Color.Gray * gingerSprite3.FadeAlpha, MathHelper.PiOver2, origin, 1.0f, SpriteEffects.None, 0f);
+            }
+            else
+            {
+                gingerSprite3.Draw(_spriteBatch);
             }
             
             fruitManager.Draw(_spriteBatch);

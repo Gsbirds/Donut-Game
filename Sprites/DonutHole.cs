@@ -139,13 +139,15 @@ namespace monogame.Sprites
             }
         }
         
-        private Sprite sushiTarget;
-        private Sprite gingerTarget;
+        private List<Sprite> enemyTargets = new List<Sprite>();
         
-        public void SetTargets(Sprite sushi, Sprite ginger)
+        public void SetTargets(params Sprite[] targets)
         {
-            sushiTarget = sushi;
-            gingerTarget = ginger;
+            enemyTargets.Clear();
+            if (targets != null)
+            {
+                enemyTargets.AddRange(targets);
+            }
         }
         
         private void ShootAtRandomTarget()
@@ -153,10 +155,13 @@ namespace monogame.Sprites
             Sprite target = null;
             
             var validTargets = new List<Sprite>();
-            if (sushiTarget != null && sushiTarget.Health > 0)
-                validTargets.Add(sushiTarget);
-            if (gingerTarget != null && gingerTarget.Health > 0)
-                validTargets.Add(gingerTarget);
+            foreach (var potentialTarget in enemyTargets)
+            {
+                if (potentialTarget != null && potentialTarget.Health > 0)
+                {
+                    validTargets.Add(potentialTarget);
+                }
+            }
                 
             if (validTargets.Count > 0)
             {
