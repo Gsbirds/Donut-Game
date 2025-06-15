@@ -255,9 +255,9 @@ namespace monogame
             gingerSprite = new Ginger(gingerTexture, 
                 new Vector2(150, screenHeight / 2 - 100), 105f);
             gingerSprite2 = new Ginger(gingerTexture, 
-                new Vector2(screenWidth - 150, screenHeight / 2 - 100), 105f); // Second Ginger
+                new Vector2(screenWidth - 150, screenHeight / 2 - 100), 105f);
             gingerSprite3 = new Ginger(gingerTexture, 
-                new Vector2(screenWidth / 2, 100), 105f); // Third Ginger
+                new Vector2(screenWidth / 2, 100), 105f);
             cheeseProjectile = new CheeseProjectile(cheeseTexture, cheeseSplashTexture);
             
             donutHole.SetTargets(sushiSprite, gingerSprite, gingerSprite2, gingerSprite3);

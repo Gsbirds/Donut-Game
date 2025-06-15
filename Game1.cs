@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -392,11 +392,47 @@ namespace monogame
                     if (cheeseRect.Intersects(donutRect) && !cheeseProjectile.HasDealtDamage)
                     {
                         showSplashEffect = true;
-                        splashPosition = donut.Position;
+                        splashPosition = new Vector2(donut.Position.X - 60, donut.Position.Y - 55);
                         splashTimer = 0f;
                         
                         cheeseProjectile.DealDamageTo(donut);
                         cheeseProjectile.Reset();
+                    }
+                }
+            }
+            
+            if (cheeseProjectile2.IsActive)
+            {
+                Vector2 projectilePos = cheeseProjectile2.Position;
+                
+                if (projectilePos.X < -100 || projectilePos.Y < -100 || 
+                    projectilePos.X > _graphicsDevice.Viewport.Width + 100 || 
+                    projectilePos.Y > _graphicsDevice.Viewport.Height + 100)
+                {
+                    cheeseProjectile2.Reset();
+                }
+                else
+                {
+                    Rectangle cheeseRect = new Rectangle(
+                        (int)cheeseProjectile2.Position.X - 32,
+                        (int)cheeseProjectile2.Position.Y - 32,
+                        64, 64
+                    );
+
+                    Rectangle donutRect = new Rectangle(
+                        (int)donut.Position.X - 48,
+                        (int)donut.Position.Y - 64,
+                        96, 128
+                    );
+
+                    if (cheeseRect.Intersects(donutRect) && !cheeseProjectile2.HasDealtDamage)
+                    {
+                        showSplashEffect = true;
+                        splashPosition = new Vector2(donut.Position.X - 60, donut.Position.Y - 55);
+                        splashTimer = 0f;
+                        
+                        cheeseProjectile2.DealDamageTo(donut);
+                        cheeseProjectile2.Reset();
                     }
                 }
             }

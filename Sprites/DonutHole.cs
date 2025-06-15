@@ -14,8 +14,6 @@ namespace monogame.Sprites
         private const float FRAME_DURATION = 0.3f;
         private Vector2 offsetFromDonut; 
         private Donut parentDonut;
-        
-        // Shooting properties
         private bool isShooting = false;
         private Vector2 targetPosition;
         private Vector2 shootDirection;
@@ -188,10 +186,10 @@ namespace monogame.Sprites
             if (isShooting && !isReturning && target.Health > 0)
             {
                 Rectangle myBounds = new Rectangle(
-                    (int)(position.X - 20), // Wider hit box
-                    (int)(position.Y - 20), // Taller hit box
-                    40,  // Fixed width 
-                    40   // Fixed height
+                    (int)(position.X - 20),
+                    (int)(position.Y - 20),
+                    40,
+                    40
                 );
                 
                 Rectangle targetBounds = new Rectangle(
