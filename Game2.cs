@@ -567,25 +567,38 @@ namespace monogame
                 if (donutSushiDistance < 70) 
                 {
                     sushiSprite.TakeDamage(20f, donut.Position);
-                    
-                    if (sushiSprite.Health <= 0 && gingerSprite.Health <= 0)
-                    {
-                        _mainGame.SwitchGameState(MainGame.GameStateType.Game1);
-                        return;
-                    }
+                    CheckAllEnemiesDefeated();
                 }
                 
                 float donutGingerDistance = Vector2.Distance(donut.Position, gingerSprite.Position);
                 if (donutGingerDistance < 70)
                 {
                     gingerSprite.TakeDamage(20f);
-                    
-                    if (sushiSprite.Health <= 0 && gingerSprite.Health <= 0)
-                    {
-                        _mainGame.SwitchGameState(MainGame.GameStateType.Game1);
-                        return;
-                    }
+                    CheckAllEnemiesDefeated();
                 }
+                
+                float donutGinger2Distance = Vector2.Distance(donut.Position, gingerSprite2.Position);
+                if (donutGinger2Distance < 70)
+                {
+                    gingerSprite2.TakeDamage(20f);
+                    CheckAllEnemiesDefeated();
+                }
+                
+                float donutGinger3Distance = Vector2.Distance(donut.Position, gingerSprite3.Position);
+                if (donutGinger3Distance < 70)
+                {
+                    gingerSprite3.TakeDamage(20f);
+                    CheckAllEnemiesDefeated();
+                }
+            }
+        }
+
+        private void CheckAllEnemiesDefeated()
+        {
+            if (sushiSprite.Health <= 0 && gingerSprite.Health <= 0 && 
+                gingerSprite2.Health <= 0 && gingerSprite3.Health <= 0)
+            {
+                _mainGame.SwitchGameState(MainGame.GameStateType.Game1);
             }
         }
 
