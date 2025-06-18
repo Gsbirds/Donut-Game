@@ -676,11 +676,20 @@ namespace monogame
                 return;
             }
             
+            int backgroundWidth = background.Width;
+            int backgroundHeight = background.Height;
+            int screenWidth = _graphicsDevice.Viewport.Width;
+            int screenHeight = _graphicsDevice.Viewport.Height;
+            
+            int x = (screenWidth - backgroundWidth) / 2;
+            int y = (screenHeight - backgroundHeight) / 2;
+            
             _spriteBatch.Draw(
                 background,
-                new Rectangle(0, 0, 850, 850), 
+                new Rectangle(x, y, backgroundWidth, backgroundHeight), 
                 Color.White
             );
+            
 
             _spriteBatch.Draw(
                 churroTree,

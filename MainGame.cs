@@ -42,12 +42,14 @@ namespace monogame
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+            
+            _graphics.IsFullScreen = true;
         }
 
         protected override void Initialize()
         {
-            _graphics.PreferredBackBufferWidth = 800;
-            _graphics.PreferredBackBufferHeight = 600;
+            _graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
+            _graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
             ballPosition = new Vector2(_graphics.PreferredBackBufferWidth / 2,
                     _graphics.PreferredBackBufferHeight / 2);
             _spriteBatch = new SpriteBatch(GraphicsDevice);
@@ -98,9 +100,6 @@ namespace monogame
                 switch (newState)
                 {
                     case GameStateType.Game1:
-                        _graphics.PreferredBackBufferWidth = 850;
-                        _graphics.PreferredBackBufferHeight = 850;
-                        _graphics.ApplyChanges();
                         Game1Instance = new Game1(this, _spriteBatch);
                         currentGameState = Game1Instance;
                         
@@ -111,9 +110,6 @@ namespace monogame
                         }
                         break;
                     case GameStateType.Game2:
-                        _graphics.PreferredBackBufferWidth = 850;
-                        _graphics.PreferredBackBufferHeight = 850;
-                        _graphics.ApplyChanges();
                         currentGameState = new Game2(this, _spriteBatch);
                         break;
                 }
@@ -121,9 +117,37 @@ namespace monogame
             }
         }
 
+        private KeyboardState previousKeyboardState;
+        
+        private void ToggleFullScreen()
+        {
+            _graphics.IsFullScreen = !_graphics.IsFullScreen;
+            
+            if (_graphics.IsFullScreen)
+            {
+                _graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
+                _graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
+            }
+            else
+            {
+                _graphics.PreferredBackBufferWidth = 850;
+                _graphics.PreferredBackBufferHeight = 850;
+            }
+            
+            _graphics.ApplyChanges();
+        }
+        
         protected override void Update(GameTime gameTime)
         {
             KeyboardState keyboardState = Keyboard.GetState();
+            
+            if (keyboardState.IsKeyDown(Keys.LeftAlt) && keyboardState.IsKeyDown(Keys.Enter) &&
+                (!previousKeyboardState.IsKeyDown(Keys.LeftAlt) || !previousKeyboardState.IsKeyDown(Keys.Enter)))
+            {
+                ToggleFullScreen();
+            }
+            
+            previousKeyboardState = keyboardState;
 
             if (inMainMenu)
             {
@@ -174,7 +198,28 @@ namespace monogame
 
             if (inMainMenu)
             {
-                _spriteBatch.Draw(mainmenu, new Rectangle(60, -10, 650, 650), Color.White);
+                int backgroundWidth = mainmenu.Width;
+                int backgroundHeight = mainmenu.Height;
+                int screenWidth = GraphicsDevice.Viewport.Width;
+                int screenHeight = GraphicsDevice.Viewport.Height;
+                
+                int x = (screenWidth - backgroundWidth) / 2;
+                int y = (screenHeight - backgroundHeight) / 2;
+                
+                _spriteBatch.Draw(mainmenu, new Rectangle(x, y, backgroundWidth, backgroundHeight), Color.White);
+                
+                float buttonScaleX = backgroundWidth / 800f;
+                float buttonScaleY = backgroundHeight / 600f;
+                startButtonArea = new Rectangle(
+                    x + (int)(300 * buttonScaleX), 
+                    y + (int)(270 * buttonScaleY), 
+                    (int)(200 * buttonScaleX), 
+                    (int)(50 * buttonScaleY));
+                endButtonArea = new Rectangle(
+                    x + (int)(300 * buttonScaleX), 
+                    y + (int)(380 * buttonScaleY), 
+                    (int)(200 * buttonScaleX), 
+                    (int)(50 * buttonScaleY));
             }
             else
             {

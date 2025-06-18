@@ -334,11 +334,19 @@ namespace monogame
         {
             _graphicsDevice.Clear(Color.Black);
 
-            _spriteBatch.Draw(sushiWallpaper, new Rectangle(0, 0, 850, 850), Color.White);
+            int backgroundWidth = sushiWallpaper.Width;
+            int backgroundHeight = sushiWallpaper.Height;
+            int screenWidth = _graphicsDevice.Viewport.Width;
+            int screenHeight = _graphicsDevice.Viewport.Height;
             
-            _spriteBatch.Draw(mochiTree, new Rectangle(250, 50, 878, 878), Color.White);
+            int x = (screenWidth - backgroundWidth) / 2;
+            int y = (screenHeight - backgroundHeight) / 2;
             
-            Vector2 puprmushPosition = new Vector2(120, 50 + 550);
+            _spriteBatch.Draw(sushiWallpaper, new Rectangle(x, y, backgroundWidth, backgroundHeight), Color.White);
+            
+            _spriteBatch.Draw(mochiTree, new Rectangle(x + 250, y + 50, 878, 878), Color.White);
+            
+            Vector2 puprmushPosition = new Vector2(x + 120, y + (50 + 550));
             _spriteBatch.Draw(
                 puprmushSpritesheet,
                 puprmushPosition,
