@@ -22,6 +22,7 @@ namespace monogame
         
         // Game music
         private Song gameMusic;
+        private Song menuMusic;
         
         public DonutColor CurrentDonutColor { get; set; } = DonutColor.Pink;
         public bool IsColorEffectActive { get; set; } = false;
@@ -64,9 +65,12 @@ namespace monogame
             startButtonArea = new Rectangle(300, 270, 200, 50);
             endButtonArea = new Rectangle(300, 380, 200, 50);
             
-            // Load game music
+            // Load music
             try {
                 gameMusic = Content.Load<Song>("donut_song");
+                menuMusic = Content.Load<Song>("menu_song");
+                MediaPlayer.Play(menuMusic);
+                MediaPlayer.IsRepeating = true;
             } catch (System.Exception e) {
                 System.Console.WriteLine("Failed to load music: " + e.Message);
             }
@@ -81,8 +85,12 @@ namespace monogame
                 inMainMenu = true;
                 currentGameState = null;
                 
-                // Stop music when returning to main menu
                 MediaPlayer.Stop();
+                if (menuMusic != null)
+                {
+                    MediaPlayer.Play(menuMusic);
+                    MediaPlayer.IsRepeating = true;
+                }
             }
             else
             {
@@ -96,7 +104,6 @@ namespace monogame
                         Game1Instance = new Game1(this, _spriteBatch);
                         currentGameState = Game1Instance;
                         
-                        // Start playing music when Game1 starts
                         if (gameMusic != null)
                         {
                             MediaPlayer.Play(gameMusic);
@@ -108,7 +115,6 @@ namespace monogame
                         _graphics.PreferredBackBufferHeight = 850;
                         _graphics.ApplyChanges();
                         currentGameState = new Game2(this, _spriteBatch);
-                        // Don't stop music when transitioning to Game2
                         break;
                 }
                 currentGameState.LoadContent();

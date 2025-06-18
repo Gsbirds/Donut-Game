@@ -223,7 +223,6 @@ namespace monogame
             try {
                 SoundEffect donutHoleDokenSound = _mainGame.Content.Load<SoundEffect>("donutholedoken");
                 DonutHole.SetAttackSound(donutHoleDokenSound);
-                System.Console.WriteLine("Game2: Loaded donutholedoken sound successfully");
             } catch (System.Exception e) {
                 System.Console.WriteLine("Failed to load donutholedoken sound: " + e.Message);
             }
