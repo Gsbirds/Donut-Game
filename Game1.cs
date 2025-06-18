@@ -2,6 +2,7 @@ using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Audio;
 using monogame.Sprites;
 using monogame.Screens;
 using monogame.UI;
@@ -76,6 +77,8 @@ namespace monogame
         private float splashCheeseTimer = 0f;
         private const float splashCheeseDuration = 1f;
         private Vector2 splashPosition;
+        
+        private SoundEffect empanadaHitSound;
 
         private Texture2D charaset;
         private Texture2D donutHoleTexture;
@@ -334,6 +337,9 @@ namespace monogame
             else if (donutEmpanadaDistance < 70 && empanadaSprite.Health > 0)
             {
                 empanadaSprite.TakeDamage(20f);
+                if (empanadaHitSound != null) {
+                    empanadaHitSound.Play();
+                }
             }
             float donutNacho2Distance = Vector2.Distance(donut.Position, nachoSprite2.Position);
             if (donutNacho2Distance < 70 && nachoSprite2.Health > 0)
@@ -512,6 +518,15 @@ namespace monogame
             splashCheese = _mainGame.Content.Load<Texture2D>("splashcheese");
             empanada = _mainGame.Content.Load<Texture2D>("empanadasprites11");
             empanadaHit = _mainGame.Content.Load<Texture2D>("Empanadahit");
+            
+            try {
+                empanadaHitSound = _mainGame.Content.Load<SoundEffect>("fu_oof");
+                SoundEffect donutHoleDokenSound = _mainGame.Content.Load<SoundEffect>("donutholedoken");
+                DonutHole.SetAttackSound(donutHoleDokenSound);
+            } catch (System.Exception e) {
+                System.Console.WriteLine("Failed to load sound effects: " + e.Message);
+            }
+            
             sombrero = _mainGame.Content.Load<Texture2D>("Sombrero");
             background = _mainGame.Content.Load<Texture2D>("pink_purp_background");
             weed = _mainGame.Content.Load<Texture2D>("weed");
@@ -729,7 +744,7 @@ namespace monogame
                     currentFrame = new Rectangle(0, 133, 110, 133);
                 else if (nachoSprite.FacingDirection == monogame.Animation.Direction.Down)
                     currentFrame = new Rectangle(0, 266, 110, 133);
-                else // Left
+                else
                     currentFrame = new Rectangle(0, 399, 110, 133);
                 
                 Vector2 origin = new Vector2(currentFrame.Width / 2, currentFrame.Height / 2);
@@ -739,7 +754,7 @@ namespace monogame
                     position,
                     currentFrame,
                     Color.Gray * nachoSprite.FadeAlpha,
-                    MathHelper.PiOver2, // 90 degrees rotation
+                    MathHelper.PiOver2,
                     origin,
                     1.0f,
                     SpriteEffects.None,
@@ -762,7 +777,7 @@ namespace monogame
                     currentFrame2 = new Rectangle(0, 133, 110, 133);
                 else if (nachoSprite2.FacingDirection == monogame.Animation.Direction.Down)
                     currentFrame2 = new Rectangle(0, 266, 110, 133);
-                else // Left
+                else
                     currentFrame2 = new Rectangle(0, 399, 110, 133);
                 
                 Vector2 origin2 = new Vector2(currentFrame2.Width / 2, currentFrame2.Height / 2);
@@ -772,7 +787,7 @@ namespace monogame
                     position2,
                     currentFrame2,
                     Color.Gray * nachoSprite2.FadeAlpha,
-                    MathHelper.PiOver2, // 90 degrees rotation
+                    MathHelper.PiOver2,
                     origin2,
                     1.0f,
                     SpriteEffects.None,

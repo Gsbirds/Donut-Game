@@ -1,6 +1,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Media;
 using monogame.Effects;
 
 namespace monogame
@@ -18,6 +19,9 @@ namespace monogame
         Vector2 ballPosition;
         Vector2 nachoPosition;
         Vector2 sushiPosition;
+        
+        // Game music
+        private Song gameMusic;
         
         public DonutColor CurrentDonutColor { get; set; } = DonutColor.Pink;
         public bool IsColorEffectActive { get; set; } = false;
@@ -59,6 +63,13 @@ namespace monogame
 
             startButtonArea = new Rectangle(300, 270, 200, 50);
             endButtonArea = new Rectangle(300, 380, 200, 50);
+            
+            // Load game music
+            try {
+                gameMusic = Content.Load<Song>("donut_song");
+            } catch (System.Exception e) {
+                System.Console.WriteLine("Failed to load music: " + e.Message);
+            }
 
             SwitchGameState(GameStateType.MainMenu);
         }
@@ -69,7 +80,9 @@ namespace monogame
             {
                 inMainMenu = true;
                 currentGameState = null;
-
+                
+                // Stop music when returning to main menu
+                MediaPlayer.Stop();
             }
             else
             {
@@ -82,12 +95,20 @@ namespace monogame
                         _graphics.ApplyChanges();
                         Game1Instance = new Game1(this, _spriteBatch);
                         currentGameState = Game1Instance;
+                        
+                        // Start playing music when Game1 starts
+                        if (gameMusic != null)
+                        {
+                            MediaPlayer.Play(gameMusic);
+                            MediaPlayer.IsRepeating = true;
+                        }
                         break;
                     case GameStateType.Game2:
                         _graphics.PreferredBackBufferWidth = 850;
                         _graphics.PreferredBackBufferHeight = 850;
                         _graphics.ApplyChanges();
                         currentGameState = new Game2(this, _spriteBatch);
+                        // Don't stop music when transitioning to Game2
                         break;
                 }
                 currentGameState.LoadContent();

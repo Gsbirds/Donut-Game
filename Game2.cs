@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Audio;
 using monogame.Sprites;
 using monogame.Screens;
 using monogame.Animation;
@@ -218,6 +219,14 @@ namespace monogame
             sushiWallpaper = _mainGame.Content.Load<Texture2D>("sushilevelsetting");
             mochiTree = _mainGame.Content.Load<Texture2D>("mochitree");
             puprmushSpritesheet = _mainGame.Content.Load<Texture2D>("pinkmush");
+            
+            try {
+                SoundEffect donutHoleDokenSound = _mainGame.Content.Load<SoundEffect>("donutholedoken");
+                DonutHole.SetAttackSound(donutHoleDokenSound);
+                System.Console.WriteLine("Game2: Loaded donutholedoken sound successfully");
+            } catch (System.Exception e) {
+                System.Console.WriteLine("Failed to load donutholedoken sound: " + e.Message);
+            }
             
             font = _mainGame.Content.Load<SpriteFont>("DefaultFont1");
             

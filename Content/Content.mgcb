@@ -224,6 +224,12 @@
 /processorParam:TextureFormat=Compressed
 /build:DefaultFont1.spritefont
 
+#begin donut_song.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:donut_song.mp3
+
 #begin Donuthole.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -235,6 +241,12 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Donuthole.png
+
+#begin donutholedoken.aac
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:donutholedoken.aac
 
 #begin donutsmol.png
 /importer:TextureImporter
@@ -523,6 +535,12 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:empanadasprites9.png
+
+#begin fu_oof.aac
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:fu_oof.aac
 
 #begin gingersprites.png
 /importer:TextureImporter

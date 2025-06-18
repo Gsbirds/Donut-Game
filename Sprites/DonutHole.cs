@@ -1,5 +1,6 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Audio;
 using System;
 using System.Collections.Generic;
 
@@ -7,6 +8,8 @@ namespace monogame.Sprites
 {
     public class DonutHole : Sprite
     {
+        // Audio system
+        private static SoundEffect attackSound;
         private Texture2D spriteSheet;
         private readonly Rectangle[] animationFrames;
         private int currentFrameIndex;
@@ -25,6 +28,7 @@ namespace monogame.Sprites
         private float shootTimer = 0f;
         private float shootInterval = 3f;
         private Random random = new Random();
+        private int attackCounter = 0;
 
         public DonutHole(Texture2D texture, Donut donut, Vector2 offset, float speed) 
             : base(texture, donut.Position + offset, speed)
@@ -44,8 +48,13 @@ namespace monogame.Sprites
             
             currentFrameIndex = 0;
             animationTimer = 0f;
-            
+            attackCounter = 0;
             showHealthBar = false;
+        }
+        
+        public static void SetAttackSound(SoundEffect sound)
+        {
+            attackSound = sound;
         }
 
         public override void Update(GameTime gameTime)
@@ -70,9 +79,10 @@ namespace monogame.Sprites
                     ShootAtRandomTarget();
                     shootInterval = 2f + (float)random.NextDouble() * 8f;
                 }
+                
+                position = parentDonut.Position + offsetFromDonut;
             }
-            
-            if (isShooting)
+            else 
             {
                 rotationAngle += 10f * deltaTime;
                 
@@ -102,10 +112,6 @@ namespace monogame.Sprites
                     }
                 }
             }
-            else
-            {
-                position = parentDonut.Position + offsetFromDonut;
-            }
         }
 
         public override void Draw(SpriteBatch spriteBatch)
@@ -129,6 +135,13 @@ namespace monogame.Sprites
         {
             if (!isShooting)
             {
+                attackCounter++;
+                
+                if (attackSound != null)
+                {
+                    attackSound.Play();
+                }
+                
                 isShooting = true;
                 isReturning = false;
                 lastHitTarget = null;
