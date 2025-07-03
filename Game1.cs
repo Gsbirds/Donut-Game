@@ -528,7 +528,7 @@ namespace monogame
             }
             
             sombrero = _mainGame.Content.Load<Texture2D>("Sombrero");
-            background = _mainGame.Content.Load<Texture2D>("pink_purp_background");
+            background = _mainGame.Content.Load<Texture2D>("Levelone");
             weed = _mainGame.Content.Load<Texture2D>("weed");
             churroTree = _mainGame.Content.Load<Texture2D>("churroTree");
             pipeTexture = _mainGame.Content.Load<Texture2D>("pipe2");

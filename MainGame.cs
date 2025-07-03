@@ -156,11 +156,6 @@ namespace monogame
                     SwitchGameState(GameStateType.Game1);
                 }
 
-                // if (keyboardState.IsKeyDown(Keys.Escape))
-                // {
-                //     Exit();
-                // }
-
                 MouseState mouseState = Mouse.GetState();
                 if (mouseState.LeftButton == ButtonState.Pressed)
                 {
@@ -217,7 +212,7 @@ namespace monogame
                     (int)(50 * buttonScaleY));
                 endButtonArea = new Rectangle(
                     x + (int)(300 * buttonScaleX), 
-                    y + (int)(380 * buttonScaleY), 
+                    y + (int)(380 * buttonScaleY),
                     (int)(200 * buttonScaleX), 
                     (int)(50 * buttonScaleY));
             }

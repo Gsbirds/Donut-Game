@@ -650,6 +650,18 @@
 /processorParam:TextureFormat=Color
 /build:japaneselevel4.png
 
+#begin Levelone.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Levelone.png
+
 #begin mainmenudonut.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -955,6 +967,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:sushisprites10.png
+
+#begin Untitled_Artwork 21.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Untitled_Artwork 21.png
 
 #begin weed.png
 /importer:TextureImporter
