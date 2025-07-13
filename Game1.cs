@@ -596,12 +596,12 @@ namespace monogame
             pipePositions = new Vector2[2];
             
             Vector2 centerPosition = new Vector2(
-                _graphicsDevice.Viewport.Width / 2 + 20,
+                _graphicsDevice.Viewport.Width / 2 + 150,
                 _graphicsDevice.Viewport.Height / 2 - 70
             );
             
-            int distance = 105;
-            int y = (int)centerPosition.Y + 50;
+            int distance = 185;
+            int y = (int)centerPosition.Y + 70;
             
             pipePositions[0] = new Vector2(centerPosition.X - distance, y);
             pipePositions[1] = new Vector2(centerPosition.X + distance, y);
@@ -693,24 +693,12 @@ namespace monogame
 
             _spriteBatch.Draw(
                 churroTree,
-                new Rectangle(500, 350, 400, 400), 
+                new Rectangle(screenWidth - 700, screenHeight - 700, 600, 600), 
                 Color.White
             );
 
-            _spriteBatch.Draw(
-                sombrero,
-                sombreroPosition,
-                null,
-                Color.White,
-                0f,
-                new Vector2(350, -100),
-                1.0f,
-                SpriteEffects.None,
-                0f
-            );
-
             Vector2 puprmushPosition = new Vector2(
-                _graphicsDevice.Viewport.Width / 2 + 20,
+                _graphicsDevice.Viewport.Width / 2 + 150,
                 _graphicsDevice.Viewport.Height / 2 - 70
             );
 
@@ -721,7 +709,7 @@ namespace monogame
                 Color.White,
                 0f,
                 new Vector2(puprmushFrames[currentPuprmushFrame].Width / 2, puprmushFrames[currentPuprmushFrame].Height / 2),
-                0.18f,
+                0.35f,
                 SpriteEffects.None,
                 0f
             );
@@ -735,7 +723,7 @@ namespace monogame
                     Color.White,
                     0f,
                     new Vector2(pipeSourceRectangles[0].Width / 2, pipeSourceRectangles[0].Height / 2),
-                    1.0f,
+                    1.3f,
                     SpriteEffects.None,
                     0f
                 );
@@ -820,7 +808,7 @@ namespace monogame
                     currentFrame = new Rectangle(0, 133, 110, 133);
                 else if (empanadaSprite.FacingDirection == monogame.Animation.Direction.Down)
                     currentFrame = new Rectangle(0, 266, 110, 133);
-                else // Left
+                else
                     currentFrame = new Rectangle(0, 399, 110, 133);
                 
                 Vector2 origin = new Vector2(currentFrame.Width / 2, currentFrame.Height / 2);
