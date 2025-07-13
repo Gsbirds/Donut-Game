@@ -435,10 +435,10 @@ namespace monogame
                 Texture2D texture = gingerSprite2.Texture;
                 Vector2 position = gingerSprite2.Position;
                 Rectangle currentFrame;
-                if (gingerSprite2.FacingDirection == Direction.Up) currentFrame = new Rectangle(0, 0, 110, 133);
-                else if (gingerSprite2.FacingDirection == Direction.Right) currentFrame = new Rectangle(0, 133, 110, 133);
-                else if (gingerSprite2.FacingDirection == Direction.Down) currentFrame = new Rectangle(0, 266, 110, 133);
-                else currentFrame = new Rectangle(0, 399, 110, 133);
+                if (gingerSprite2.FacingDirection == Direction.Up) currentFrame = new Rectangle(0, 0, 98, 85);
+                else if (gingerSprite2.FacingDirection == Direction.Right) currentFrame = new Rectangle(0, 85, 98, 85);
+                else if (gingerSprite2.FacingDirection == Direction.Down) currentFrame = new Rectangle(0, 170, 98, 85);
+                else currentFrame = new Rectangle(0, 255, 98, 85);
                 Vector2 origin = new Vector2(currentFrame.Width / 2, currentFrame.Height / 2);
                 _spriteBatch.Draw(texture, position, currentFrame, Color.Gray * gingerSprite2.FadeAlpha, MathHelper.PiOver2, origin, 1.0f, SpriteEffects.None, 0f);
             }
@@ -452,12 +452,12 @@ namespace monogame
                 Texture2D texture = gingerSprite3.Texture;
                 Vector2 position = gingerSprite3.Position;
                 Rectangle currentFrame;
-                if (gingerSprite3.FacingDirection == Direction.Up) currentFrame = new Rectangle(0, 0, 110, 133);
-                else if (gingerSprite3.FacingDirection == Direction.Right) currentFrame = new Rectangle(0, 133, 110, 133);
-                else if (gingerSprite3.FacingDirection == Direction.Down) currentFrame = new Rectangle(0, 266, 110, 133);
-                else currentFrame = new Rectangle(0, 399, 110, 133);
+                if (gingerSprite3.FacingDirection == Direction.Up) currentFrame = new Rectangle(0, 0, 98, 85);
+                else if (gingerSprite3.FacingDirection == Direction.Right) currentFrame = new Rectangle(0, 85, 98, 85);
+                else if (gingerSprite3.FacingDirection == Direction.Down) currentFrame = new Rectangle(0, 170, 98, 85);
+                else currentFrame = new Rectangle(0, 255, 98, 85);
                 Vector2 origin = new Vector2(currentFrame.Width / 2, currentFrame.Height / 2);
-                _spriteBatch.Draw(texture, position, currentFrame, Color.Gray * gingerSprite3.FadeAlpha, MathHelper.PiOver2, origin, 1.0f, SpriteEffects.None, 0f);
+                _spriteBatch.Draw(texture, position, currentFrame, Color.Gray * gingerSprite3.FadeAlpha, MathHelper.PiOver2, origin, 0.7f, SpriteEffects.None, 0f);
             }
             else
             {
