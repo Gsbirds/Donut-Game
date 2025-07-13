@@ -457,7 +457,7 @@ namespace monogame
                 else if (gingerSprite3.FacingDirection == Direction.Down) currentFrame = new Rectangle(0, 170, 98, 85);
                 else currentFrame = new Rectangle(0, 255, 98, 85);
                 Vector2 origin = new Vector2(currentFrame.Width / 2, currentFrame.Height / 2);
-                _spriteBatch.Draw(texture, position, currentFrame, Color.Gray * gingerSprite3.FadeAlpha, MathHelper.PiOver2, origin, 0.7f, SpriteEffects.None, 0f);
+                _spriteBatch.Draw(texture, position, currentFrame, Color.Gray * gingerSprite3.FadeAlpha, MathHelper.PiOver2, origin, 1.0f, SpriteEffects.None, 0f);
             }
             else
             {
