@@ -193,6 +193,18 @@
 /processorParam:TextureFormat=Color
 /build:cheeselaunch.png
 
+#begin chinese_wallpaper_fullsize.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:chinese_wallpaper_fullsize.png
+
 #begin churro.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -601,6 +613,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:gingersprites5.png
+
+#begin japanese_wallpeper_fullsize.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:japanese_wallpeper_fullsize.png
 
 #begin japaneselevel.png
 /importer:TextureImporter

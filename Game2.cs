@@ -216,7 +216,7 @@ namespace monogame
             sushiTexture = _mainGame.Content.Load<Texture2D>("sushisprites10");
             sushiHitTexture = _mainGame.Content.Load<Texture2D>("Sushihit");
             gingerTexture = _mainGame.Content.Load<Texture2D>("gingersprites4");
-            sushiWallpaper = _mainGame.Content.Load<Texture2D>("sushilevelsetting");
+            sushiWallpaper = _mainGame.Content.Load<Texture2D>("japanese_wallpeper_fullsize");
             mochiTree = _mainGame.Content.Load<Texture2D>("mochitree");
             puprmushSpritesheet = _mainGame.Content.Load<Texture2D>("pinkmush");
             
@@ -344,9 +344,9 @@ namespace monogame
             
             _spriteBatch.Draw(sushiWallpaper, new Rectangle(x, y, backgroundWidth, backgroundHeight), Color.White);
             
-            _spriteBatch.Draw(mochiTree, new Rectangle(x + 250, y + 50, 878, 878), Color.White);
+            _spriteBatch.Draw(mochiTree, new Rectangle(x + screenWidth - 978, y + screenHeight - 950, 878, 878), Color.White);
             
-            Vector2 puprmushPosition = new Vector2(x + 120, y + (50 + 550));
+            Vector2 puprmushPosition = new Vector2(x + 120, y + (50 + 750));
             _spriteBatch.Draw(
                 puprmushSpritesheet,
                 puprmushPosition,
