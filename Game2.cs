@@ -31,6 +31,7 @@ namespace monogame
         private Texture2D sushiWallpaper;
         private Texture2D mochiTree;
         private Texture2D puprmushSpritesheet;
+        private Texture2D sushiPlatterMoon;
         private SpriteFont font;
         private bool isColorEffectActive = false;
 
@@ -56,6 +57,12 @@ namespace monogame
         private int currentPuprmushFrame;
         private float puprmushFrameTimer;
         private const float PuprmushFrameDuration = 0.2f;
+        
+        private float moonRotation = 0f;
+        private float moonRotationTimer = 0f;
+        private const float MOON_ROTATION_INTERVAL = 8f;
+        private const float MOON_ROTATION_SPEED = 0.5f;
+        private bool moonIsRotating = false;
         
         private GameOverScreen gameOverScreen;
         
@@ -219,6 +226,7 @@ namespace monogame
             sushiWallpaper = _mainGame.Content.Load<Texture2D>("japanese_wallpeper_fullsize");
             mochiTree = _mainGame.Content.Load<Texture2D>("mochitree");
             puprmushSpritesheet = _mainGame.Content.Load<Texture2D>("pinkmush");
+            sushiPlatterMoon = _mainGame.Content.Load<Texture2D>("Sushiplatter (1)");
             
             try {
                 SoundEffect donutHoleDokenSound = _mainGame.Content.Load<SoundEffect>("donutholedoken");
@@ -327,6 +335,8 @@ namespace monogame
             
             UpdateAnimations(deltaTime);
             
+            UpdateMoonRotation(deltaTime);
+            
             previousMouseState = currentMouseState;
         }
 
@@ -343,6 +353,21 @@ namespace monogame
             int y = (screenHeight - backgroundHeight) / 2;
             
             _spriteBatch.Draw(sushiWallpaper, new Rectangle(x, y, backgroundWidth, backgroundHeight), Color.White);
+            
+            // Draw sushi platter moon in top right corner
+            Vector2 moonPosition = new Vector2(screenWidth - 120, 80);
+            Vector2 moonOrigin = new Vector2(sushiPlatterMoon.Width / 2, sushiPlatterMoon.Height / 2);
+            _spriteBatch.Draw(
+                sushiPlatterMoon,
+                moonPosition,
+                null,
+                Color.White,
+                moonRotation,
+                moonOrigin,
+                0.3f,
+                SpriteEffects.None,
+                0f
+            );
             
             _spriteBatch.Draw(mochiTree, new Rectangle(x + screenWidth - 978, y + screenHeight - 950, 878, 878), Color.White);
             
@@ -615,6 +640,28 @@ namespace monogame
                 gingerSprite2.Health <= 0 && gingerSprite3.Health <= 0)
             {
                 _mainGame.SwitchGameState(MainGame.GameStateType.Game3);
+            }
+        }
+
+        private void UpdateMoonRotation(float deltaTime)
+        {
+            moonRotationTimer += deltaTime;
+            
+            if (!moonIsRotating && moonRotationTimer >= MOON_ROTATION_INTERVAL)
+            {
+                moonIsRotating = true;
+                moonRotationTimer = 0f;
+            }
+            
+            if (moonIsRotating)
+            {
+                moonRotation += MOON_ROTATION_SPEED * deltaTime;
+                
+                if (moonRotation >= MathHelper.PiOver4)
+                {
+                    moonIsRotating = false;
+                    moonRotationTimer = 0f;
+                }
             }
         }
 
