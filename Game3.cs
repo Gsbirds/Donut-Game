@@ -91,18 +91,37 @@ namespace monogame
             cheeseProjectile = new CheeseProjectile(cheeseTexture, cheeseSplashTexture);
             
             donut = new Donut(donutTexture, new Vector2(400, 300), 200f);
-            donutHole = new DonutHole(donutHoleTexture, donut, Vector2.Zero, 400f);
+            donutHole = new DonutHole(donutHoleTexture, donut, new Vector2(50, -15), 400f);
             
             Vector2 pos1 = new Vector2(100, 100);
             Vector2 pos2 = new Vector2(700, 500);
             
-            lomeinSprite = new Lomein(lomeinTexture, pos1, 150f);
-            lomeinSprite2 = new Lomein(lomeinTexture, pos2, 150f);
+            lomeinSprite = new Lomein(lomeinTexture, pos1, 100f);
+            lomeinSprite2 = new Lomein(lomeinTexture, pos2, 100f);
             
             lomeinSprite.OnDamageDealt += (damage) => donut.TakeDamage(damage);
             lomeinSprite2.OnDamageDealt += (damage) => donut.TakeDamage(damage);
             
             fruitManager = new FruitProjectileManager(_mainGame.Content);
+            
+            buttonTexture = new Texture2D(_graphicsDevice, 1, 1);
+            Color[] colorData = new Color[1];
+            colorData[0] = Color.White;
+            buttonTexture.SetData(colorData);
+            
+            pinkDonutButton = new Button(
+                new Rectangle(20, 20, 200, 50),
+                buttonTexture, 
+                font, 
+                "Pink Donut");
+                
+            pinkDonutButton.SetColorIndex(_mainGame.ColorButtonIndex);
+            isColorEffectActive = _mainGame.IsColorEffectActive;
+            
+            if (_mainGame.IsColorEffectActive)
+            {
+                donut.SetColor(pinkDonutButton.GetCurrentColor());
+            }
         }
 
         public void Update(GameTime gameTime)
@@ -154,6 +173,7 @@ namespace monogame
             donutHole.CheckCollision(lomeinSprite);
             donutHole.CheckCollision(lomeinSprite2);
 
+            UpdateUIControls(currentMouseState);
 
             fruitManager.Update(gameTime, donut.Position, donut.GetColor(), currentMouseState, previousMouseState);
 
@@ -174,6 +194,23 @@ namespace monogame
                 }
             }
 
+            if (currentMouseState.LeftButton == ButtonState.Pressed && previousMouseState.LeftButton != ButtonState.Pressed)
+            {
+                float donutLomeinDistance = Vector2.Distance(donut.Position, lomeinSprite.Position);
+                if (donutLomeinDistance < 70 && lomeinSprite.Health > 0) 
+                {
+                    lomeinSprite.TakeDamage(20f);
+                    CheckAllEnemiesDefeated();
+                }
+                
+                float donutLomein2Distance = Vector2.Distance(donut.Position, lomeinSprite2.Position);
+                if (donutLomein2Distance < 70 && lomeinSprite2.Health > 0)
+                {
+                    lomeinSprite2.TakeDamage(20f);
+                    CheckAllEnemiesDefeated();
+                }
+            }
+
             if (showSplashEffect)
             {
                 splashTimer += deltaTime;
@@ -185,9 +222,7 @@ namespace monogame
             }
 
 
-            if (lomeinSprite.Health <= 0 && lomeinSprite2.Health <= 0)
-            {
-            }
+            CheckAllEnemiesDefeated();
 
 
             if (keyboardState.IsKeyDown(Keys.Escape))
@@ -226,6 +261,7 @@ namespace monogame
 
             fruitManager.Draw(_spriteBatch);
 
+            pinkDonutButton.Draw(_spriteBatch);
 
             string healthText = $"Health: {donut.Health:F0}";
             _spriteBatch.DrawString(font, healthText, new Vector2(10, 10), Color.White);
@@ -238,6 +274,35 @@ namespace monogame
             _spriteBatch.DrawString(font, enemyText, new Vector2(10, 40), Color.White);
 
             _spriteBatch.DrawString(font, "Level 3 - Chinese Garden", new Vector2(10, 70), Color.Yellow);
+        }
+
+        private void UpdateUIControls(MouseState currentMouseState)
+        {
+            pinkDonutButton.Update(currentMouseState);
+            pinkDonutButton.SetCooldownPercentage(fruitManager.GetCooldownPercentage());
+            
+            if (pinkDonutButton.IsClicked)
+            {
+                pinkDonutButton.CycleToNextColor();
+                DonutColor newColor = pinkDonutButton.GetCurrentColor();
+                donut.SetColor(newColor);
+                _mainGame.CurrentDonutColor = newColor;
+                _mainGame.ColorButtonIndex = pinkDonutButton.GetCurrentColorIndex();
+                
+                if (_mainGame.Game1Instance != null)
+                {
+                    _mainGame.Game1Instance.UpdateDonutColor(newColor, pinkDonutButton.GetCurrentColorIndex());
+                }
+            }
+        }
+
+        private void CheckAllEnemiesDefeated()
+        {
+            if (lomeinSprite.Health <= 0 && lomeinSprite2.Health <= 0)
+            {
+                // Level 3 completed - could transition to next level or back to main menu
+                // For now, just stay in level 3
+            }
         }
 
         public void HandleInput(KeyboardState keyboardState, MouseState mouseState)

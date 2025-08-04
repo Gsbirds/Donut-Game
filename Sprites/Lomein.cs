@@ -147,7 +147,15 @@ namespace monogame.Sprites
                 }
             }
 
-            base.Update(new GameTime());
+            if (isInvulnerable)
+            {
+                invulnerabilityTimer += deltaTime;
+                if (invulnerabilityTimer >= InvulnerabilityDuration)
+                {
+                    isInvulnerable = false;
+                    invulnerabilityTimer = 0f;
+                }
+            }
         }
 
         public void Draw(SpriteBatch spriteBatch)
@@ -209,11 +217,13 @@ namespace monogame.Sprites
 
         public override Rectangle GetBounds()
         {
+            int scaledWidth = (int)(frameWidth * 0.3f);
+            int scaledHeight = (int)(frameHeight * 0.3f);
             return new Rectangle(
-                (int)position.X - 15, 
-                (int)position.Y - 18,
-                30,                    
-                36                     
+                (int)position.X - scaledWidth / 2, 
+                (int)position.Y - scaledHeight / 2,
+                scaledWidth,                    
+                scaledHeight                     
             );
         }
 
