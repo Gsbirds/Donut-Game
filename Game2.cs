@@ -188,7 +188,7 @@ namespace monogame
             
             if (sushiSprite.Health <= 0 && gingerSprite.Health <= 0 && gingerSprite2.Health <= 0 && gingerSprite3.Health <= 0)
             {
-                _mainGame.SwitchGameState(MainGame.GameStateType.Game1);
+                _mainGame.SwitchGameState(MainGame.GameStateType.Game3);
                 return true;
             }
             
@@ -614,7 +614,7 @@ namespace monogame
             if (sushiSprite.Health <= 0 && gingerSprite.Health <= 0 && 
                 gingerSprite2.Health <= 0 && gingerSprite3.Health <= 0)
             {
-                _mainGame.SwitchGameState(MainGame.GameStateType.Game1);
+                _mainGame.SwitchGameState(MainGame.GameStateType.Game3);
             }
         }
 

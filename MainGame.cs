@@ -34,7 +34,8 @@ namespace monogame
         {
             MainMenu,
             Game1,
-            Game2
+            Game2,
+            Game3
         }
 
         public MainGame()
@@ -111,6 +112,9 @@ namespace monogame
                         break;
                     case GameStateType.Game2:
                         currentGameState = new Game2(this, _spriteBatch);
+                        break;
+                    case GameStateType.Game3:
+                        currentGameState = new Game3(this, _graphics.GraphicsDevice, _spriteBatch);
                         break;
                 }
                 currentGameState.LoadContent();
