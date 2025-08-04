@@ -109,6 +109,16 @@ namespace monogame.Sprites
             {
                 rotation -= MathHelper.TwoPi;
             }
+            
+            if (isInvulnerable)
+            {
+                invulnerabilityTimer += deltaTime;
+                if (invulnerabilityTimer >= InvulnerabilityDuration)
+                {
+                    isInvulnerable = false;
+                    invulnerabilityTimer = 0f;
+                }
+            }
         }
 
         private void StartAttack()
