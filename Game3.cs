@@ -19,11 +19,15 @@ namespace monogame
         private DonutHole donutHole; 
         private Lomein lomeinSprite;
         private Lomein lomeinSprite2;
+        private Eggroll eggrollSprite;
+        private Eggroll eggrollSprite2;
+        private Eggroll eggrollSprite3;
         private CheeseProjectile cheeseProjectile;
         private FruitProjectileManager fruitManager;        
         private Texture2D donutTexture;
         private Texture2D donutHoleTexture;
         private Texture2D lomeinTexture;
+        private Texture2D eggrollTexture;
         private Texture2D chineseWallpaper;
         private SpriteFont font;
         private bool isColorEffectActive = false;
@@ -66,6 +70,7 @@ namespace monogame
             donutHoleTexture = _mainGame.Content.Load<Texture2D>("Donuthole"); 
             
             lomeinTexture = _mainGame.Content.Load<Texture2D>("Lomein");
+            eggrollTexture = _mainGame.Content.Load<Texture2D>("Eggroll");
             
             chineseWallpaper = _mainGame.Content.Load<Texture2D>("chinese_wallpaper_fullsize");
             
@@ -101,6 +106,23 @@ namespace monogame
             
             lomeinSprite.OnDamageDealt += (damage) => donut.TakeDamage(damage);
             lomeinSprite2.OnDamageDealt += (damage) => donut.TakeDamage(damage);
+            
+            Vector2 eggPos1 = new Vector2(200, 150);
+            Vector2 eggPos2 = new Vector2(600, 200);
+            Vector2 eggPos3 = new Vector2(400, 450);
+            
+            eggrollSprite = new Eggroll(eggrollTexture, eggPos1, 120f);
+            eggrollSprite2 = new Eggroll(eggrollTexture, eggPos2, 120f);
+            eggrollSprite3 = new Eggroll(eggrollTexture, eggPos3, 120f);
+            
+            // Set different orbit parameters for each eggroll
+            eggrollSprite.SetOrbitCenter(eggPos1, 100f, 0f);
+            eggrollSprite2.SetOrbitCenter(eggPos2, 120f, MathHelper.PiOver2);
+            eggrollSprite3.SetOrbitCenter(eggPos3, 110f, MathHelper.Pi);
+            
+            eggrollSprite.OnDamageDealt += (damage) => donut.TakeDamage(damage);
+            eggrollSprite2.OnDamageDealt += (damage) => donut.TakeDamage(damage);
+            eggrollSprite3.OnDamageDealt += (damage) => donut.TakeDamage(damage);
             
             fruitManager = new FruitProjectileManager(_mainGame.Content);
             
@@ -154,6 +176,19 @@ namespace monogame
                 lomeinSprite2.Update(deltaTime, donut.Position);
             }
             
+            if (eggrollSprite.Health > 0)
+            {
+                eggrollSprite.Update(deltaTime, donut.Position);
+            }
+            if (eggrollSprite2.Health > 0)
+            {
+                eggrollSprite2.Update(deltaTime, donut.Position);
+            }
+            if (eggrollSprite3.Health > 0)
+            {
+                eggrollSprite3.Update(deltaTime, donut.Position);
+            }
+            
             if (lomeinSprite.Health > 0 && lomeinSprite2.Health > 0)
             {
                 float minDistance = 120f;
@@ -172,6 +207,9 @@ namespace monogame
 
             donutHole.CheckCollision(lomeinSprite);
             donutHole.CheckCollision(lomeinSprite2);
+            donutHole.CheckCollision(eggrollSprite);
+            donutHole.CheckCollision(eggrollSprite2);
+            donutHole.CheckCollision(eggrollSprite3);
 
             UpdateUIControls(currentMouseState);
 
@@ -192,6 +230,21 @@ namespace monogame
                     lomeinSprite2.TakeDamage(15f);
                     fruit.Reset();
                 }
+                if (eggrollSprite.Health > 0 && eggrollSprite.GetBounds().Intersects(fruitBounds))
+                {
+                    eggrollSprite.TakeDamage(15f);
+                    fruit.Reset();
+                }
+                if (eggrollSprite2.Health > 0 && eggrollSprite2.GetBounds().Intersects(fruitBounds))
+                {
+                    eggrollSprite2.TakeDamage(15f);
+                    fruit.Reset();
+                }
+                if (eggrollSprite3.Health > 0 && eggrollSprite3.GetBounds().Intersects(fruitBounds))
+                {
+                    eggrollSprite3.TakeDamage(15f);
+                    fruit.Reset();
+                }
             }
 
             if (currentMouseState.LeftButton == ButtonState.Pressed && previousMouseState.LeftButton != ButtonState.Pressed)
@@ -207,6 +260,27 @@ namespace monogame
                 if (donutLomein2Distance < 70 && lomeinSprite2.Health > 0)
                 {
                     lomeinSprite2.TakeDamage(20f);
+                    CheckAllEnemiesDefeated();
+                }
+                
+                float donutEggroll1Distance = Vector2.Distance(donut.Position, eggrollSprite.Position);
+                if (donutEggroll1Distance < 70 && eggrollSprite.Health > 0)
+                {
+                    eggrollSprite.TakeDamage(20f);
+                    CheckAllEnemiesDefeated();
+                }
+                
+                float donutEggroll2Distance = Vector2.Distance(donut.Position, eggrollSprite2.Position);
+                if (donutEggroll2Distance < 70 && eggrollSprite2.Health > 0)
+                {
+                    eggrollSprite2.TakeDamage(20f);
+                    CheckAllEnemiesDefeated();
+                }
+                
+                float donutEggroll3Distance = Vector2.Distance(donut.Position, eggrollSprite3.Position);
+                if (donutEggroll3Distance < 70 && eggrollSprite3.Health > 0)
+                {
+                    eggrollSprite3.TakeDamage(20f);
                     CheckAllEnemiesDefeated();
                 }
             }
@@ -258,6 +332,19 @@ namespace monogame
             {
                 lomeinSprite2.Draw(_spriteBatch);
             }
+            
+            if (eggrollSprite.Health > 0)
+            {
+                eggrollSprite.Draw(_spriteBatch);
+            }
+            if (eggrollSprite2.Health > 0)
+            {
+                eggrollSprite2.Draw(_spriteBatch);
+            }
+            if (eggrollSprite3.Health > 0)
+            {
+                eggrollSprite3.Draw(_spriteBatch);
+            }
 
             fruitManager.Draw(_spriteBatch);
 
@@ -269,8 +356,11 @@ namespace monogame
             int aliveEnemies = 0;
             if (lomeinSprite.Health > 0) aliveEnemies++;
             if (lomeinSprite2.Health > 0) aliveEnemies++;
+            if (eggrollSprite.Health > 0) aliveEnemies++;
+            if (eggrollSprite2.Health > 0) aliveEnemies++;
+            if (eggrollSprite3.Health > 0) aliveEnemies++;
             
-            string enemyText = $"Lomein Enemies: {aliveEnemies}";
+            string enemyText = $"Enemies Remaining: {aliveEnemies}";
             _spriteBatch.DrawString(font, enemyText, new Vector2(10, 40), Color.White);
 
             _spriteBatch.DrawString(font, "Level 3 - Chinese Garden", new Vector2(10, 70), Color.Yellow);
@@ -298,7 +388,8 @@ namespace monogame
 
         private void CheckAllEnemiesDefeated()
         {
-            if (lomeinSprite.Health <= 0 && lomeinSprite2.Health <= 0)
+            if (lomeinSprite.Health <= 0 && lomeinSprite2.Health <= 0 && 
+                eggrollSprite.Health <= 0 && eggrollSprite2.Health <= 0 && eggrollSprite3.Health <= 0)
             {
                 // Level 3 completed - could transition to next level or back to main menu
                 // For now, just stay in level 3
