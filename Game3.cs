@@ -116,7 +116,6 @@ namespace monogame
             eggrollSprite2 = new Eggroll(eggrollTexture, eggPos2, 120f);
             eggrollSprite3 = new Eggroll(eggrollTexture, eggPos3, 120f);
             
-            // Set different orbit parameters for each eggroll
             eggrollSprite.SetOrbitCenter(eggPos1, 100f, 0f);
             eggrollSprite2.SetOrbitCenter(eggPos2, 120f, MathHelper.PiOver2);
             eggrollSprite3.SetOrbitCenter(eggPos3, 110f, MathHelper.Pi);
@@ -145,6 +144,8 @@ namespace monogame
             {
                 donut.SetColor(pinkDonutButton.GetCurrentColor());
             }
+            
+            donutHole.SetTargets(lomeinSprite, lomeinSprite2, eggrollSprite, eggrollSprite2, eggrollSprite3);
         }
 
         public void Update(GameTime gameTime)
@@ -214,7 +215,6 @@ namespace monogame
 
             UpdateUIControls(currentMouseState);
 
-            // Create enemy list for FruitProjectileManager collision detection
             var enemies = new List<Sprite>();
             if (lomeinSprite.Health > 0) enemies.Add(lomeinSprite);
             if (lomeinSprite2.Health > 0) enemies.Add(lomeinSprite2);
@@ -327,26 +327,6 @@ namespace monogame
             fruitManager.Draw(_spriteBatch);
 
             pinkDonutButton.Draw(_spriteBatch);
-
-            string healthText = $"Health: {donut.Health:F0}";
-            _spriteBatch.DrawString(font, healthText, new Vector2(10, 10), Color.White);
-
-            int aliveEnemies = 0;
-            if (lomeinSprite.Health > 0) aliveEnemies++;
-            if (lomeinSprite2.Health > 0) aliveEnemies++;
-            if (eggrollSprite.Health > 0) aliveEnemies++;
-            if (eggrollSprite2.Health > 0) aliveEnemies++;
-            if (eggrollSprite3.Health > 0) aliveEnemies++;
-            
-            string enemyText = $"Enemies Remaining: {aliveEnemies}";
-            _spriteBatch.DrawString(font, enemyText, new Vector2(10, 40), Color.White);
-
-            // Debug: Show fruit projectile count
-            int fruitCount = fruitManager.Projectiles.Count(p => p.IsActive);
-            string fruitText = $"Active Fruits: {fruitCount}";
-            _spriteBatch.DrawString(font, fruitText, new Vector2(10, 100), Color.Cyan);
-
-            _spriteBatch.DrawString(font, "Level 3 - Chinese Garden", new Vector2(10, 70), Color.Yellow);
         }
 
         private void UpdateUIControls(MouseState currentMouseState)
