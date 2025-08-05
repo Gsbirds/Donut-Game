@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Audio;
+using System.Linq;
 using monogame.Sprites;
 using monogame.Screens;
 using monogame.Animation;
@@ -213,39 +214,16 @@ namespace monogame
 
             UpdateUIControls(currentMouseState);
 
+            // Create enemy list for FruitProjectileManager collision detection
+            var enemies = new List<Sprite>();
+            if (lomeinSprite.Health > 0) enemies.Add(lomeinSprite);
+            if (lomeinSprite2.Health > 0) enemies.Add(lomeinSprite2);
+            if (eggrollSprite.Health > 0) enemies.Add(eggrollSprite);
+            if (eggrollSprite2.Health > 0) enemies.Add(eggrollSprite2);
+            if (eggrollSprite3.Health > 0) enemies.Add(eggrollSprite3);
+            
             fruitManager.Update(gameTime, donut.Position, donut.GetColor(), currentMouseState, previousMouseState);
-
-            var activeFruits = fruitManager.Projectiles;
-            foreach (var fruit in activeFruits)
-            {
-                Rectangle fruitBounds = fruit.GetBounds();
-                
-                if (lomeinSprite.Health > 0 && lomeinSprite.GetBounds().Intersects(fruitBounds))
-                {
-                    lomeinSprite.TakeDamage(15f);
-                    fruit.Reset();
-                }
-                if (lomeinSprite2.Health > 0 && lomeinSprite2.GetBounds().Intersects(fruitBounds))
-                {
-                    lomeinSprite2.TakeDamage(15f);
-                    fruit.Reset();
-                }
-                if (eggrollSprite.Health > 0 && eggrollSprite.GetBounds().Intersects(fruitBounds))
-                {
-                    eggrollSprite.TakeDamage(15f);
-                    fruit.Reset();
-                }
-                if (eggrollSprite2.Health > 0 && eggrollSprite2.GetBounds().Intersects(fruitBounds))
-                {
-                    eggrollSprite2.TakeDamage(15f);
-                    fruit.Reset();
-                }
-                if (eggrollSprite3.Health > 0 && eggrollSprite3.GetBounds().Intersects(fruitBounds))
-                {
-                    eggrollSprite3.TakeDamage(15f);
-                    fruit.Reset();
-                }
-            }
+            fruitManager.CheckCollisions(enemies.ToArray(), _graphicsDevice);
 
             if (currentMouseState.LeftButton == ButtonState.Pressed && previousMouseState.LeftButton != ButtonState.Pressed)
             {
@@ -321,7 +299,7 @@ namespace monogame
             
             _spriteBatch.Draw(chineseWallpaper, new Rectangle(x, y, backgroundWidth, backgroundHeight), Color.White);
             
-            donut.Draw(_spriteBatch);
+            donut.DrawWithColorReplacement(_spriteBatch);
             donutHole.Draw(_spriteBatch);
 
             if (lomeinSprite.Health > 0)
@@ -362,6 +340,11 @@ namespace monogame
             
             string enemyText = $"Enemies Remaining: {aliveEnemies}";
             _spriteBatch.DrawString(font, enemyText, new Vector2(10, 40), Color.White);
+
+            // Debug: Show fruit projectile count
+            int fruitCount = fruitManager.Projectiles.Count(p => p.IsActive);
+            string fruitText = $"Active Fruits: {fruitCount}";
+            _spriteBatch.DrawString(font, fruitText, new Vector2(10, 100), Color.Cyan);
 
             _spriteBatch.DrawString(font, "Level 3 - Chinese Garden", new Vector2(10, 70), Color.Yellow);
         }
