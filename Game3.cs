@@ -30,6 +30,11 @@ namespace monogame
         private Texture2D lomeinTexture;
         private Texture2D eggrollTexture;
         private Texture2D chineseWallpaper;
+        private Texture2D weed;
+        private Texture2D pinkWeed;
+        private Texture2D purpleWeed;
+        private List<SwayingTree> leftTreeLine;
+        private List<SwayingTree> rightTreeLine;
         private SpriteFont font;
         private bool isColorEffectActive = false;
 
@@ -74,6 +79,35 @@ namespace monogame
             eggrollTexture = _mainGame.Content.Load<Texture2D>("Eggroll");
             
             chineseWallpaper = _mainGame.Content.Load<Texture2D>("chinesewallpaperNEW");
+            
+            // Load weed textures for swaying trees
+            weed = _mainGame.Content.Load<Texture2D>("weed");
+            pinkWeed = _mainGame.Content.Load<Texture2D>("pinkweed");
+            purpleWeed = _mainGame.Content.Load<Texture2D>("purpleweed");
+            
+            leftTreeLine = new List<SwayingTree>();
+            rightTreeLine = new List<SwayingTree>();
+            
+            int treeSpacing = 80;
+            int baseY = _graphicsDevice.Viewport.Height / 2 + 180; // Move trees down by ~50 pixels (half tree height)
+            
+            // Create trees with different colors, shifted right with gap on left
+            Texture2D[] weedTextures = { weed, pinkWeed, purpleWeed };
+            TreeColor[] treeColors = { TreeColor.Original, TreeColor.Pink, TreeColor.Purple };
+            
+            int treeIndex = 0;
+            // Start at x=200 instead of x=80 to create gap on left
+            for (int x = 200; x < _graphicsDevice.Viewport.Width; x += treeSpacing)
+            {
+                int yOffset = (x / treeSpacing % 2) * 30;
+                
+                // Cycle through different colored trees
+                Texture2D currentTexture = weedTextures[treeIndex % 3];
+                TreeColor currentColor = treeColors[treeIndex % 3];
+                
+                leftTreeLine.Add(new SwayingTree(currentTexture, new Vector2(x, baseY + yOffset), currentColor));
+                treeIndex++;
+            }
             
             if (Game1.WhitePixel == null) {
                 Game1.WhitePixel = new Texture2D(_graphicsDevice, 1, 1);
@@ -191,6 +225,16 @@ namespace monogame
                 eggrollSprite3.Update(deltaTime, donut.Position);
             }
             
+            // Update swaying trees
+            foreach (var tree in leftTreeLine)
+            {
+                tree.Update(gameTime);
+            }
+            foreach (var tree in rightTreeLine)
+            {
+                tree.Update(gameTime);
+            }
+            
             if (lomeinSprite.Health > 0 && lomeinSprite2.Health > 0)
             {
                 float minDistance = 120f;
@@ -298,6 +342,16 @@ namespace monogame
             int y = (screenHeight - backgroundHeight) / 2;
             
             _spriteBatch.Draw(chineseWallpaper, new Rectangle(x, y, backgroundWidth, backgroundHeight), Color.White);
+            
+            // Draw swaying trees with gap on left
+            foreach (var tree in leftTreeLine)
+            {
+                tree.Draw(_spriteBatch);
+            }
+            foreach (var tree in rightTreeLine)
+            {
+                tree.Draw(_spriteBatch);
+            }
             
             donut.DrawWithColorReplacement(_spriteBatch);
             donutHole.Draw(_spriteBatch);
