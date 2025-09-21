@@ -32,6 +32,12 @@ namespace monogame
         private Texture2D mochiTree;
         private Texture2D puprmushSpritesheet;
         private Texture2D sushiPlatterMoon;
+        
+        private Texture2D weed;
+        private Texture2D pinkWeed;
+        private Texture2D purpleWeed;
+        private List<SwayingTree> leftTreeLine;
+        private List<SwayingTree> rightTreeLine;
         private SpriteFont font;
         private bool isColorEffectActive = false;
 
@@ -228,6 +234,31 @@ namespace monogame
             puprmushSpritesheet = _mainGame.Content.Load<Texture2D>("pinkmush");
             sushiPlatterMoon = _mainGame.Content.Load<Texture2D>("Sushiplatter (1)");
             
+            weed = _mainGame.Content.Load<Texture2D>("weed");
+            pinkWeed = _mainGame.Content.Load<Texture2D>("pinkweed");
+            purpleWeed = _mainGame.Content.Load<Texture2D>("purpleweed");
+            
+            leftTreeLine = new List<SwayingTree>();
+            rightTreeLine = new List<SwayingTree>();
+            
+            int treeSpacing = 80;
+            int baseY = _graphicsDevice.Viewport.Height / 2 + 130;
+            
+            Texture2D[] weedTextures = { weed, pinkWeed, purpleWeed };
+            TreeColor[] treeColors = { TreeColor.Original, TreeColor.Pink, TreeColor.Purple };
+            
+            int treeIndex = 0;
+            for (int x = 80; x < _graphicsDevice.Viewport.Width; x += treeSpacing)
+            {
+                int yOffset = (x / treeSpacing % 2) * 30;
+                
+                Texture2D currentTexture = weedTextures[treeIndex % 3];
+                TreeColor currentColor = treeColors[treeIndex % 3];
+                
+                leftTreeLine.Add(new SwayingTree(currentTexture, new Vector2(x, baseY + yOffset), currentColor));
+                treeIndex++;
+            }
+            
             try {
                 SoundEffect donutHoleDokenSound = _mainGame.Content.Load<SoundEffect>("donutholedoken");
                 DonutHole.SetAttackSound(donutHoleDokenSound);
@@ -335,6 +366,15 @@ namespace monogame
             
             UpdateAnimations(deltaTime);
             
+            foreach (var tree in leftTreeLine)
+            {
+                tree.Update(gameTime);
+            }
+            foreach (var tree in rightTreeLine)
+            {
+                tree.Update(gameTime);
+            }
+            
             UpdateMoonRotation(deltaTime);
             
             previousMouseState = currentMouseState;
@@ -353,6 +393,16 @@ namespace monogame
             int y = (screenHeight - backgroundHeight) / 2;
             
             _spriteBatch.Draw(sushiWallpaper, new Rectangle(x, y, backgroundWidth, backgroundHeight), Color.White);
+            
+            // Draw swaying trees behind mochi tree
+            foreach (var tree in leftTreeLine)
+            {
+                tree.Draw(_spriteBatch);
+            }
+            foreach (var tree in rightTreeLine)
+            {
+                tree.Draw(_spriteBatch);
+            }
             
             // Draw sushi platter moon in top right corner
             Vector2 moonPosition = new Vector2(screenWidth - 120, 80);
