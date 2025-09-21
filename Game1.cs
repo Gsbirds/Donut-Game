@@ -92,6 +92,8 @@ namespace monogame
         private Texture2D mushroom;
         private Texture2D churroTree;
         public static Texture2D WhitePixel;
+        
+        // private SwayingTree swayingTree; // Commented out - keeping for future use
 
         private Texture2D pipeTexture;
         private Vector2[] pipePositions;
@@ -533,6 +535,10 @@ namespace monogame
             churroTree = _mainGame.Content.Load<Texture2D>("churroTree");
             pipeTexture = _mainGame.Content.Load<Texture2D>("pipe2");
             puprmushSpritesheet = _mainGame.Content.Load<Texture2D>("Puprmush");
+            
+            // Create swaying tree example - positioned over the existing churro tree
+            // Vector2 treePosition = new Vector2(_graphicsDevice.Viewport.Width - 400, _graphicsDevice.Viewport.Height - 200);
+            // swayingTree = new SwayingTree(weed, treePosition); // Commented out - keeping for future use
 
             WhitePixel = new Texture2D(_graphicsDevice, 1, 1);
             WhitePixel.SetData(new[] { Color.White });
@@ -595,16 +601,16 @@ namespace monogame
             
             pipePositions = new Vector2[2];
             
-            Vector2 centerPosition = new Vector2(
+            Vector2 pipeCenter = new Vector2(
                 _graphicsDevice.Viewport.Width / 2 + 150,
                 _graphicsDevice.Viewport.Height / 2 - 70
             );
             
             int distance = 185;
-            int y = (int)centerPosition.Y + 70;
+            int y = (int)pipeCenter.Y + 70;
             
-            pipePositions[0] = new Vector2(centerPosition.X - distance, y);
-            pipePositions[1] = new Vector2(centerPosition.X + distance, y);
+            pipePositions[0] = new Vector2(pipeCenter.X - distance, y);
+            pipePositions[1] = new Vector2(pipeCenter.X + distance, y);
             
             currentPipeFrameIndices = new int[2];
             pipeAnimationTimers = new float[2];
@@ -646,6 +652,9 @@ namespace monogame
             UpdatePlayer(gameTime);
             UpdateEnemies(deltaTime, gameTime);
             
+            // Update swaying tree
+            // swayingTree?.Update(gameTime); // Commented out - keeping for future use
+
             HandlePlayerAttack(currentMouseState);
             
             CheckCollisions(currentMouseState, gameTime);
@@ -696,6 +705,9 @@ namespace monogame
                 new Rectangle(screenWidth - 700, screenHeight - 700, 600, 600), 
                 Color.White
             );
+            
+            // Draw swaying tree
+            // swayingTree?.Draw(_spriteBatch); // Commented out - keeping for future use
 
             Vector2 puprmushPosition = new Vector2(
                 _graphicsDevice.Viewport.Width / 2 + 150,
