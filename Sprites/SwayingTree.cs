@@ -5,19 +5,29 @@ using monogame.Animation;
 
 namespace monogame.Sprites
 {
+    public enum TreeColor
+    {
+        Original,
+        Pink,
+        Purple
+    }
+
     public class SwayingTree
     {
         private Texture2D texture;
         private Vector2 position;
         private TreeAnimation animation;
         private Vector2 origin;
+        private TreeColor treeColor;
         
         public Vector2 Position => position;
+        public TreeColor Color => treeColor;
         
-        public SwayingTree(Texture2D texture, Vector2 position)
+        public SwayingTree(Texture2D texture, Vector2 position, TreeColor color = TreeColor.Original)
         {
             this.texture = texture;
             this.position = position;
+            this.treeColor = color;
             this.animation = new TreeAnimation(
                 swayDuration: 6f,
                 scaleDuration: 8f,
@@ -44,7 +54,7 @@ namespace monogame.Sprites
                 texture,
                 position,
                 null,
-                Color.White,
+                Microsoft.Xna.Framework.Color.White,
                 rotation,
                 origin,
                 scale,

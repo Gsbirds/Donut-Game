@@ -89,6 +89,8 @@ namespace monogame
         private Texture2D sombrero;
         private Texture2D background;
         private Texture2D weed;
+        private Texture2D pinkWeed;
+        private Texture2D purpleWeed;
         private Texture2D pipe;
         private Texture2D mushroom;
         private Texture2D churroTree;
@@ -534,6 +536,8 @@ namespace monogame
             sombrero = _mainGame.Content.Load<Texture2D>("Sombrero");
             background = _mainGame.Content.Load<Texture2D>("mexicanwallpaperNEW");
             weed = _mainGame.Content.Load<Texture2D>("weed");
+            pinkWeed = _mainGame.Content.Load<Texture2D>("pinkweed");
+            purpleWeed = _mainGame.Content.Load<Texture2D>("purpleweed");
             churroTree = _mainGame.Content.Load<Texture2D>("churroTree");
             pipeTexture = _mainGame.Content.Load<Texture2D>("pipe2");
             puprmushSpritesheet = _mainGame.Content.Load<Texture2D>("Puprmush");
@@ -544,10 +548,19 @@ namespace monogame
             int treeSpacing = 80;
             int baseY = _graphicsDevice.Viewport.Height / 2 + 130;
             
+            Texture2D[] weedTextures = { weed, pinkWeed, purpleWeed };
+            TreeColor[] treeColors = { TreeColor.Original, TreeColor.Pink, TreeColor.Purple };
+            
+            int treeIndex = 0;
             for (int x = 80; x < _graphicsDevice.Viewport.Width; x += treeSpacing)
             {
                 int yOffset = (x / treeSpacing % 2) * 30;
-                leftTreeLine.Add(new SwayingTree(weed, new Vector2(x, baseY + yOffset)));
+                
+                Texture2D currentTexture = weedTextures[treeIndex % 3];
+                TreeColor currentColor = treeColors[treeIndex % 3];
+                
+                leftTreeLine.Add(new SwayingTree(currentTexture, new Vector2(x, baseY + yOffset), currentColor));
+                treeIndex++;
             }
 
             WhitePixel = new Texture2D(_graphicsDevice, 1, 1);
