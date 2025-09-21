@@ -223,7 +223,7 @@ namespace monogame
             sushiTexture = _mainGame.Content.Load<Texture2D>("sushisprites10");
             sushiHitTexture = _mainGame.Content.Load<Texture2D>("Sushihit");
             gingerTexture = _mainGame.Content.Load<Texture2D>("gingersprites4");
-            sushiWallpaper = _mainGame.Content.Load<Texture2D>("japanese_wallpeper_fullsize");
+            sushiWallpaper = _mainGame.Content.Load<Texture2D>("JapanesewallpaperNEW");
             mochiTree = _mainGame.Content.Load<Texture2D>("mochitree");
             puprmushSpritesheet = _mainGame.Content.Load<Texture2D>("pinkmush");
             sushiPlatterMoon = _mainGame.Content.Load<Texture2D>("Sushiplatter (1)");

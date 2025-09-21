@@ -217,6 +217,18 @@
 /processorParam:TextureFormat=Color
 /build:chinese_wallpaper_fullsize.png
 
+#begin chinesewallpaperNEW.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:chinesewallpaperNEW.png
+
 #begin churro.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -698,6 +710,18 @@
 /processorParam:TextureFormat=Color
 /build:japaneselevel4.png
 
+#begin JapanesewallpaperNEW.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:JapanesewallpaperNEW.png
+
 #begin Levelone.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -787,6 +811,18 @@
 /processor:SongProcessor
 /processorParam:Quality=Best
 /build:menu_song.mp3
+
+#begin mexicanwallpaperNEW.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:mexicanwallpaperNEW.png
 
 #begin mochitree.png
 /importer:TextureImporter
@@ -1052,6 +1088,18 @@
 /processorParam:TextureFormat=Color
 /build:sushisprites10.png
 
+#begin Untitled_Artwork 1 12.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Untitled_Artwork 1 12.png
+
 #begin Untitled_Artwork 21.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -1063,6 +1111,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Untitled_Artwork 21.png
+
+#begin Untitled_Artwork 38.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Untitled_Artwork 38.png
 
 #begin weed.png
 /importer:TextureImporter

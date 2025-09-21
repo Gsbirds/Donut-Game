@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -93,7 +94,8 @@ namespace monogame
         private Texture2D churroTree;
         public static Texture2D WhitePixel;
         
-        // private SwayingTree swayingTree; // Commented out - keeping for future use
+        private List<SwayingTree> leftTreeLine;
+        private List<SwayingTree> rightTreeLine;
 
         private Texture2D pipeTexture;
         private Vector2[] pipePositions;
@@ -530,15 +532,23 @@ namespace monogame
             }
             
             sombrero = _mainGame.Content.Load<Texture2D>("Sombrero");
-            background = _mainGame.Content.Load<Texture2D>("Levelone");
+            background = _mainGame.Content.Load<Texture2D>("mexicanwallpaperNEW");
             weed = _mainGame.Content.Load<Texture2D>("weed");
             churroTree = _mainGame.Content.Load<Texture2D>("churroTree");
             pipeTexture = _mainGame.Content.Load<Texture2D>("pipe2");
             puprmushSpritesheet = _mainGame.Content.Load<Texture2D>("Puprmush");
             
-            // Create swaying tree example - positioned over the existing churro tree
-            // Vector2 treePosition = new Vector2(_graphicsDevice.Viewport.Width - 400, _graphicsDevice.Viewport.Height - 200);
-            // swayingTree = new SwayingTree(weed, treePosition); // Commented out - keeping for future use
+            leftTreeLine = new List<SwayingTree>();
+            rightTreeLine = new List<SwayingTree>();
+            
+            int treeSpacing = 80;
+            int baseY = _graphicsDevice.Viewport.Height / 2 + 130;
+            
+            for (int x = 80; x < _graphicsDevice.Viewport.Width; x += treeSpacing)
+            {
+                int yOffset = (x / treeSpacing % 2) * 30;
+                leftTreeLine.Add(new SwayingTree(weed, new Vector2(x, baseY + yOffset)));
+            }
 
             WhitePixel = new Texture2D(_graphicsDevice, 1, 1);
             WhitePixel.SetData(new[] { Color.White });
@@ -652,8 +662,14 @@ namespace monogame
             UpdatePlayer(gameTime);
             UpdateEnemies(deltaTime, gameTime);
             
-            // Update swaying tree
-            // swayingTree?.Update(gameTime); // Commented out - keeping for future use
+            foreach (var tree in leftTreeLine)
+            {
+                tree.Update(gameTime);
+            }
+            foreach (var tree in rightTreeLine)
+            {
+                tree.Update(gameTime);
+            }
 
             HandlePlayerAttack(currentMouseState);
             
@@ -699,15 +715,20 @@ namespace monogame
                 Color.White
             );
             
+            foreach (var tree in leftTreeLine)
+            {
+                tree.Draw(_spriteBatch);
+            }
+            foreach (var tree in rightTreeLine)
+            {
+                tree.Draw(_spriteBatch);
+            }
 
             _spriteBatch.Draw(
                 churroTree,
                 new Rectangle(screenWidth - 700, screenHeight - 700, 600, 600), 
                 Color.White
             );
-            
-            // Draw swaying tree
-            // swayingTree?.Draw(_spriteBatch); // Commented out - keeping for future use
 
             Vector2 puprmushPosition = new Vector2(
                 _graphicsDevice.Viewport.Width / 2 + 150,

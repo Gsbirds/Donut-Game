@@ -73,7 +73,7 @@ namespace monogame
             lomeinTexture = _mainGame.Content.Load<Texture2D>("Lomein");
             eggrollTexture = _mainGame.Content.Load<Texture2D>("Eggroll");
             
-            chineseWallpaper = _mainGame.Content.Load<Texture2D>("chinese_wallpaper_fullsize");
+            chineseWallpaper = _mainGame.Content.Load<Texture2D>("chinesewallpaperNEW");
             
             if (Game1.WhitePixel == null) {
                 Game1.WhitePixel = new Texture2D(_graphicsDevice, 1, 1);
