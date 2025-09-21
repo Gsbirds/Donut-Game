@@ -80,7 +80,6 @@ namespace monogame
             
             chineseWallpaper = _mainGame.Content.Load<Texture2D>("chinesewallpaperNEW");
             
-            // Load weed textures for swaying trees
             weed = _mainGame.Content.Load<Texture2D>("weed");
             pinkWeed = _mainGame.Content.Load<Texture2D>("pinkweed");
             purpleWeed = _mainGame.Content.Load<Texture2D>("purpleweed");
@@ -89,19 +88,16 @@ namespace monogame
             rightTreeLine = new List<SwayingTree>();
             
             int treeSpacing = 80;
-            int baseY = _graphicsDevice.Viewport.Height / 2 + 180; // Move trees down by ~50 pixels (half tree height)
+            int baseY = _graphicsDevice.Viewport.Height / 2 + 180; 
             
-            // Create trees with different colors, shifted right with gap on left
             Texture2D[] weedTextures = { weed, pinkWeed, purpleWeed };
             TreeColor[] treeColors = { TreeColor.Original, TreeColor.Pink, TreeColor.Purple };
             
             int treeIndex = 0;
-            // Start at x=200 instead of x=80 to create gap on left
             for (int x = 200; x < _graphicsDevice.Viewport.Width; x += treeSpacing)
             {
                 int yOffset = (x / treeSpacing % 2) * 30;
                 
-                // Cycle through different colored trees
                 Texture2D currentTexture = weedTextures[treeIndex % 3];
                 TreeColor currentColor = treeColors[treeIndex % 3];
                 
